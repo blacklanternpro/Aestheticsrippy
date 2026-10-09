@@ -1,0 +1,53 @@
+/* Self-hosted variable fonts (SIL Open Font License 1.1, see README.md).
+   Latin subset from Google Fonts. Loaded by Rip packs so renders are
+   identical on every machine and work offline. */
+@font-face {
+  font-family: 'Inter';
+  src: url('Inter-var.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('Inter-Italic-var.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Inter Tight';
+  src: url('InterTight-var.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Archivo';
+  src: url('Archivo-var.woff2') format('woff2');
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Jost';
+  src: url('Jost-var.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Jost';
+  src: url('Jost-Italic-var.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Mrs Saint Delafield';
+  src: url('MrsSaintDelafield-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}

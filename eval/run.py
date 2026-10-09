@@ -38,6 +38,14 @@ BASELINE = BASE_DIR / "eval" / "baseline.json"
 REFERENCE_NAMES = ("reference.jpg", "reference.jpeg", "reference.png", "reference.webp")
 
 
+def reference_crop(pack_dir: Path) -> Optional[List[int]]:
+    """A Rip pack may pin the sheet inside its reference: rip.json reference.crop."""
+    rip = pack_dir / "rip.json"
+    if rip.exists():
+        return json.loads(rip.read_text(encoding="utf-8")).get("reference", {}).get("crop")
+    return None
+
+
 def find_reference(pack_dir: Path) -> Optional[Path]:
     for name in REFERENCE_NAMES:
         p = pack_dir / "assets" / name
@@ -66,8 +74,10 @@ def evaluate(pack_ids: Optional[List[str]] = None) -> List[Dict]:
             }
             if ref_path:
                 ref_bytes = ref_path.read_bytes()
-                row.update(score(ref_bytes, result.png).as_dict())
-                cv2.imwrite(str(OUT_DIR / f"{pack_dir.name}.png"), diff_image(ref_bytes, result.png))
+                crop = reference_crop(pack_dir)
+                row.update(score(ref_bytes, result.png, crop).as_dict())
+                cv2.imwrite(str(OUT_DIR / f"{pack_dir.name}.png"),
+                            diff_image(ref_bytes, result.png, crop=crop))
             rows.append(row)
             label = f"{row['score']:5.1f}" if "score" in row else "  n/a"
             print(f"  {label}  {pack_dir.name}", flush=True)

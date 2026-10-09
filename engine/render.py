@@ -44,6 +44,7 @@ class RenderResult:
     height_mm: float
     overflow: bool
     errors: List[str] = field(default_factory=list)
+    report: Optional[dict] = None   # Rip packs: {"fit": {frame: scale}, "overflow": [frame ids]}
 
     @property
     def single_sheet(self) -> bool:
@@ -92,6 +93,11 @@ class Renderer:
             page.goto(Path(html_path).resolve().as_uri(), wait_until="networkidle",
                       timeout=self.timeout_ms)
             page.evaluate("document.fonts.ready.then(() => true)")
+            report = None
+            if page.locator("[data-rip]").count():
+                page.wait_for_function("document.documentElement.dataset.ripReady === '1'",
+                                       timeout=self.timeout_ms)
+                report = page.evaluate("window.__ripReport || null")
 
             probe = page.evaluate(_SHEET_PROBE)
             if probe:
@@ -116,7 +122,7 @@ class Renderer:
                 pack_id=pack_id or Path(html_path).parent.name,
                 png=png, pdf=pdf_bytes, pages=pages,
                 width_mm=round(width_mm, 2), height_mm=round(height_mm, 2),
-                overflow=overflow, errors=errors,
+                overflow=overflow, errors=errors, report=report,
             )
         finally:
             page.close()

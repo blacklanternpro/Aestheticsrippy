@@ -53,3 +53,6 @@ cloudflared.exe
 export/*
 !export/.gitkeep
 eval/out/
+
+# Personal content: rendered locally, never committed
+content/private/

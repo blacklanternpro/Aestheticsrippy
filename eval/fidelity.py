@@ -20,7 +20,7 @@ on a contrasting background (a receipt on black, a poster in a frame).
 from __future__ import annotations
 
 from dataclasses import dataclass, asdict
-from typing import Dict, Tuple
+from typing import Dict, Optional, Sequence, Tuple
 
 import cv2
 import numpy as np
@@ -186,9 +186,14 @@ def aspect_score(ref_aspect: float, ren_aspect: float) -> float:
 # Entry points
 # --------------------------------------------------------------------------
 
-def prepare(ref_bytes: bytes, render_bytes: bytes):
+def prepare(ref_bytes: bytes, render_bytes: bytes, crop: Optional[Sequence[int]] = None):
+    """`crop` = [x0, y0, x1, y1] in reference pixels, when the sheet is known."""
     ref_full = decode(ref_bytes)
-    ref, cropped = crop_to_sheet(ref_full)
+    if crop:
+        x0, y0, x1, y1 = (int(v) for v in crop)
+        ref, cropped = ref_full[y0:y1, x0:x1], True
+    else:
+        ref, cropped = crop_to_sheet(ref_full)
     ren = decode(render_bytes)
     rh, rw = ref.shape[:2]
     size = (GRID_W, max(1, round(GRID_W * rh / rw)))
@@ -210,8 +215,8 @@ def _weighted(parts: Dict[str, float]) -> float:
     return sum(WEIGHTS[k] * v for k, v in parts.items())
 
 
-def score(ref_bytes: bytes, render_bytes: bytes) -> Fidelity:
-    ref, ren, cropped, ref_s, ren_s = prepare(ref_bytes, render_bytes)
+def score(ref_bytes: bytes, render_bytes: bytes, crop: Optional[Sequence[int]] = None) -> Fidelity:
+    ref, ren, cropped, ref_s, ren_s = prepare(ref_bytes, render_bytes, crop)
     ref_aspect = ref.shape[1] / ref.shape[0]
     ren_aspect = ren.shape[1] / ren.shape[0]
 
@@ -231,12 +236,13 @@ def score(ref_bytes: bytes, render_bytes: bytes) -> Fidelity:
                     cropped=cropped, **parts)
 
 
-def diff_image(ref_bytes: bytes, render_bytes: bytes, height: int = 720) -> np.ndarray:
+def diff_image(ref_bytes: bytes, render_bytes: bytes, height: int = 720,
+               crop: Optional[Sequence[int]] = None) -> np.ndarray:
     """
     Reference | render | ink overlay. In the overlay, red is ink the reference
     has and the render lacks; blue is ink the render added; dark is agreement.
     """
-    _, _, _, ref_s, ren_s = prepare(ref_bytes, render_bytes)
+    _, _, _, ref_s, ren_s = prepare(ref_bytes, render_bytes, crop)
     a = _ink_mask(cv2.cvtColor(ref_s, cv2.COLOR_BGR2GRAY)) > 0
     b = _ink_mask(cv2.cvtColor(ren_s, cv2.COLOR_BGR2GRAY)) > 0
     overlay = np.full(ref_s.shape, 245, np.uint8)
