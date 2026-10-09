@@ -230,7 +230,7 @@ def refine(result, sheet, blocks: Sequence[Block], renderer, rounds: int = 3, pr
                 st = cand["styles"][f["style"]]
                 size_px = st["size"] / PT_PER_MM * px_mm
                 if n_chars > 2 and (r_ - l) > 4:
-                    delta = ((rr - rl) - (r_ - l)) / (n_chars - 1) / size_px
+                    delta = ((rr - rl) - (r_ - l)) / (n_chars - 1) / size_px / st.get("scale_x", 1)
                     if abs(delta) > 0.004:
                         cur = wth.get("tracking", st.get("tracking", 0.0))
                         f["with"] = dict(wth, tracking=round(cur + delta, 4))

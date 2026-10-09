@@ -226,12 +226,13 @@ def split_runs(lines: Sequence[Line]) -> List[Run]:
         hs = [w.box[3] - w.box[1] for w in words]
         em = max(4.0, float(np.median(hs)))
         gaps = [b.box[0] - a.box[2] for a, b in zip(words, words[1:])]
-        typical = float(np.percentile(gaps, 30)) if len(gaps) >= 3 else 0.3 * em
+        median = float(np.median(gaps)) if gaps else 0.3 * em
         cur = [words[0]]
         for w in words[1:]:
             gap = w.box[0] - cur[-1].box[2]
-            # A column gap stands out from the line's own spacing (justified lines space widely).
-            if gap > 1.25 * em and gap > 2.5 * max(typical, 0.2 * em):
+            # A column gap is wide outright, or wide against this line's own spacing
+            # (a justified line spaces every gap wide, so its median gap is wide too).
+            if gap > 2.5 * em or (gap > 1.25 * em and gap > 2.5 * max(min(median, 0.6 * em), 0.2 * em)):
                 runs.append(Run(cur, line))
                 cur = [w]
             else:
@@ -274,10 +275,10 @@ def group_blocks(runs: Sequence[Run]) -> List[Block]:
         for b in open_blocks:
             last = b.runs[-1]
             s = max(r.size, last.size)
-            if abs(r.size - last.size) > 0.14 * s or not _colour_close(r, last):
+            if abs(r.size - last.size) > max(0.14 * s, 2.5) or not _colour_close(r, last):
                 continue
             step = r.baseline - last.baseline
-            if step <= 0.6 * s or step > 2.1 * s:
+            if step <= 0.6 * s or step > max(1.7 * s, s + 4):  # small type: heights are +-1 px
                 continue
             if b.step and abs(step - b.step) > 0.18 * b.step:
                 continue
@@ -371,8 +372,46 @@ def _plausible(r: Run) -> bool:
     return alnum >= 2 or (alnum == 1 and r.conf >= 70)
 
 
+_NATURAL = {}
+
+
+def _natural_width(text: str) -> float:
+    """Width of the text in a plain bold grotesque, in em: a yardstick for letterspacing."""
+    if not _NATURAL:
+        from ..typecase import matcher_data
+        inst = next(m for m in matcher_data()["instances"] if m["family"] == "Inter" and int(m["weight"]) == 700)
+        _NATURAL.update(inst["adv"])
+    return sum(_NATURAL.get(c, 0.6) for c in text)
+
+
+def split_forced(blocks: Sequence[Block]) -> List[Block]:
+    """
+    Poster lines set to one width ('TOM of ENGLAND' over a letterspaced 'IVAN BERKO')
+    are spaced line by line, which one frame with one tracking cannot do. Give each
+    such line its own frame, so each gets its own tracking.
+    """
+    out: List[Block] = []
+    for b in blocks:
+        if len(b.runs) < 2 or not all(b.hard) or b.align == "justify":
+            out.append(b)
+            continue
+        widths = [r.right - r.left for r in b.runs]
+        same_width = (max(widths) - min(widths)) <= 0.09 * max(widths)
+        # Spacing per line, against what the letters themselves would need (an M is wider than an I).
+        spacing = [w / max(1e-6, _natural_width(r.text)) for w, r in zip(widths, b.runs)]
+        ratio = max(spacing) / max(1e-6, min(spacing))
+        uneven = ratio > (1.12 if same_width else 1.15 if b.align in ("center", "right") else 1.3)
+        if uneven:
+            for r in b.runs:
+                nb = Block([r], align=b.align, hard=[], step=None)
+                out.append(nb)
+        else:
+            out.append(b)
+    return out
+
+
 def analyse(img: np.ndarray, lines: Sequence[Line]) -> List[Block]:
     runs = split_runs(lines)
     measure_runs(img, runs)
     runs = [r for r in runs if r.ink is not None and _plausible(r)]
-    return group_blocks(runs)
+    return split_forced(group_blocks(runs))

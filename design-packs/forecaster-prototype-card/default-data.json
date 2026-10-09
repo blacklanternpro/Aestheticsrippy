@@ -3,9 +3,10 @@
   "t02": "INSTRUCTION\nPROVIDED",
   "t03": "THROUGH\nTHE PROCESS",
   "t04": "A",
-  "t05": "01. SELECT A LETTER. OPTIONS: “A”, “B”, “C”, OR “D” PROTOTYPE\nSTANDARD",
+  "t05": "01. SELECT A LETTER. OPTIONS: “A”, “B”, “C”, OR “D”",
   "t06": "PROTOTYPE",
   "t07": "PROTOTYPE",
-  "t08": "PAPER CUT TO\nSQUARE",
-  "t09": "2021\nOS"
+  "t08": "PROTOTYPE",
+  "t09": "STANDARD\nPAPER CUT TO\nSQUARE",
+  "t10": "2021"
 }

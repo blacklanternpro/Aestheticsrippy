@@ -3,7 +3,7 @@
   "id": "forecaster-prototype-card",
   "name": "Forecaster Prototype Card",
   "category": "Ephemera",
-  "description": "Ripped from a reference by the harvester. 3 type styles, 9 text frames, 5 art frames.",
+  "description": "Ripped from a reference by the harvester. 2 type styles, 10 text frames, 3 art frames.",
   "reference": {
     "image": "assets/reference.jpg"
   },
@@ -16,34 +16,24 @@
   },
   "tokens": {
     "paper": "#f3f3f3",
-    "ink": "#1a1a1a"
+    "ink": "#1b1b1b"
   },
   "styles": {
     "body": {
-      "font": "Inter",
-      "size": 20.5,
+      "font": "Barlow",
+      "size": 22.1,
       "weight": 800,
-      "leading": 1.32,
-      "tracking": -0.035,
+      "leading": 1.03,
       "color": "ink",
       "case": "upper"
     },
     "body-b": {
-      "font": "Inter",
-      "size": 20.9,
+      "font": "Barlow",
+      "size": 22.5,
       "weight": 800,
       "leading": 1.2,
-      "tracking": -0.04,
+      "tracking": -0.005,
       "color": "ink"
-    },
-    "display": {
-      "font": "Archivo",
-      "size": 23.6,
-      "weight": 800,
-      "leading": 1.2,
-      "color": "ink",
-      "stretch": 75,
-      "case": "upper"
     }
   },
   "frames": [
@@ -61,10 +51,10 @@
     },
     {
       "id": "art02",
-      "x": 120.4,
+      "x": 25.9,
       "y": 114.45,
-      "w": 63.7,
-      "h": 53.2,
+      "w": 158.2,
+      "h": 84.7,
       "z": 0,
       "type": "image",
       "src": "mark-02.png",
@@ -72,35 +62,13 @@
     },
     {
       "id": "art03",
-      "x": 25.9,
-      "y": 116.2,
-      "w": 66.15,
-      "h": 51.1,
-      "z": 0,
-      "type": "image",
-      "src": "mark-03.png",
-      "fit": "fill"
-    },
-    {
-      "id": "art04",
       "x": 110.25,
       "y": 119.0,
       "w": 29.75,
       "h": 10.15,
       "z": 0,
       "type": "image",
-      "src": "mark-04.png",
-      "fit": "fill"
-    },
-    {
-      "id": "art05",
-      "x": 88.9,
-      "y": 163.45,
-      "w": 39.55,
-      "h": 35.7,
-      "z": 0,
-      "type": "image",
-      "src": "mark-05.png",
+      "src": "mark-03.png",
       "fit": "fill"
     },
     {
@@ -109,12 +77,11 @@
       "style": "body",
       "bind": "t01",
       "x": 56.81,
-      "y": 10.49,
-      "w": 94.99,
+      "y": 10.37,
+      "w": 95.33,
       "with": {
         "align": "center",
-        "wrap": "nowrap",
-        "leading": 1.113
+        "wrap": "nowrap"
       },
       "z": 2
     },
@@ -124,12 +91,12 @@
       "style": "body",
       "bind": "t02",
       "x": 40.36,
-      "y": 66.32,
-      "w": 50.19,
+      "y": 65.83,
+      "w": 50.53,
       "with": {
         "align": "center",
         "wrap": "nowrap",
-        "leading": 1.065
+        "leading": 0.988
       },
       "z": 2
     },
@@ -138,13 +105,12 @@
       "type": "text",
       "style": "body",
       "bind": "t03",
-      "x": 117.01,
-      "y": 66.14,
-      "w": 52.64,
+      "x": 116.83,
+      "y": 65.67,
+      "w": 52.98,
       "with": {
         "align": "center",
-        "wrap": "nowrap",
-        "leading": 1.113
+        "wrap": "nowrap"
       },
       "z": 2
     },
@@ -153,9 +119,9 @@
       "type": "text",
       "style": "body-b",
       "bind": "t04",
-      "x": 102.26,
-      "y": 69.54,
-      "w": 9.32,
+      "x": 102.23,
+      "y": 68.71,
+      "w": 9.66,
       "with": {
         "wrap": "nowrap"
       },
@@ -166,25 +132,26 @@
       "type": "text",
       "style": "body",
       "bind": "t05",
-      "x": 18.96,
-      "y": 87.23,
-      "w": 173.72,
+      "x": 18.59,
+      "y": 90.17,
+      "w": 174.78,
       "with": {
-        "leading": 2.057
+        "wrap": "nowrap",
+        "tracking": -0.018
       },
       "z": 2
     },
     {
       "id": "t06",
       "type": "text",
-      "style": "display",
+      "style": "body",
       "bind": "t06",
-      "x": 18.92,
-      "y": 104.22,
-      "w": 45.95,
+      "x": 19.29,
+      "y": 104.87,
+      "w": 45.63,
       "with": {
         "wrap": "nowrap",
-        "tracking": 0.0053
+        "tracking": -0.0112
       },
       "z": 2
     },
@@ -193,12 +160,12 @@
       "type": "text",
       "style": "body",
       "bind": "t07",
-      "x": 148.11,
-      "y": 104.25,
-      "w": 45.64,
+      "x": 83.69,
+      "y": 104.87,
+      "w": 45.98,
       "with": {
         "wrap": "nowrap",
-        "tracking": -0.029
+        "tracking": -0.0056
       },
       "z": 2
     },
@@ -207,28 +174,39 @@
       "type": "text",
       "style": "body",
       "bind": "t08",
-      "x": 78.16,
-      "y": 127.74,
-      "w": 53.34,
+      "x": 148.09,
+      "y": 104.87,
+      "w": 45.98,
       "with": {
-        "align": "center",
         "wrap": "nowrap",
-        "leading": 1.113
+        "tracking": -0.0056
       },
       "z": 2
     },
     {
       "id": "t09",
       "type": "text",
-      "style": "display",
+      "style": "body",
       "bind": "t09",
-      "x": 93.52,
-      "y": 147.9,
-      "w": 20.75,
+      "x": 73.54,
+      "y": 119.92,
+      "w": 53.68,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t10",
+      "type": "text",
+      "style": "body-b",
+      "bind": "t10",
+      "x": 93.4,
+      "y": 148.51,
+      "w": 20.51,
       "with": {
         "align": "right",
-        "wrap": "nowrap",
-        "leading": 1.471
+        "wrap": "nowrap"
       },
       "z": 2
     }
@@ -243,7 +221,8 @@
       "t06",
       "t07",
       "t08",
-      "t09"
+      "t09",
+      "t10"
     ],
     "labels": {
       "t01": "Body 1",
@@ -251,38 +230,47 @@
       "t03": "Body 3",
       "t04": "Body b 1",
       "t05": "Body 4",
-      "t06": "Display 1",
-      "t07": "Body 5",
-      "t08": "Body 6",
-      "t09": "Display 2"
+      "t06": "Body 5",
+      "t07": "Body 6",
+      "t08": "Body 7",
+      "t09": "Body 8",
+      "t10": "Body b 2"
     }
   },
   "harvest": {
-    "score": 90.8,
-    "live": 0.703,
+    "score": 96.2,
+    "live": 0.671,
+    "type_match": 0.802,
     "notes": [
       "No contrasting surround; the whole image is the sheet.",
       "Paper: Square, 210 x 210 mm.",
-      "Kept 1 unreadable text area as art."
+      "Kept 2 unreadable text areas as art.",
+      "Letter match 0.802 with the chosen faces (the best face per block alone: 0.830)."
     ],
     "history": [
       {
         "round": 0,
-        "score": 90.6
+        "score": 95.1
       },
       {
         "round": 1,
-        "score": 90.8,
-        "moved": 8,
+        "score": 96.1,
+        "moved": 9,
         "kept": "position, size and tracking"
       },
       {
         "round": 2,
-        "score": 90.5,
-        "moved": 4,
+        "score": 96.2,
+        "moved": 3,
+        "kept": "position, size and tracking"
+      },
+      {
+        "round": 3,
+        "score": 96.1,
+        "moved": 3,
         "kept": null
       }
     ],
-    "seconds": 17.9
+    "seconds": 35.7
   }
 }

@@ -61,8 +61,9 @@ def _harmonise_weights(matches: Dict[int, Match], chosen: Dict[int, Face]) -> Di
         for w, n in sorted(counts.items(), key=lambda kv: -kv[1]):
             if w == f.weight or n <= counts[f.weight]:
                 continue
-            alt = Face(f.family, w, f.stretch)
-            if alt.key in m.scores and cur - m.scores[alt.key] <= 0.02 and abs(w - f.weight) <= 200:
+            alt = Face(f.family, w, f.stretch, f.italic)
+            slack = 0.045 if m.size_px < 18 else 0.02  # small type cannot tell weights apart reliably
+            if alt.key in m.scores and cur - m.scores[alt.key] <= slack and abs(w - f.weight) <= 200:
                 out[bi] = alt
                 break
     return out
@@ -70,9 +71,11 @@ def _harmonise_weights(matches: Dict[int, Match], chosen: Dict[int, Face]) -> Di
 
 def _harmonise_family(matches: Dict[int, Match], blocks: Sequence[Block], margin: float) -> Dict[int, Face]:
     """
-    Designs use one or two families. Pick the family that explains the most
-    text, then let a block keep a different family only when it is clearly
-    better there (display type usually is the exception).
+    Designs use few families. Choose the set of families that explains the
+    sheet best, paying a price for each family added: a second (or third)
+    family must earn its place by fitting its blocks clearly better. Each block
+    then takes its best face within the set. A block may still go its own way
+    when nothing in the set comes close (a logotype in a face of its own).
     """
     def fam_best(m: Match, family: str) -> Tuple[float, Optional[str]]:
         best, key = -1.0, None
@@ -81,35 +84,80 @@ def _harmonise_family(matches: Dict[int, Match], blocks: Sequence[Block], margin
                 best, key = v, k
         return best, key
 
-    weight_of = {bi: max(1, len(blocks[bi].text())) for bi in matches}
+    if not matches:
+        return {}
+    weight_of = {bi: max(6, len(blocks[bi].text())) ** 0.5 * max(1.0, blocks[bi].size / 14) ** 0.5
+                 for bi in matches}
+    total_w = sum(weight_of.values())
     families = {k.split("|")[0] for m in matches.values() for k in m.scores}
-    total = {f: sum(weight_of[bi] * max(0.0, fam_best(m, f)[0]) for bi, m in matches.items()) for f in families}
-    primary = max(total, key=total.get) if total else None
+    best_of = {f: {bi: fam_best(m, f) for bi, m in matches.items()} for f in families}
 
-    chosen: Dict[int, Face] = {}
-    secondary: Dict[str, float] = {}
-    for bi, m in matches.items():
-        top_key = max(m.scores, key=m.scores.get)
-        p_score, p_key = fam_best(m, primary) if primary else (-1, None)
-        if p_key and m.scores[top_key] - p_score <= _margin(blocks[bi], margin):
-            chosen[bi] = _face(p_key)
+    def value(fset) -> float:
+        v = 0.0
+        for bi, m in matches.items():
+            scores = [best_of[f][bi][0] for f in fset if best_of[f][bi][1]]
+            # A block the set cannot render at all keeps its own best, discounted.
+            v += weight_of[bi] * (max(scores) if scores else max(m.scores.values()) - 0.15)
+        return v / total_w
+
+    chosen_set: List[str] = []
+    current = -1e9
+    price = margin  # each extra family must raise the sheet's mean score by this much
+    for _ in range(3):
+        best_f, best_v = None, current
+        for f in families - set(chosen_set):
+            v = value(chosen_set + [f])
+            if v > best_v + (price if chosen_set else 0):
+                best_f, best_v = f, v
+        if best_f is None:
+            break
+        chosen_set.append(best_f)
+        current = best_v
+
+    # Text of one size and colour is one family: decide per group of like blocks, not per
+    # block, so measurement noise cannot set two neighbouring prices in different faces.
+    groups: List[List[int]] = []
+    for bi in sorted(matches, key=lambda b: blocks[b].size):
+        b = blocks[bi]
+        for g in groups:
+            ref = blocks[g[0]]
+            if abs(b.size - ref.size) <= max(0.15 * ref.size, 2.5) and _close_colour(b, ref):
+                g.append(bi)
+                break
         else:
-            chosen[bi] = _face(top_key)
-            secondary[top_key.split("|")[0]] = secondary.get(top_key.split("|")[0], 0) + weight_of[bi]
-    # Collapse several "exception" families into the strongest one where close.
-    if len(secondary) > 1:
-        second = max(secondary, key=secondary.get)
-        for bi, face in list(chosen.items()):
-            if face.family not in (primary, second):
-                s_score, s_key = fam_best(matches[bi], second)
-                if s_key and matches[bi].scores[_key(face)] - s_score <= _margin(blocks[bi], margin):
-                    chosen[bi] = _face(s_key)
+            groups.append([bi])
+    chosen: Dict[int, Face] = {}
+    for g in groups:
+        def group_value(f):
+            return sum(weight_of[bi] * best_of[f][bi][0] for bi in g if best_of[f][bi][1])
+        usable = [f for f in chosen_set if all(best_of[f][bi][1] for bi in g)]
+        fam = max(usable, key=group_value) if usable else None
+        for bi in g:
+            m = matches[bi]
+            top_key = max(m.scores, key=m.scores.get)
+            short = sum(c.isalnum() for c in blocks[bi].text()) < 4  # a figure or two proves nothing
+            if fam and (short or m.scores[top_key] - best_of[fam][bi][0] <= _margin(blocks[bi], 0.06)):
+                chosen[bi] = _face(best_of[fam][bi][1])
+            else:
+                cands = [best_of[f][bi] for f in chosen_set if best_of[f][bi][1]]
+                in_set = max(cands) if cands else (-1.0, None)
+                if in_set[1] and m.scores[top_key] - in_set[0] <= _margin(blocks[bi], 0.06):
+                    chosen[bi] = _face(in_set[1])
+                else:
+                    chosen[bi] = _face(top_key)
     return chosen
 
 
+def _close_colour(a: Block, b: Block) -> bool:
+    ca = np.array(a.runs[0].ink.colour, float) if a.runs[0].ink else np.zeros(3)
+    cb = np.array(b.runs[0].ink.colour, float) if b.runs[0].ink else np.zeros(3)
+    return float(np.linalg.norm(ca - cb)) < 70
+
+
 def _face(key: str) -> Face:
-    fam, w, st = key.split("|")
-    return Face(fam, int(w), int(st) if st else None)
+    parts = key.split("|")
+    fam, w, st = parts[:3]
+    return Face(fam, int(w), float(st) if st else None, len(parts) > 3 and parts[3] == "i")
 
 
 def _key(face: Face) -> str:
@@ -184,6 +232,7 @@ class StyleSpec:
     upper: bool
     members: List[int] = field(default_factory=list)
     chars: int = 0
+    sx: float = 1.0
 
 
 def _round(v: float, step: float) -> float:
@@ -203,15 +252,16 @@ def _consolidate(specs: List[StyleSpec], style_of: Dict[int, int]) -> Tuple[List
     target = {i: i for i in range(len(specs))}
     for i in order:
         a = specs[i]
-        if a.chars >= 40:
-            continue
+        small = a.chars < 40
+        size_tol, weight_tol = (0.16, 200) if small else (0.10, 100)
         best, dist = None, None
         for j, b in enumerate(specs):
             if j == i or target[j] != j or b.chars <= a.chars:
                 continue
             if b.face.family != a.face.family or b.colour != a.colour or b.upper != a.upper:
                 continue
-            if abs(b.face.weight - a.face.weight) > 200 or abs(b.size_pt / a.size_pt - 1) > 0.16:
+            if abs(b.face.weight - a.face.weight) > weight_tol or abs(b.size_pt / a.size_pt - 1) > size_tol \
+                    or abs(b.sx - a.sx) > 0.06:
                 continue
             d = abs(np.log(b.size_pt / a.size_pt)) + abs(b.face.weight - a.face.weight) / 1000
             if dist is None or d < dist:
@@ -283,6 +333,8 @@ class Harvest:
     paper_bgr: Tuple[int, int, int]
     notes: List[str] = field(default_factory=list)
     frame_blocks: Dict[str, int] = field(default_factory=dict)
+    type_match: float = 0.0
+    rotated: List = field(default_factory=list)
 
 
 def _metrics(family: str) -> Dict:
@@ -312,6 +364,124 @@ def _borrow_matches(h: "Harvest") -> None:
                               dict(m.scores))
 
 
+def _table_frame(t, n: int, styles: Dict[str, Dict], sheet: Sheet, data: Dict, labels: Dict) -> Dict:
+    """A repeat of rows: each row a grid of cells (with spacers) at the measured column edges."""
+    mm = sheet.mm
+    k = len(t.styles)
+    sizes = [styles[s]["size"] / PT_PER_MM * sheet.px_per_mm for s in t.styles]
+    L = [min(row[c].left for row in t.rows) for c in range(k)]
+    R = [max(row[c].right for row in t.rows) for c in range(k)]
+    S, E = [], []
+    for c in range(k):
+        slack = 0.6 * sizes[c]
+        if t.aligns[c] == "right":
+            S.append(L[c] - slack)
+            E.append(R[c] + 0.02 * sizes[c])
+        elif t.aligns[c] == "center":
+            S.append(L[c] - slack / 2)
+            E.append(R[c] + slack / 2)
+        else:
+            S.append(L[c] - 0.04 * sizes[c])
+            E.append(R[c] + slack)
+    cols, children = [], []
+    for c in range(k):
+        if c:
+            gap = S[c] - E[c - 1]
+            if gap < 0:  # columns overlap: split the difference
+                mid = (S[c] + E[c - 1]) / 2
+                E[c - 1], S[c] = mid - 0.5, mid + 0.5
+                cols[-1] = round(mm(E[c - 1] - S[c - 1]), 2)
+                gap = 1.0
+            cols.append(round(mm(gap), 2))
+            children.append({"type": "space", "h": 0})
+        cols.append(round(mm(E[c] - S[c]), 2))
+        cell = {"type": "text", "style": t.styles[c], "bind": f".c{c + 1}",
+                "with": {"wrap": "nowrap", "leading": round(t.step / sizes[c], 3)}}
+        if t.aligns[c] != "left":
+            cell["with"]["align"] = t.aligns[c]
+        children.append(cell)
+    # First row: put the baselines where they were.
+    base = max(first_baseline(sizes[c], t.step / sizes[c], styles[t.styles[c]]["font"]) for c in range(k))
+    top = t.rows[0][0].baseline - base
+    key = f"list{n + 1:02d}"
+    data[key] = [{f"c{c + 1}": row[c].text for c in range(k)} for row in t.rows]
+    labels[key] = f"List {n + 1}"
+    for c in range(k):
+        labels[f"{key}.*.c{c + 1}"] = f"Column {c + 1}"
+    return {"id": key, "type": "repeat", "bind": key, "x": round(mm(S[0]), 2), "y": round(mm(top), 2),
+            "gap": 0, "item": {"type": "row", "cols": cols, "gap": 0, "align": "baseline", "children": children}}
+
+
+def _rotated_frames(h: "Harvest", styles: Dict[str, Dict], specs, names, data, labels, tokens) -> List[Dict]:
+    """
+    Rotated lines take the sheet's main face, sized from their cap height and
+    tracked to their measured length; lines of one size share a style.
+    """
+    if not h.rotated:
+        return []
+    from ..typecase import matcher_data
+    sheet = h.sheet
+    mm = sheet.mm
+    # The face that sets the most text on the sheet.
+    if specs:
+        main = max(specs, key=lambda sp: sp.chars).face
+    else:
+        main = Face("Inter", 500)
+    inst = next((m for m in matcher_data()["instances"] if m["family"] == main.family
+                 and int(m["weight"]) == main.weight and (m.get("stretch") or None) == main.stretch), None)
+    if inst is None:
+        inst = next(m for m in matcher_data()["instances"] if m["family"] == main.family)
+    frames, made = [], {}
+    for k, rt in enumerate(h.rotated):
+        size_px = rt.cap / max(0.3, inst["cap"])
+        size_pt = mm(size_px) * PT_PER_MM
+        sname = None
+        for n, st in made.items():
+            if abs(st["size"] - size_pt) <= max(0.08 * size_pt, mm(2.2) * PT_PER_MM):
+                sname = n
+                break
+        if sname is None:
+            sname = "angled" if not made else f"angled-{'bcdefghij'[(len(made) - 1) % 9]}"
+            colour = min(tokens, key=lambda t: _dist_hex(tokens[t], rt.colour)) if tokens else "ink"
+            made[sname] = {"font": main.family, "weight": main.weight, "size": round(size_pt, 1),
+                           "leading": 1.0, "color": colour}
+            if main.stretch:
+                made[sname]["stretch"] = main.stretch
+        st = made[sname]
+        size_px = st["size"] / PT_PER_MM * sheet.px_per_mm
+        adv = sum(inst["adv"].get(c, inst["adv"].get("n", 0.55)) for c in rt.text)
+        n = max(2, len(rt.text))
+        track = (rt.width / size_px - adv + 0.06) / (n - 1)
+        track = float(np.clip(track, -0.1, 0.6))
+        width = size_px * (adv + track * (n - 1)) + 0.8 * size_px
+        height = size_px * 1.0
+        m = metrics_of(main.family)
+        base = first_baseline(size_px, 1.0, main.family)
+        cap_c = base - inst["cap"] * size_px / 2
+        dvec = np.array([0.0, cap_c - height / 2])
+        a = np.radians(rt.angle)
+        rot = np.array([[np.cos(a), -np.sin(a)], [np.sin(a), np.cos(a)]])
+        cx, cy = np.array([rt.cx, rt.cy]) - rot @ dvec
+        key = f"r{k + 1:02d}"
+        data[key] = rt.text
+        labels[key] = f"Angled {k + 1}"
+        f = {"id": key, "type": "text", "style": sname, "bind": key,
+             "x": round(mm(cx - width / 2), 2), "y": round(mm(cy - height / 2), 2), "w": round(mm(width), 2),
+             "rotate": round(rt.angle, 2), "with": {"align": "center", "wrap": "nowrap", "tracking": round(track, 3)}}
+        frames.append(f)
+    styles.update(made)
+    return frames
+
+
+def _dist_hex(hexstr: str, bgr) -> float:
+    r, g, b = int(hexstr[1:3], 16), int(hexstr[3:5], 16), int(hexstr[5:7], 16)
+    return float(np.linalg.norm(np.array([b, g, r], float) - np.array(bgr, float)))
+
+
+def metrics_of(family: str) -> Dict:
+    return _metrics(family)
+
+
 def first_baseline(size_px: float, leading: float, family: str) -> float:
     """Distance from a text frame's top to its first baseline, in px (CSS line box model)."""
     m = _metrics(family)
@@ -325,13 +495,23 @@ def build_rip(h: Harvest, pack_id: str, name: str, asset_names: Dict[int, str],
     mm = sheet.mm
     _borrow_matches(h)
     faces = harmonise(h.matches, h.blocks)
+    # How closely the chosen faces match the reference's letters (the matcher's own measure).
+    ws = [(len(h.blocks[bi].text()), h.matches[bi].scores.get(f.key, h.matches[bi].score)) for bi, f in faces.items()]
+    h.type_match = sum(w * v for w, v in ws) / max(1, sum(w for w, _ in ws)) if ws else 0.0
+    best = [(len(h.blocks[bi].text()), max(h.matches[bi].scores.values())) for bi in faces]
+    h.notes.append(f"Letter match {h.type_match:.3f} with the chosen faces "
+                   f"(the best face per block alone: {sum(w * v for w, v in best) / max(1, sum(w for w, _ in best)):.3f}).")
     blocks = [(bi, b) for bi, b in enumerate(h.blocks) if bi in faces]
 
-    tokens, ink_names = colour_tokens(h.paper_bgr, [_block_colour(b) for _, b in blocks],
+    from .typeface import true_inks
+    inks = true_inks(h.blocks)
+    tokens, ink_names = colour_tokens(h.paper_bgr, [inks.get(bi, _block_colour(b)) for bi, b in blocks],
                                       [b.size < 22 for _, b in blocks])
     colour_of = {bi: ink_names[k] for k, (bi, _) in enumerate(blocks)}
 
-    # Group blocks into styles.
+    # Group blocks into styles. Display lines that differ only in tracking share a style
+    # and keep their own tracking on the frame.
+    block_track: Dict[int, float] = {}
     specs: List[StyleSpec] = []
     style_of: Dict[int, int] = {}
     for bi, b in blocks:
@@ -348,11 +528,15 @@ def build_rip(h: Harvest, pack_id: str, name: str, asset_names: Dict[int, str],
         letters = [c for c in b.text() if c.isalpha()]
         upper = bool(letters) and all(c.isupper() for c in letters) and len(letters) >= 2
         track = m.tracking_em if face.family == m.face.family else 0.0
+        block_track[bi] = track
+        sx = m.scale_x if face.family == m.face.family else 1.0
         # Sizes come from heights measured in whole pixels: a pixel of x-height is ~2 px of size.
         tol = max(0.07 * size_pt, mm(2.2) * PT_PER_MM)
         for si, sp in enumerate(specs):
             if (sp.face == face and abs(sp.size_pt - size_pt) <= tol
-                    and abs(sp.tracking - track) <= 0.025 and sp.colour == colour_of[bi] and sp.upper == upper):
+                    and (abs(sp.tracking - track) <= 0.025 or len(b.runs) == 1 and b.align != "left")
+                    and sp.colour == colour_of[bi] and sp.upper == upper
+                    and abs(sp.sx - sx) <= 0.04):
                 n = sp.chars
                 c = len(b.text())
                 sp.size_pt = (sp.size_pt * n + size_pt * c) / (n + c)
@@ -364,7 +548,7 @@ def build_rip(h: Harvest, pack_id: str, name: str, asset_names: Dict[int, str],
                 style_of[bi] = si
                 break
         else:
-            specs.append(StyleSpec(face, size_pt, track, leading, colour_of[bi], upper, [bi], len(b.text())))
+            specs.append(StyleSpec(face, size_pt, track, leading, colour_of[bi], upper, [bi], len(b.text()), sx))
             style_of[bi] = len(specs) - 1
 
     specs, style_of = _consolidate(specs, style_of)
@@ -376,19 +560,37 @@ def build_rip(h: Harvest, pack_id: str, name: str, asset_names: Dict[int, str],
               "tracking": _round(sp.tracking, 0.005), "color": sp.colour}
         if sp.face.stretch:
             st["stretch"] = sp.face.stretch
+        if sp.face.italic:
+            st["italic"] = True
         if sp.upper:
             st["case"] = "upper"
+        if abs(sp.sx - 1) > 0.03:
+            st["scale_x"] = round(sp.sx, 3)
         if st["tracking"] == 0:
             del st["tracking"]
         styles[n] = st
 
+    # Repeated rows become lists first; the blocks they use up are not framed again.
+    from .tables import find_tables
+    def same_style(x: str, y: str) -> bool:
+        if x == y:
+            return True
+        a, b = styles[x], styles[y]
+        return a["font"] == b["font"] and a["color"] == b["color"] and abs(a["size"] / b["size"] - 1) <= 0.15
+
+    tables = find_tables(h.blocks, {bi: names[style_of[bi]] for bi, _ in blocks}, same_style)
+    in_table = {bi for t in tables for bi in t.blocks}
+
     # Frames and data, in reading order.
-    order = sorted(blocks, key=lambda t: (round(t[1].top / max(1.0, t[1].size * 2)), t[1].left))
+    order = sorted([t for t in blocks if t[0] not in in_table],
+                   key=lambda t: (round(t[1].top / max(1.0, t[1].size * 2)), t[1].left))
     frames: List[Dict] = []
     h.frame_blocks = {}
-    data: Dict[str, str] = {}
+    data: Dict[str, object] = {}
     labels: Dict[str, str] = {}
     counters: Dict[str, int] = {}
+    for n, t in enumerate(tables):
+        frames.append(_table_frame(t, n, styles, sheet, data, labels))
     for k, (bi, b) in enumerate(order):
         sname = names[style_of[bi]]
         st = styles[sname]
@@ -426,6 +628,9 @@ def build_rip(h: Harvest, pack_id: str, name: str, asset_names: Dict[int, str],
         f = {"id": key, "type": "text", "style": sname, "bind": key,
              "x": round(mm(x_px), 2), "y": round(mm(top_px), 2), "w": round(mm(w_px), 2)}
         override = {}
+        own_track = block_track.get(bi, 0.0)
+        if abs(own_track - st.get("tracking", 0.0)) > 0.012:
+            override["tracking"] = round(own_track, 3)
         if b.align in ("right", "center", "justify"):
             override["align"] = b.align
         if hard_only:
@@ -463,6 +668,7 @@ def build_rip(h: Harvest, pack_id: str, name: str, asset_names: Dict[int, str],
             art_frames.append({"id": f"rule{j + 1:02d}", "type": "rule", "x": round(mm(r.x0), 2),
                                "y": round(mm(r.y0 - r.thickness / 2), 2), "w": round(mm(r.x1 - r.x0), 2),
                                "weight": weight_pt, "color": col, "z": 0})
+    frames += _rotated_frames(h, styles, specs, names, data, labels, tokens)
     for f in frames:
         f["z"] = 2
     if paper_image:
@@ -479,7 +685,9 @@ def build_rip(h: Harvest, pack_id: str, name: str, asset_names: Dict[int, str],
         "tokens": tokens,
         "styles": styles,
         "frames": art_frames + frames,
-        "fields": {"order": list(data), "labels": labels},
+        "fields": {"order": [f["bind"] for f in sorted((f for f in frames if f.get("bind") in data),
+                                                       key=lambda f: (round(f["y"] / 4), f["x"]))],
+                   "labels": labels},
         "harvest": {"notes": h.notes},
     }
     return rip, data

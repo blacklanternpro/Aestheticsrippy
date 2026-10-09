@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 import time
@@ -39,6 +40,7 @@ class Result:
     notes: List[str] = field(default_factory=list)
     seconds: float = 0.0
     frame_blocks: Dict[str, int] = field(default_factory=dict)
+    type_match: float = 0.0  # how alike the chosen faces' letters are to the reference's (0-1)
     live: float = 0.0   # share of the reference's ink rebuilt as live type and shapes (not pasted images)
 
 
@@ -101,6 +103,13 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
         text_lines = [r.line for b in blocks for r in b.runs]
         say("Extracting art")
         regions = art_mod.regions(sheet.image, text_lines, rule_mask, paper, pans, body_px)
+        say("Looking for type set at an angle")
+        from .rotated import find as find_rotated
+        import os
+        rotated, regions = ([], regions) if os.environ.get("RIP_NO_ROTATED") else \
+            find_rotated(sheet.image, regions, bg)
+        if rotated:
+            notes.append(f"Read {len(rotated)} {'line' if len(rotated) == 1 else 'lines'} of type set at an angle.")
         covered = art_mod.text_mask(sheet.image.shape, text_lines) | (rule_mask > 0)
         for reg in regions:
             x0, y0, x1, y1 = reg.box
@@ -113,7 +122,7 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
         plate = art_mod.plate(sheet.image, covered, paper)
         if plate is not None:
             notes.append("The paper is not flat; kept it as a paper image under everything.")
-        h = Harvest(sheet, blocks, matches, rules, regions, paper, notes)
+        h = Harvest(sheet, blocks, matches, rules, regions, paper, notes, rotated=rotated)
         say("Writing the pack")
         if pack_dir.exists():
             shutil.rmtree(pack_dir)
@@ -128,7 +137,8 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
         rip, data = build_rip(h, pack_id, name, asset_names, paper_image="paper.jpg" if plate is not None else None)
         _write(pack_dir, rip, data)
 
-        result = Result(pack_dir, rip, data, notes=notes, frame_blocks=dict(h.frame_blocks), live=live)
+        result = Result(pack_dir, rip, data, notes=notes, frame_blocks=dict(h.frame_blocks), live=live,
+                        type_match=h.type_match)
         if refine_rounds:
             from .refine import refine
             say("Rendering and comparing")
@@ -139,7 +149,7 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
         result.seconds = time.time() - t0
         rip = result.rip
         rip["harvest"] = {"score": round(result.score, 1) if result.score is not None else None,
-                          "live": round(result.live, 3),
+                          "live": round(result.live, 3), "type_match": round(result.type_match, 3),
                           "notes": result.notes, "history": result.history,
                           "seconds": round(result.seconds, 1)}
         _write(pack_dir, rip, result.data)
@@ -193,14 +203,29 @@ def load_image(path: Path) -> np.ndarray:
 
 
 def trusted(block, match, body_px: float) -> bool:
+    """
+    Is this reading type we can set? A guessed logotype or a tilted letter read
+    sideways looks unlike any face once rendered, or is too short to judge and
+    read with little confidence; those stay as art.
+    """
     conf = float(np.mean([r.conf for r in block.runs]))
+    alnum = sum(c.isalnum() for c in block.text())
+    if block.size < 4:
+        return False
     if match is None:
-        return conf >= 70
+        return conf >= (88 if alnum < 3 else 70)
+    if alnum < 3 and conf < 88:
+        return False
     if match.score < 0.5:
         return False
     if match.score < 0.62 and conf < 80:
         return False
-    if block.size > 3 * body_px and conf < 85 and match.score < 0.7:
+    if os.environ.get("RIP_DEBUG_TRUST") and block.size > 2 * body_px:
+        print(f"    trust? {block.text()[:24]!r} size={block.size:.0f} body={body_px:.0f} conf={conf:.0f} score={match.score:.3f}")
+    if block.size > 3 * body_px and (conf < 88 or match.score < 0.66):
+        return False
+    # Very large lettering is usually drawn, not set: only a close match keeps it as type.
+    if block.size > 5 * body_px and match.score < 0.88 and conf < 93:
         return False
     return True
 

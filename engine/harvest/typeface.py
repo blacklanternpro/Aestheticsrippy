@@ -22,7 +22,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 import cv2
 import numpy as np
 
-from ..typecase import FONTS, catalogue
+from ..typecase import FONTS, catalogue, matcher_data
 from .layout import Block, Run, ink_mask
 
 PAGE_W = 2400
@@ -33,11 +33,16 @@ BATCH_H = 9000
 class Face:
     family: str
     weight: int
-    stretch: Optional[int] = None
+    stretch: Optional[float] = None
+    italic: bool = False
 
     @property
     def key(self) -> str:
-        return f"{self.family}|{self.weight}|{self.stretch or ''}"
+        return f"{self.family}|{self.weight}|{self.stretch or ''}{'|i' if self.italic else ''}"
+
+    @property
+    def upright(self) -> "Face":
+        return Face(self.family, self.weight, self.stretch)
 
 
 @dataclass
@@ -51,6 +56,8 @@ class Sample:
     ink_w: float           # ink width, px
     height: float          # the measured height used for size
     kind: str              # "cap", "x", "tall"
+    mass: float = 0.0      # total ink, px^2 (darkness summed)
+    xcap: Optional[float] = None  # x-height / cap height, when the line shows both
 
 
 @dataclass
@@ -60,21 +67,96 @@ class Match:
     tracking_em: float
     score: float
     scores: Dict[str, float] = field(default_factory=dict)   # face key -> block score
+    scale_x: float = 1.0
 
 
 def faces() -> List[Face]:
     out = []
     for fam in catalogue()["families"]:
-        if not fam.get("match", True):
+        for t in fam["try"]:
+            st = t.get("stretch")
+            out.append(Face(fam["family"], int(t["weight"]), st if st is None else float(st)))
+    return out
+
+
+def instances() -> Dict[str, Dict]:
+    """Face key -> measured instance (cap, x, per-char advance and ink area, em units)."""
+    import os
+    only = set(filter(None, os.environ.get("RIP_ONLY_FAMILIES", "").split(",")))
+    out = {}
+    for m in matcher_data()["instances"]:
+        if only and m["family"] not in only:
             continue
-        for w in fam["try"]["weight"]:
-            for st in fam["try"].get("stretch", [None]):
-                out.append(Face(fam["family"], w, st))
+        st = m.get("stretch")
+        out[Face(m["family"], int(m["weight"]), st if st is None else float(st)).key] = m
     return out
 
 
 def _metrics() -> Dict[str, Dict]:
     return {f["family"]: f["metrics"] for f in catalogue()["families"]}
+
+
+# ---------------------------------------------------------------- shortlist
+
+def _sums(inst: Dict, text: str) -> Tuple[float, float]:
+    adv, area = inst["adv"], inst["area"]
+    a_avg = adv.get("n", 0.55)
+    r_avg = area.get("n", 0.1)
+    return (sum(adv.get(c, a_avg) for c in text), sum(area.get(c, r_avg) for c in text))
+
+
+def instance_size(sample: "Sample", inst: Dict) -> float:
+    if sample.kind == "cap":
+        return sample.height / max(0.3, inst["cap"])
+    if sample.kind == "x":
+        return sample.height / max(0.2, inst["x"])
+    return sample.height / max(0.3, inst["cap"] * 1.04)
+
+
+def feature_cost(sample: "Sample", inst: Dict) -> float:
+    """
+    How plausible a face is before rendering it: does the text set at the size
+    its height implies come out the measured width (tracking can only widen it
+    so far, and rarely narrows it), with the measured amount of ink (weight),
+    and the measured x-height to cap-height ratio?
+    """
+    text = sample.run.text
+    size = instance_size(sample, inst)
+    adv, area = _sums(inst, text)
+    w_pred = max(1.0, size * adv - 0.06 * size)
+    rw = float(np.log(max(1.0, sample.ink_w) / w_pred))
+    width = -rw * 2.2 if rw < 0 else rw * 0.8
+    mass_pred = max(1e-3, size * size * area)
+    rm = float(np.log(max(1e-3, sample.mass) / mass_pred))
+    cost = width + abs(rm) * 0.9
+    if sample.xcap:
+        cost += abs(float(np.log(sample.xcap / max(0.2, inst["x"] / inst["cap"])))) * 2.5
+    return cost
+
+
+def shortlist(samples: Sequence["Sample"], insts: Dict[str, Dict], k: int = 30, per_family: int = 3) -> List[Face]:
+    """The k most plausible faces for a block's samples, at most per_family from any one family."""
+    scored = []
+    for key, inst in insts.items():
+        c = float(np.mean([feature_cost(s, inst) for s in samples]))
+        scored.append((c, key))
+    scored.sort()
+    out, per = [], {}
+    for c, key in scored:
+        fam = key.split("|")[0]
+        if per.get(fam, 0) >= per_family:
+            continue
+        per[fam] = per.get(fam, 0) + 1
+        out.append(_face(key))
+        if len(out) >= k:
+            break
+    return out
+
+
+def _face(key: str) -> Face:
+    parts = key.split("|")
+    fam, w, st = parts[:3]
+    return Face(fam, int(w), float(st) if st else None, len(parts) > 3 and parts[3] == "i")
 
 
 # ------------------------------------------------------------------ samples
@@ -103,7 +185,7 @@ def true_inks(blocks: Sequence[Block]) -> Dict[int, Tuple[int, int, int]]:
         if not cols:
             continue
         own = tuple(int(v) for v in np.median(np.array(cols), axis=0))
-        if b.size >= 26 or not big:
+        if b.size >= 26 or not big or any(r.ink and r.ink.inverted for r in b.runs):
             out[bi] = own
             continue
         lo = lab(own)
@@ -148,7 +230,11 @@ def make_sample(img: np.ndarray, run: Run, ink_bgr: Optional[Tuple[int, int, int
         c, d = int(w.box[1]) - y0 - g, int(np.ceil(w.box[3])) - y0 + g
         keep[max(0, c):max(0, d), max(0, a):max(0, b)] = 1
     dark *= keep
-    return Sample(run, dark, x0, y0, ink.baseline - y0, ink.left - x0, ink.right - ink.left, height, kind)
+    xcap = None
+    if ink.x_height and ink.tall and ink.tall_kind == "cap" and ink.tall >= 8:
+        xcap = ink.x_height / ink.tall
+    return Sample(run, dark, x0, y0, ink.baseline - y0, ink.left - x0, ink.right - ink.left, height, kind,
+                  float(dark.sum()), xcap)
 
 
 def nominal_size(sample: Sample, family: str, metrics: Dict[str, Dict]) -> float:
@@ -167,18 +253,22 @@ async (items) => {
   const root = document.getElementById('root');
   root.innerHTML = '';
   const specs = new Set();
-  for (const it of items) specs.add(`${it.weight} ${it.stretch ? it.stretch + '% ' : ''}${it.size}px '${it.family}'`);
+  for (const it of items) specs.add(`${it.italic ? 'italic ' : ''}${it.weight} ${it.stretch ? it.stretch + '% ' : ''}${it.size}px '${it.family}'`);
   await Promise.all([...specs].map((s) => document.fonts.load(s).catch(() => null)));
   const els = items.map((it) => {
     const d = document.createElement('div');
     d.style.cssText = `position:absolute; left:${it.left}px; top:${it.top}px; white-space:pre; line-height:1;` +
       `font-family:'${it.family}'; font-weight:${it.weight}; font-size:${it.size}px;` +
-      (it.stretch ? `font-stretch:${it.stretch}%;` : '') + `letter-spacing:${it.ls || 0}px; color:#000;` +
+      (it.stretch ? `font-stretch:${it.stretch}%;` : '') + (it.italic ? 'font-style:italic;' : '') +
+      `letter-spacing:${it.ls || 0}px; color:#000;` +
       `font-kerning:normal; font-optical-sizing:auto;`;
     const b = document.createElement('span');
     b.style.cssText = 'display:inline-block; width:0; height:0; vertical-align:baseline';
     d.appendChild(b);
-    d.appendChild(document.createTextNode(it.text));
+    const t = document.createElement('span');
+    t.style.cssText = `display:inline-block; transform-origin:left bottom; transform:scaleX(${it.sx || 1})`;
+    t.appendChild(document.createTextNode(it.text));
+    d.appendChild(t);
     root.appendChild(d);
     return d;
   });
@@ -186,14 +276,15 @@ async (items) => {
   return els.map((d, i) => {
     const it = items[i];
     const r = document.createRange();
-    r.selectNodeContents(d.lastChild);
-    let w = r.getBoundingClientRect().width;
+    r.selectNodeContents(d.lastChild.firstChild);
+    const sx = it.sx || 1;
+    let w = r.getBoundingClientRect().width / sx;  // before the horizontal scale
     let ls = it.ls || 0;
     const n = [...it.text].length;
     if (it.fitWidth && n > 1) {
       // Advance width w = w0 + n * ls; aim the first n-1 gaps at the target.
       const w0 = w - n * ls;
-      ls = (it.fitWidth - w0) / (n - 1);
+      ls = (it.fitWidth / sx - w0) / (n - 1);
       d.style.letterSpacing = ls + 'px';
     }
     const base = d.firstChild.getBoundingClientRect().bottom;
@@ -238,7 +329,8 @@ class Bench:
             self.page.set_viewport_size({"width": width, "height": max(10, y)})
             res = self.page.evaluate(_JS, [
                 {k: b[k] for k in ("text", "family", "weight", "stretch", "size", "top", "left", "baseline")}
-                | {"ls": b.get("ls"), "fitWidth": b.get("fitWidth")} for b in batch])
+                | {"ls": b.get("ls"), "fitWidth": b.get("fitWidth"), "sx": b.get("sx", 1),
+                   "italic": b.get("italic", False)} for b in batch])
             shot = self.page.screenshot(clip={"x": 0, "y": 0, "width": width, "height": max(10, y)})
             img = cv2.imdecode(np.frombuffer(shot, np.uint8), cv2.IMREAD_GRAYSCALE)
             for j, b in enumerate(batch):
@@ -291,6 +383,7 @@ class _Try:
     ls: Optional[float] = None
     score: float = 0.0
     shift: Tuple[int, int] = (0, 0)
+    sx: float = 1.0
 
 
 def _items(tries: Sequence[_Try], fit: bool) -> List[Dict]:
@@ -301,7 +394,7 @@ def _items(tries: Sequence[_Try], fit: bool) -> List[Dict]:
         dy = max(2, int(round(0.04 * t.size)))
         n = len(s.run.text)
         it = {"text": s.run.text, "family": t.face.family, "weight": t.face.weight,
-              "stretch": t.face.stretch, "size": round(t.size, 3),
+              "stretch": t.face.stretch, "size": round(t.size, 3), "sx": round(t.sx, 4), "italic": t.face.italic,
               "w": s.ref.shape[1] + 2 * dx, "h": s.ref.shape[0] + 2 * dy,
               "base": s.base + dy, "ox": s.left + dx - 0.04 * t.size, "_dx": dx, "_dy": dy}
         if fit or t.ls is None:
@@ -323,7 +416,7 @@ def _run(bench: Bench, tries: List[_Try], fit: bool) -> None:
         w = _ink_width(tile)
         n = len(t.sample.run.text)
         if w and n > 1:
-            t.ls = ls + (t.sample.ink_w - (w[1] - w[0])) / (n - 1)
+            t.ls = ls + (t.sample.ink_w - (w[1] - w[0])) / (n - 1) / t.sx
 
 
 def _penalty(t: _Try) -> float:
@@ -334,9 +427,8 @@ def _penalty(t: _Try) -> float:
 
 
 def match_blocks(bench: Bench, img: np.ndarray, blocks: Sequence[Block],
-                 per_block: int = 2, finalists: int = 6) -> Dict[int, Match]:
-    metrics = _metrics()
-    all_faces = faces()
+                 per_block: int = 2, finalists: int = 6, shortlist_k: int = 40) -> Dict[int, Match]:
+    insts = instances()
     inks = true_inks(blocks)
     samples: Dict[int, List[Sample]] = {}
     for bi, b in enumerate(blocks):
@@ -350,44 +442,105 @@ def match_blocks(bench: Bench, img: np.ndarray, blocks: Sequence[Block],
                 break
         if got:
             samples[bi] = got
+    if not samples:
+        return {}
+    owner = {id(s): bi for bi, ss in samples.items() for s in ss}
+
+    italic_families = {f["family"] for f in catalogue()["families"] if f.get("italic")}
+
+    def size_of(s: Sample, face: Face) -> float:
+        inst = insts.get(face.upright.key)
+        return instance_size(s, inst) if inst else s.height / 0.7
 
     # How soft is the reference? Blur the candidates to match (scans and JPEGs are soft;
     # comparing soft against crisp would favour heavy weights).
     probe = sorted((s for ss in samples.values() for s in ss), key=lambda s: -s.run.conf)[:6]
-    if probe:
-        tries = [_Try(s, Face("Inter", w), nominal_size(s, "Inter", metrics)) for s in probe for w in (400, 700)]
-        items = _items(tries, True)
-        tiles = bench.render(items)
-        best_sigma, best_val = 0.7, -1.0
-        for sigma in (0.4, 0.7, 1.0, 1.4, 1.9):
-            vals = []
-            for s in probe:
-                vals.append(max(_compare(t.sample.ref, tile, it["_dx"], it["_dy"], sigma)[0]
-                                for t, it, (tile, _) in zip(tries, items, tiles) if t.sample is s))
-            if np.mean(vals) > best_val:
-                best_sigma, best_val = sigma, float(np.mean(vals))
-        bench.blur = best_sigma
+    tries = [_Try(s, Face("Inter", w), size_of(s, Face("Inter", w))) for s in probe for w in (400, 700)]
+    items = _items(tries, True)
+    tiles = bench.render(items)
+    best_sigma, best_val = 0.7, -1.0
+    for sigma in (0.4, 0.7, 1.0, 1.4, 1.9):
+        vals = [max(_compare(t.sample.ref, tile, it["_dx"], it["_dy"], sigma)[0]
+                    for t, it, (tile, _) in zip(tries, items, tiles) if t.sample is s) for s in probe]
+        if np.mean(vals) > best_val:
+            best_sigma, best_val = sigma, float(np.mean(vals))
+    bench.blur = best_sigma
 
-    # Stage 1: every face at its nominal size, tracked to width.
-    stage1 = [_Try(s, f, nominal_size(s, f.family, metrics))
-              for bi, ss in samples.items() for s in ss for f in all_faces]
-    _run(bench, stage1, fit=True)
-    owner = {id(s): bi for bi, ss in samples.items() for s in ss}
+    # Stage 1: the plausible faces (by width, weight and proportions), rendered and compared.
     table: Dict[int, Dict[str, List[_Try]]] = {}
-    for t in stage1:
-        table.setdefault(owner[id(t.sample)], {}).setdefault(t.face.key, []).append(t)
+
+    def run_faces(per_block_faces: Dict[int, List[Face]]) -> None:
+        batch = [_Try(s, f, size_of(s, f)) for bi, fs in per_block_faces.items() for s in samples[bi] for f in fs
+                 if f.key not in table.get(bi, {})]
+        _run(bench, batch, fit=True)
+        for t in batch:
+            table.setdefault(owner[id(t.sample)], {}).setdefault(t.face.key, []).append(t)
+
+    run_faces({bi: shortlist(ss, insts, shortlist_k) for bi, ss in samples.items()})
 
     def face_score(ts: List[_Try]) -> float:
         return float(np.mean([t.score - _penalty(t) for t in ts]))
 
-    # Stage 2: for each block's finalists, nudge size; keep the best per sample.
+    # Stage 1b: the families winning elsewhere on the sheet get a fair hearing in every
+    # block (so the document can settle on them later), at their best weight there.
+    # Rank families by how well they explain the whole sheet (not by outright wins, which
+    # near-identical grotesques split between them).
+    fam_scores: Dict[str, Dict[int, float]] = {}
+    for bi, faces_ in table.items():
+        for k, ts in faces_.items():
+            f = k.split("|")[0]
+            v = face_score(ts)
+            if v > fam_scores.setdefault(f, {}).get(bi, -9):
+                fam_scores[f][bi] = v
+    fill = {bi: float(np.percentile([face_score(ts) for ts in faces_.values()], 60)) - 0.03
+            for bi, faces_ in table.items()}
+    weight = {bi: max(6, len(blocks[bi].text())) ** 0.5 for bi in table}
+    total = {f: sum(weight[bi] * fs.get(bi, fill[bi]) for bi in table) for f, fs in fam_scores.items()}
+    favourites = [f for f, _ in sorted(total.items(), key=lambda kv: -kv[1])[:6]]
+    extra: Dict[int, List[Face]] = {}
+    for bi, ss in samples.items():
+        for fam in favourites:
+            if any(k.split("|")[0] == fam for k in table[bi]):
+                continue
+            cands = [k for k in insts if k.split("|")[0] == fam]
+            ranked = sorted(cands, key=lambda k: np.mean([feature_cost(s, insts[k]) for s in ss]))[:2]
+            extra.setdefault(bi, []).extend(_face(k) for k in ranked)
+    if extra:
+        run_faces(extra)
+
+    # Stage 2: for each block's finalists, nudge the size, try the italic, and try squashing
+    # or stretching the face horizontally to the measured width (display type is often scaled).
     stage2: List[_Try] = []
+    italics: Dict[int, List[Face]] = {}
     for bi, faces_ in table.items():
         ranked = sorted(faces_.items(), key=lambda kv: -face_score(kv[1]))[:finalists]
-        for _, ts in ranked:
+        for rank, (key, ts) in enumerate(ranked):
+            inst = insts.get(_face(key).upright.key)
+            face = _face(key)
+            letters = sum(ch.isalpha() for ss in samples[bi] for ch in ss.run.text)
+            if rank < 3 and not face.italic and face.family in italic_families and letters >= 4:
+                it_face = Face(face.family, face.weight, face.stretch, True)
+                if it_face.key not in faces_:
+                    italics.setdefault(bi, []).append(it_face)
+            if rank < 3:  # neighbouring weights and widths of the leaders, if the shortlist skipped them
+                for k2 in insts:
+                    f2 = _face(k2)
+                    if f2.family == face.family and k2 not in faces_ and \
+                            abs(f2.weight - face.weight) <= 200 and (f2.stretch or 100) == (face.stretch or 100) or \
+                            f2.family == face.family and f2.weight == face.weight and k2 not in faces_:
+                        f2 = Face(f2.family, f2.weight, f2.stretch, face.italic)
+                        if f2.key not in faces_:
+                            italics.setdefault(bi, []).append(f2)
             for t in ts:
                 for mult in (0.92, 0.96, 1.04, 1.08):
                     stage2.append(_Try(t.sample, t.face, t.size * mult))
+                if inst and rank < 4 and len(t.sample.run.text) >= 3:
+                    adv, _ = _sums(inst, t.sample.run.text)
+                    sx = t.sample.ink_w / max(1.0, t.size * adv - 0.06 * t.size)
+                    if 0.7 <= sx <= 1.35 and abs(sx - 1) > 0.06:
+                        stage2.append(_Try(t.sample, t.face, t.size, sx=round(sx, 3)))
+    if italics:
+        run_faces(italics)
     _run(bench, stage2, fit=True)
     for t in stage2:
         lst = table[owner[id(t.sample)]][t.face.key]
@@ -410,5 +563,6 @@ def match_blocks(bench: Bench, img: np.ndarray, blocks: Sequence[Block],
         ts = faces_[best_key]
         size = float(np.median([t.size for t in ts]))
         track = float(np.median([(t.ls or 0) / t.size for t in ts]))
-        out[bi] = Match(ts[0].face, size, track, scores[best_key], scores)
+        sx = float(np.median([t.sx for t in ts]))
+        out[bi] = Match(ts[0].face, size, track, scores[best_key], scores, scale_x=sx)
     return out

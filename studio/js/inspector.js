@@ -8,20 +8,16 @@ import { h, clear } from "./dom.js";
 let FONTS = [
   { family: "Inter", category: "neo-grotesque", axes: [], weights: [100, 900] },
 ];
-const CATEGORY_NAMES = {
-  "neo-grotesque": "Neo-grotesque", grotesque: "Grotesque", geometric: "Geometric", wide: "Wide",
-  condensed: "Condensed", stencil: "Stencil", serif: "Serif", oldstyle: "Old-style", didone: "Didone",
-  mono: "Mono", typewriter: "Typewriter", script: "Script",
-};
+let CATEGORY_NAMES = {};
 export const fontsReady = fetch("/fonts/catalogue.json")
   .then((r) => (r.ok ? r.json() : null))
   .then((cat) => {
     if (!cat) return;
-    FONTS = cat.families.map((f) => {
-      const lo = Math.min(...f.faces.map((x) => x.weight[0])), hi = Math.max(...f.faces.map((x) => x.weight[1]));
-      return { family: f.family, category: f.category, axes: f.stretch ? ["stretch"] : [], stretch: f.stretch,
-        weights: [lo, hi], fixedWeight: lo === hi ? lo : null };
-    });
+    CATEGORY_NAMES = cat.categories || {};
+    FONTS = cat.families.map((f) => ({
+      family: f.family, category: f.category, axes: f.stretch ? ["stretch"] : [], stretch: f.stretch,
+      weights: f.weights, fixedWeight: f.weights[0] === f.weights[1] ? f.weights[0] : null,
+    }));
   })
   .catch(() => {});
 
@@ -100,6 +96,7 @@ export class Inspector {
       row("size", "Size", number("size", { step: 0.1, min: 3, max: 400, unit: "pt" })),
       font.fixedWeight ? null : row("weight", "Weight", number("weight", { step: 10, min: font.weights[0], max: font.weights[1], unit: "" })),
       font.axes.includes("stretch") ? row("stretch", "Width", number("stretch", { step: 1, min: font.stretch[0], max: font.stretch[1], unit: "%" })) : null,
+      row("scale_x", "Squash", number("scale_x", { step: 0.01, min: 0.4, max: 2, unit: "×" })),
       row("tracking", "Tracking", number("tracking", { step: 0.005, min: -0.2, max: 1, unit: "em" })),
       row("leading", "Leading", number("leading", { step: 0.01, min: 0.6, max: 3, unit: "×" })),
       row("case", "Case", select("case", CASES, eff.case)),

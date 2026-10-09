@@ -62,18 +62,20 @@ def main(argv=None) -> int:
             cv2.imwrite(str(OUT / f"{p.name}.png"),
                         diff_image(ref, cv2.imencode(".png", ren)[1].tobytes(), height=900))
             n_text = sum(1 for f in res.rip["frames"] if f.get("type") == "text")
-            rows[p.name] = {"score": round(res.score, 1), "live": round(res.live, 3), "styles": len(res.rip["styles"]),
+            rows[p.name] = {"score": round(res.score, 1), "live": round(res.live, 3), "type": round(res.type_match, 3), "styles": len(res.rip["styles"]),
                             "text_frames": n_text, "frames": len(res.rip["frames"]),
                             "seconds": round(time.time() - t, 1)}
             b = base.get(p.name)
             was = prev.get(p.name, {}).get("score")
             print(f"  {res.score:5.1f}  (hand/legacy {b if b is not None else '-':>5}"
                   f"{'' if was is None else f', last {was:5.1f}'})  {p.name}  "
-                  f"[live {res.live:4.0%}, {len(res.rip['styles'])} styles, {n_text} texts, {time.time() - t:.0f}s]", flush=True)
+                  f"[type {res.type_match:.3f}, live {res.live:4.0%}, {len(res.rip['styles'])} styles, {n_text} texts, {time.time() - t:.0f}s]", flush=True)
     scores = [v["score"] for v in rows.values() if "score" in v]
     if scores:
         lives = [v["live"] for v in rows.values() if "live" in v]
-        print(f"  mean {sum(scores) / len(scores):.1f} over {len(scores)}, live {sum(lives) / len(lives):.0%}")
+        types = [v["type"] for v in rows.values() if "type" in v]
+        print(f"  mean {sum(scores) / len(scores):.1f} over {len(scores)}, live {sum(lives) / len(lives):.0%}, "
+              f"type {sum(types) / len(types):.3f}")
     if a.save:
         SAVED.write_text(json.dumps({"recorded": time.strftime("%Y-%m-%d"), "packs": {**prev, **rows}},
                                     indent=2) + "\n")

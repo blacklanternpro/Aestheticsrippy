@@ -3,7 +3,7 @@
   "id": "lsd-magick-city-poster",
   "name": "LSD Magick City Poster",
   "category": "Editorial & Poster | Ephemera | Industrial",
-  "description": "Ripped from a reference by the harvester. 7 type styles, 17 text frames, 18 art frames.",
+  "description": "Ripped from a reference by the harvester. 6 type styles, 17 text frames, 19 art frames.",
   "reference": {
     "image": "assets/reference.jpg"
   },
@@ -16,62 +16,57 @@
   },
   "tokens": {
     "paper": "#fd5aa6",
-    "ink": "#361312",
-    "accent": "#fd5735"
+    "ink": "#361311",
+    "accent": "#fc5737"
   },
   "styles": {
-    "subheading": {
-      "font": "Unbounded",
-      "size": 24.2,
+    "heading": {
+      "font": "Roboto Flex",
+      "size": 48.0,
       "weight": 900,
       "leading": 1.2,
-      "tracking": -0.05,
-      "color": "ink"
+      "tracking": 0.045,
+      "color": "ink",
+      "stretch": 125.0
     },
-    "heading": {
-      "font": "Archivo Black",
-      "size": 26.4,
-      "weight": 400,
+    "subheading": {
+      "font": "Archivo",
+      "size": 26.8,
+      "weight": 900,
       "leading": 1.2,
-      "color": "ink"
+      "color": "ink",
+      "stretch": 112.5
     },
     "display": {
-      "font": "Archivo Black",
-      "size": 50.4,
-      "weight": 400,
+      "font": "Archivo",
+      "size": 50.7,
+      "weight": 900,
       "leading": 1.01,
-      "tracking": 0.08,
-      "color": "ink"
-    },
-    "lead": {
-      "font": "Unbounded",
-      "size": 23.6,
-      "weight": 700,
-      "leading": 1.2,
-      "color": "ink"
-    },
-    "title": {
-      "font": "Archivo Black",
-      "size": 46.9,
-      "weight": 400,
-      "leading": 1.1,
       "color": "ink",
+      "stretch": 112.5,
       "case": "upper"
     },
     "small": {
       "font": "Archivo Black",
-      "size": 5.1,
+      "size": 4.6,
       "weight": 400,
       "leading": 1.2,
-      "tracking": 0.035,
       "color": "accent"
+    },
+    "title": {
+      "font": "Archivo Black",
+      "size": 48.4,
+      "weight": 400,
+      "leading": 1.2,
+      "color": "ink",
+      "case": "upper"
     },
     "body": {
       "font": "Archivo Black",
-      "size": 16.1,
+      "size": 16.6,
       "weight": 400,
-      "leading": 1.59,
-      "tracking": 0.03,
+      "leading": 1.57,
+      "tracking": 0.005,
       "color": "ink",
       "case": "upper"
     }
@@ -126,7 +121,7 @@
       "x": 0.0,
       "y": 137.67,
       "w": 3.0,
-      "h": 83.67,
+      "h": 53.17,
       "z": 0,
       "type": "image",
       "src": "mark-04.png",
@@ -145,10 +140,10 @@
     },
     {
       "id": "art06",
-      "x": 26.83,
-      "y": 213.5,
-      "w": 5.83,
-      "h": 10.67,
+      "x": 0.0,
+      "y": 191.5,
+      "w": 3.0,
+      "h": 25.83,
       "z": 0,
       "type": "image",
       "src": "mark-06.png",
@@ -156,10 +151,10 @@
     },
     {
       "id": "art07",
-      "x": 91.0,
-      "y": 217.17,
-      "w": 6.0,
-      "h": 7.5,
+      "x": 26.83,
+      "y": 213.83,
+      "w": 5.83,
+      "h": 10.33,
       "z": 0,
       "type": "image",
       "src": "mark-07.png",
@@ -167,9 +162,9 @@
     },
     {
       "id": "art08",
-      "x": 0.0,
-      "y": 242.67,
-      "w": 2.83,
+      "x": 91.0,
+      "y": 214.0,
+      "w": 6.0,
       "h": 10.67,
       "z": 0,
       "type": "image",
@@ -178,10 +173,10 @@
     },
     {
       "id": "art09",
-      "x": 57.0,
-      "y": 250.67,
-      "w": 6.5,
-      "h": 9.5,
+      "x": 41.33,
+      "y": 225.67,
+      "w": 11.83,
+      "h": 17.5,
       "z": 0,
       "type": "image",
       "src": "mark-09.png",
@@ -189,10 +184,10 @@
     },
     {
       "id": "art10",
-      "x": 86.33,
+      "x": 57.0,
       "y": 250.83,
-      "w": 6.33,
-      "h": 9.67,
+      "w": 6.5,
+      "h": 9.33,
       "z": 0,
       "type": "image",
       "src": "mark-10.png",
@@ -200,10 +195,10 @@
     },
     {
       "id": "art11",
-      "x": 97.17,
+      "x": 86.33,
       "y": 250.83,
-      "w": 17.17,
-      "h": 12.33,
+      "w": 6.33,
+      "h": 9.67,
       "z": 0,
       "type": "image",
       "src": "mark-11.png",
@@ -211,10 +206,10 @@
     },
     {
       "id": "art12",
-      "x": 22.17,
-      "y": 278.5,
-      "w": 6.5,
-      "h": 8.83,
+      "x": 97.17,
+      "y": 251.0,
+      "w": 17.17,
+      "h": 12.17,
       "z": 0,
       "type": "image",
       "src": "mark-12.png",
@@ -222,10 +217,10 @@
     },
     {
       "id": "art13",
-      "x": 86.67,
+      "x": 22.17,
       "y": 278.5,
-      "w": 6.17,
-      "h": 9.0,
+      "w": 6.5,
+      "h": 8.83,
       "z": 0,
       "type": "image",
       "src": "mark-13.png",
@@ -233,10 +228,10 @@
     },
     {
       "id": "art14",
-      "x": 115.83,
-      "y": 278.33,
-      "w": 6.33,
-      "h": 7.33,
+      "x": 86.67,
+      "y": 278.5,
+      "w": 6.17,
+      "h": 9.0,
       "z": 0,
       "type": "image",
       "src": "mark-14.png",
@@ -244,10 +239,10 @@
     },
     {
       "id": "art15",
-      "x": 71.83,
-      "y": 279.0,
+      "x": 115.83,
+      "y": 278.5,
       "w": 6.33,
-      "h": 8.33,
+      "h": 7.17,
       "z": 0,
       "type": "image",
       "src": "mark-15.png",
@@ -255,10 +250,10 @@
     },
     {
       "id": "art16",
-      "x": 131.67,
+      "x": 71.83,
       "y": 279.0,
-      "w": 8.67,
-      "h": 18.0,
+      "w": 6.33,
+      "h": 8.33,
       "z": 0,
       "type": "image",
       "src": "mark-16.png",
@@ -266,23 +261,34 @@
     },
     {
       "id": "art17",
-      "x": 47.5,
-      "y": 287.0,
-      "w": 6.17,
-      "h": 9.83,
+      "x": 131.67,
+      "y": 279.0,
+      "w": 8.67,
+      "h": 18.0,
       "z": 0,
       "type": "image",
       "src": "mark-17.png",
       "fit": "fill"
     },
     {
+      "id": "art18",
+      "x": 47.5,
+      "y": 287.0,
+      "w": 6.17,
+      "h": 9.83,
+      "z": 0,
+      "type": "image",
+      "src": "mark-18.png",
+      "fit": "fill"
+    },
+    {
       "id": "t01",
       "type": "text",
-      "style": "display",
+      "style": "heading",
       "bind": "t01",
-      "x": 7.17,
-      "y": 100.25,
-      "w": 184.67,
+      "x": 7.42,
+      "y": 99.22,
+      "w": 184.16,
       "with": {
         "align": "center",
         "wrap": "nowrap"
@@ -292,11 +298,11 @@
     {
       "id": "t02",
       "type": "text",
-      "style": "title",
+      "style": "display",
       "bind": "t02",
-      "x": 8.2,
-      "y": 162.37,
-      "w": 182.76,
+      "x": 21.97,
+      "y": 118.49,
+      "w": 156.73,
       "with": {
         "align": "center",
         "wrap": "nowrap"
@@ -306,12 +312,13 @@
     {
       "id": "t03",
       "type": "text",
-      "style": "subheading",
+      "style": "display",
       "bind": "t03",
-      "x": 95.49,
-      "y": 89.01,
-      "w": 18.96,
+      "x": 7.63,
+      "y": 163.16,
+      "w": 183.56,
       "with": {
+        "align": "center",
         "wrap": "nowrap"
       },
       "z": 2
@@ -319,11 +326,11 @@
     {
       "id": "t04",
       "type": "text",
-      "style": "heading",
+      "style": "subheading",
       "bind": "t04",
-      "x": 157.13,
-      "y": 88.8,
-      "w": 17.59,
+      "x": 95.46,
+      "y": 89.0,
+      "w": 19.51,
       "with": {
         "wrap": "nowrap"
       },
@@ -332,11 +339,11 @@
     {
       "id": "t05",
       "type": "text",
-      "style": "title",
+      "style": "subheading",
       "bind": "t05",
-      "x": 45.5,
-      "y": 225.71,
-      "w": 118.76,
+      "x": 156.79,
+      "y": 89.0,
+      "w": 17.67,
       "with": {
         "wrap": "nowrap"
       },
@@ -347,9 +354,9 @@
       "type": "text",
       "style": "title",
       "bind": "t06",
-      "x": 26.17,
-      "y": 263.21,
-      "w": 94.09,
+      "x": 51.32,
+      "y": 223.89,
+      "w": 112.58,
       "with": {
         "wrap": "nowrap"
       },
@@ -358,11 +365,11 @@
     {
       "id": "t07",
       "type": "text",
-      "style": "lead",
+      "style": "display",
       "bind": "t07",
-      "x": 95.33,
-      "y": 150.72,
-      "w": 18.33,
+      "x": 25.45,
+      "y": 263.33,
+      "w": 94.9,
       "with": {
         "wrap": "nowrap"
       },
@@ -371,11 +378,11 @@
     {
       "id": "t08",
       "type": "text",
-      "style": "title",
+      "style": "subheading",
       "bind": "t08",
-      "x": 124.5,
-      "y": 263.71,
-      "w": 57.43,
+      "x": 95.12,
+      "y": 150.5,
+      "w": 19.01,
       "with": {
         "wrap": "nowrap"
       },
@@ -384,11 +391,11 @@
     {
       "id": "t09",
       "type": "text",
-      "style": "heading",
+      "style": "display",
       "bind": "t09",
-      "x": 156.96,
-      "y": 150.8,
-      "w": 17.59,
+      "x": 124.28,
+      "y": 264.16,
+      "w": 58.23,
       "with": {
         "wrap": "nowrap"
       },
@@ -397,11 +404,11 @@
     {
       "id": "t10",
       "type": "text",
-      "style": "heading",
+      "style": "subheading",
       "bind": "t10",
-      "x": 95.29,
-      "y": 212.8,
-      "w": 19.42,
+      "x": 156.63,
+      "y": 151.34,
+      "w": 17.67,
       "with": {
         "wrap": "nowrap"
       },
@@ -410,11 +417,11 @@
     {
       "id": "t11",
       "type": "text",
-      "style": "heading",
+      "style": "subheading",
       "bind": "t11",
-      "x": 156.79,
-      "y": 213.8,
-      "w": 17.75,
+      "x": 95.29,
+      "y": 212.84,
+      "w": 19.51,
       "with": {
         "wrap": "nowrap"
       },
@@ -423,11 +430,11 @@
     {
       "id": "t12",
       "type": "text",
-      "style": "heading",
+      "style": "subheading",
       "bind": "t12",
-      "x": 30.96,
-      "y": 212.97,
-      "w": 11.09,
+      "x": 156.46,
+      "y": 213.84,
+      "w": 17.84,
       "with": {
         "wrap": "nowrap"
       },
@@ -438,9 +445,9 @@
       "type": "text",
       "style": "body",
       "bind": "t13",
-      "x": 61.61,
-      "y": 250.92,
-      "w": 79.57,
+      "x": 61.43,
+      "y": 250.78,
+      "w": 79.68,
       "with": {
         "wrap": "nowrap"
       },
@@ -451,12 +458,12 @@
       "type": "text",
       "style": "body",
       "bind": "t14",
-      "x": 26.61,
-      "y": 277.6,
-      "w": 37.74,
+      "x": 26.43,
+      "y": 277.94,
+      "w": 37.85,
       "with": {
-        "wrap": "nowrap",
-        "leading": 1.643
+        "tracking": 0.02,
+        "wrap": "nowrap"
       },
       "z": 2
     },
@@ -465,9 +472,9 @@
       "type": "text",
       "style": "body",
       "bind": "t15",
-      "x": 76.11,
-      "y": 278.09,
-      "w": 38.24,
+      "x": 76.05,
+      "y": 277.78,
+      "w": 38.35,
       "with": {
         "wrap": "nowrap"
       },
@@ -478,9 +485,9 @@
       "type": "text",
       "style": "body",
       "bind": "t16",
-      "x": 120.27,
-      "y": 278.59,
-      "w": 55.74,
+      "x": 120.1,
+      "y": 278.62,
+      "w": 55.85,
       "with": {
         "wrap": "nowrap"
       },
@@ -491,9 +498,9 @@
       "type": "text",
       "style": "small",
       "bind": "t17",
-      "x": 155.26,
-      "y": 216.82,
-      "w": 2.25,
+      "x": 155.44,
+      "y": 217.49,
+      "w": 2.14,
       "with": {
         "wrap": "nowrap"
       },
@@ -502,37 +509,37 @@
   ],
   "fields": {
     "order": [
-      "t01",
-      "t02",
-      "t03",
       "t04",
       "t05",
-      "t06",
-      "t07",
+      "t01",
+      "t02",
       "t08",
-      "t09",
       "t10",
+      "t03",
       "t11",
       "t12",
+      "t17",
+      "t06",
       "t13",
+      "t07",
+      "t09",
       "t14",
       "t15",
-      "t16",
-      "t17"
+      "t16"
     ],
     "labels": {
-      "t01": "Display 1",
-      "t02": "Title 1",
-      "t03": "Subheading 1",
-      "t04": "Heading 1",
-      "t05": "Title 2",
-      "t06": "Title 3",
-      "t07": "Lead 1",
-      "t08": "Title 4",
-      "t09": "Heading 2",
-      "t10": "Heading 3",
-      "t11": "Heading 4",
-      "t12": "Heading 5",
+      "t01": "Heading 1",
+      "t02": "Display 1",
+      "t03": "Display 2",
+      "t04": "Subheading 1",
+      "t05": "Subheading 2",
+      "t06": "Title 1",
+      "t07": "Display 3",
+      "t08": "Subheading 3",
+      "t09": "Display 4",
+      "t10": "Subheading 4",
+      "t11": "Subheading 5",
+      "t12": "Subheading 6",
       "t13": "Body 1",
       "t14": "Body 2",
       "t15": "Body 3",
@@ -541,26 +548,34 @@
     }
   },
   "harvest": {
-    "score": 86.4,
-    "live": 0.517,
+    "score": 86.6,
+    "live": 0.514,
+    "type_match": 0.781,
     "notes": [
       "No contrasting surround; the whole image is the sheet.",
       "Paper: 2:3, 200 x 300 mm.",
-      "Kept 1 unreadable text area as art.",
-      "The paper is not flat; kept it as a paper image under everything."
+      "Kept 2 unreadable text areas as art.",
+      "The paper is not flat; kept it as a paper image under everything.",
+      "Letter match 0.781 with the chosen faces (the best face per block alone: 0.799)."
     ],
     "history": [
       {
         "round": 0,
-        "score": 86.4
+        "score": 86.6
       },
       {
         "round": 1,
-        "score": 86.3,
-        "moved": 14,
+        "score": 86.6,
+        "moved": 16,
+        "kept": "position"
+      },
+      {
+        "round": 2,
+        "score": 85.8,
+        "moved": 10,
         "kept": null
       }
     ],
-    "seconds": 30.5
+    "seconds": 62.7
   }
 }

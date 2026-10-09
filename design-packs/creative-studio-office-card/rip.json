@@ -3,7 +3,7 @@
   "id": "creative-studio-office-card",
   "name": "Creative Studio Office Card",
   "category": "Editorial & Poster | Identity | Technical Ephemera",
-  "description": "Ripped from a reference by the harvester. 5 type styles, 8 text frames, 40 art frames.",
+  "description": "Ripped from a reference by the harvester. 4 type styles, 8 text frames, 40 art frames.",
   "reference": {
     "image": "assets/reference.jpg"
   },
@@ -20,46 +20,36 @@
     "ink-2": "#73757a"
   },
   "styles": {
-    "body": {
-      "font": "Space Mono",
-      "size": 26.9,
-      "weight": 700,
-      "leading": 1.2,
-      "tracking": -0.03,
-      "color": "ink",
-      "case": "upper"
-    },
     "small": {
-      "font": "Space Mono",
-      "size": 19.8,
-      "weight": 700,
+      "font": "Geist Mono",
+      "size": 20.0,
+      "weight": 900,
       "leading": 1.2,
       "color": "ink"
-    },
-    "caption": {
-      "font": "Inter",
-      "size": 18.3,
-      "weight": 800,
-      "leading": 1.2,
-      "tracking": -0.02,
-      "color": "ink"
-    },
-    "micro": {
-      "font": "Space Mono",
-      "size": 15.0,
-      "weight": 700,
-      "leading": 1.2,
-      "tracking": -0.04,
-      "color": "ink",
-      "case": "upper"
     },
     "fine": {
-      "font": "Space Mono",
-      "size": 15.6,
+      "font": "Geist Mono",
+      "size": 14.8,
+      "weight": 900,
+      "leading": 1.2,
+      "color": "ink",
+      "case": "upper"
+    },
+    "caption": {
+      "font": "Geist Mono",
+      "size": 15.4,
+      "weight": 900,
+      "leading": 1.2,
+      "tracking": -0.04,
+      "color": "ink-2",
+      "case": "upper"
+    },
+    "body": {
+      "font": "Geist Mono",
+      "size": 26.5,
       "weight": 700,
       "leading": 1.2,
-      "tracking": -0.06,
-      "color": "ink-2",
+      "color": "ink",
       "case": "upper"
     }
   },
@@ -478,7 +468,7 @@
       "y": 115.22,
       "w": 18.2,
       "weight": 3.08,
-      "color": "#c62e33",
+      "color": "#c42f33",
       "z": 0
     },
     {
@@ -507,9 +497,10 @@
       "style": "body",
       "bind": "t01",
       "x": 4.7,
-      "y": 1.03,
-      "w": 87.77,
+      "y": 1.4,
+      "w": 87.68,
       "with": {
+        "tracking": -0.037,
         "wrap": "nowrap"
       },
       "z": 2
@@ -519,10 +510,11 @@
       "type": "text",
       "style": "body",
       "bind": "t02",
-      "x": 145.57,
-      "y": 1.38,
-      "w": 65.54,
+      "x": 145.58,
+      "y": 1.75,
+      "w": 65.46,
       "with": {
+        "tracking": -0.018,
         "wrap": "nowrap"
       },
       "z": 2
@@ -532,9 +524,9 @@
       "type": "text",
       "style": "small",
       "bind": "t03",
-      "x": 49.25,
-      "y": 41.98,
-      "w": 11.72,
+      "x": 49.24,
+      "y": 42.09,
+      "w": 11.76,
       "with": {
         "wrap": "nowrap"
       },
@@ -543,11 +535,11 @@
     {
       "id": "t04",
       "type": "text",
-      "style": "caption",
+      "style": "small",
       "bind": "t04",
-      "x": 150.94,
-      "y": 42.78,
-      "w": 11.22,
+      "x": 150.92,
+      "y": 42.26,
+      "w": 11.58,
       "with": {
         "wrap": "nowrap"
       },
@@ -556,11 +548,11 @@
     {
       "id": "t05",
       "type": "text",
-      "style": "micro",
+      "style": "fine",
       "bind": "t05",
-      "x": 5.21,
-      "y": 59.04,
-      "w": 48.5,
+      "x": 5.22,
+      "y": 59.24,
+      "w": 48.46,
       "with": {
         "wrap": "nowrap"
       },
@@ -572,8 +564,8 @@
       "style": "body",
       "bind": "t06",
       "x": 5.4,
-      "y": 195.8,
-      "w": 87.77,
+      "y": 196.17,
+      "w": 87.68,
       "with": {
         "wrap": "nowrap"
       },
@@ -585,8 +577,8 @@
       "style": "body",
       "bind": "t07",
       "x": 129.65,
-      "y": 196.15,
-      "w": 82.17,
+      "y": 196.52,
+      "w": 82.08,
       "with": {
         "wrap": "nowrap"
       },
@@ -595,11 +587,11 @@
     {
       "id": "t08",
       "type": "text",
-      "style": "fine",
+      "style": "caption",
       "bind": "t08",
       "x": 159.03,
-      "y": 132.33,
-      "w": 48.8,
+      "y": 132.54,
+      "w": 48.76,
       "with": {
         "wrap": "nowrap"
       },
@@ -613,41 +605,43 @@
       "t03",
       "t04",
       "t05",
+      "t08",
       "t06",
-      "t07",
-      "t08"
+      "t07"
     ],
     "labels": {
       "t01": "Body 1",
       "t02": "Body 2",
       "t03": "Small 1",
-      "t04": "Caption 1",
-      "t05": "Micro 1",
+      "t04": "Small 2",
+      "t05": "Fine 1",
       "t06": "Body 3",
       "t07": "Body 4",
-      "t08": "Fine 1"
+      "t08": "Caption 1"
     }
   },
   "harvest": {
-    "score": 97.1,
+    "score": 96.7,
     "live": 0.195,
+    "type_match": 0.876,
     "notes": [
       "No contrasting surround; the whole image is the sheet.",
       "Paper: Square, 210 x 210 mm.",
-      "The paper is not flat; kept it as a paper image under everything."
+      "The paper is not flat; kept it as a paper image under everything.",
+      "Letter match 0.876 with the chosen faces (the best face per block alone: 0.879)."
     ],
     "history": [
       {
         "round": 0,
-        "score": 97.1
+        "score": 96.7
       },
       {
         "round": 1,
         "score": 96.4,
-        "moved": 8,
+        "moved": 7,
         "kept": null
       }
     ],
-    "seconds": 18.5
+    "seconds": 46.8
   }
 }

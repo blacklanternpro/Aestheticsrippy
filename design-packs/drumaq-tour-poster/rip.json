@@ -3,7 +3,7 @@
   "id": "drumaq-tour-poster",
   "name": "Drumaq Tour Poster",
   "category": "Editorial & Poster | Ephemera | Brutalist",
-  "description": "Ripped from a reference by the harvester. 8 type styles, 13 text frames, 6 art frames.",
+  "description": "Ripped from a reference by the harvester. 5 type styles, 15 text frames, 6 art frames.",
   "reference": {
     "image": "assets/reference.jpg"
   },
@@ -16,76 +16,48 @@
   },
   "tokens": {
     "paper": "#ccc8c7",
-    "ink": "#514d4d"
+    "ink": "#514d4e"
   },
   "styles": {
     "body": {
-      "font": "Archivo",
-      "size": 36.1,
-      "weight": 400,
-      "leading": 0.88,
-      "tracking": -0.08,
-      "color": "ink",
-      "stretch": 100
-    },
-    "display": {
-      "font": "Arimo",
-      "size": 38.4,
+      "font": "Archivo Narrow",
+      "size": 40.6,
       "weight": 700,
-      "leading": 0.84,
-      "tracking": 0.035,
+      "leading": 0.78,
+      "tracking": -0.06,
       "color": "ink"
-    },
-    "body-strong-inter": {
-      "font": "Inter",
-      "size": 35.4,
-      "weight": 900,
-      "leading": 1.2,
-      "color": "ink"
-    },
-    "small": {
-      "font": "Inter",
-      "size": 27.2,
-      "weight": 700,
-      "leading": 1.2,
-      "tracking": -0.04,
-      "color": "ink",
-      "case": "upper"
-    },
-    "body-strong-inter-b": {
-      "font": "Inter",
-      "size": 36.5,
-      "weight": 600,
-      "leading": 0.88,
-      "tracking": -0.005,
-      "color": "ink"
-    },
-    "body-caps-inter-tight": {
-      "font": "Inter Tight",
-      "size": 36.4,
-      "weight": 500,
-      "leading": 1.2,
-      "tracking": -0.03,
-      "color": "ink",
-      "case": "upper"
     },
     "caption": {
-      "font": "Archivo",
-      "size": 21.8,
-      "weight": 600,
+      "font": "Mona Sans",
+      "size": 12.3,
+      "weight": 400,
       "leading": 1.2,
-      "tracking": -0.03,
       "color": "ink",
-      "stretch": 75
+      "stretch": 75.0
+    },
+    "body-light-caps": {
+      "font": "Archivo Narrow",
+      "size": 40.2,
+      "weight": 500,
+      "leading": 1.2,
+      "color": "ink",
+      "case": "upper"
+    },
+    "small": {
+      "font": "Archivo Narrow",
+      "size": 21.8,
+      "weight": 700,
+      "leading": 1.2,
+      "tracking": -0.07,
+      "color": "ink"
     },
     "fine": {
-      "font": "Archivo",
-      "size": 9.4,
-      "weight": 600,
+      "font": "Archivo Narrow",
+      "size": 10.0,
+      "weight": 700,
       "leading": 1.2,
-      "tracking": -0.005,
+      "tracking": -0.045,
       "color": "ink",
-      "stretch": 75,
       "case": "upper"
     }
   },
@@ -160,9 +132,13 @@
       "type": "text",
       "style": "body",
       "bind": "t01",
-      "x": 5.2,
-      "y": 40.46,
-      "w": 172.54,
+      "x": 72.58,
+      "y": 5.73,
+      "w": 26.56,
+      "with": {
+        "tracking": -0.047,
+        "wrap": "nowrap"
+      },
       "z": 2
     },
     {
@@ -170,12 +146,9 @@
       "type": "text",
       "style": "body",
       "bind": "t02",
-      "x": 125.92,
-      "y": 39.19,
-      "w": 23.92,
-      "with": {
-        "wrap": "nowrap"
-      },
+      "x": 5.14,
+      "y": 39.55,
+      "w": 173.33,
       "z": 2
     },
     {
@@ -183,10 +156,11 @@
       "type": "text",
       "style": "body",
       "bind": "t03",
-      "x": 4.99,
-      "y": 62.45,
-      "w": 25.61,
+      "x": 126.49,
+      "y": 39.13,
+      "w": 24.87,
       "with": {
+        "tracking": 0.0,
         "wrap": "nowrap"
       },
       "z": 2
@@ -196,10 +170,11 @@
       "type": "text",
       "style": "body",
       "bind": "t04",
-      "x": 48.12,
-      "y": 74.14,
-      "w": 55.21,
+      "x": 5.56,
+      "y": 62.6,
+      "w": 26.56,
       "with": {
+        "tracking": -0.047,
         "wrap": "nowrap"
       },
       "z": 2
@@ -207,12 +182,13 @@
     {
       "id": "t05",
       "type": "text",
-      "style": "display",
+      "style": "body",
       "bind": "t05",
-      "x": 68.8,
-      "y": 84.75,
-      "w": 103.27,
+      "x": 48.74,
+      "y": 74.44,
+      "w": 56.16,
       "with": {
+        "tracking": 0.0,
         "wrap": "nowrap"
       },
       "z": 2
@@ -220,12 +196,13 @@
     {
       "id": "t06",
       "type": "text",
-      "style": "body-strong-inter-b",
+      "style": "body",
       "bind": "t06",
-      "x": 4.98,
-      "y": 107.2,
-      "w": 54.87,
+      "x": 161.45,
+      "y": 85.22,
+      "w": 20.01,
       "with": {
+        "tracking": 0.0,
         "wrap": "nowrap"
       },
       "z": 2
@@ -233,12 +210,13 @@
     {
       "id": "t07",
       "type": "text",
-      "style": "body-strong-inter",
+      "style": "body",
       "bind": "t07",
-      "x": 52.35,
-      "y": 94.94,
-      "w": 16.58,
+      "x": 5.14,
+      "y": 107.21,
+      "w": 55.74,
       "with": {
+        "tracking": 0.0,
         "wrap": "nowrap"
       },
       "z": 2
@@ -246,21 +224,25 @@
     {
       "id": "t08",
       "type": "text",
-      "style": "body-strong-inter-b",
+      "style": "body",
       "bind": "t08",
-      "x": 4.77,
-      "y": 141.03,
-      "w": 126.31,
+      "x": 162.22,
+      "y": 119.04,
+      "w": 28.04,
+      "with": {
+        "tracking": 0.0,
+        "wrap": "nowrap"
+      },
       "z": 2
     },
     {
       "id": "t09",
       "type": "text",
-      "style": "body-caps-inter-tight",
+      "style": "body",
       "bind": "t09",
-      "x": 156.36,
-      "y": 150.85,
-      "w": 22.93,
+      "x": 4.92,
+      "y": 141.88,
+      "w": 128.47,
       "with": {
         "wrap": "nowrap"
       },
@@ -269,12 +251,13 @@
     {
       "id": "t10",
       "type": "text",
-      "style": "small",
+      "style": "body",
       "bind": "t10",
-      "x": 102.57,
-      "y": 143.18,
-      "w": 18.44,
+      "x": 67.5,
+      "y": 141.24,
+      "w": 70.54,
       "with": {
+        "tracking": 0.0,
         "wrap": "nowrap"
       },
       "z": 2
@@ -282,11 +265,11 @@
     {
       "id": "t11",
       "type": "text",
-      "style": "caption",
+      "style": "body-light-caps",
       "bind": "t11",
-      "x": 6.29,
-      "y": 200.0,
-      "w": 25.12,
+      "x": 156.31,
+      "y": 149.79,
+      "w": 23.73,
       "with": {
         "wrap": "nowrap"
       },
@@ -295,11 +278,11 @@
     {
       "id": "t12",
       "type": "text",
-      "style": "fine",
+      "style": "caption",
       "bind": "t12",
-      "x": 56.53,
-      "y": 243.62,
-      "w": 40.04,
+      "x": 94.96,
+      "y": 82.19,
+      "w": 4.08,
       "with": {
         "wrap": "nowrap"
       },
@@ -308,11 +291,38 @@
     {
       "id": "t13",
       "type": "text",
-      "style": "fine",
+      "style": "small",
       "bind": "t13",
-      "x": 101.14,
-      "y": 243.41,
-      "w": 43.0,
+      "x": 6.46,
+      "y": 200.0,
+      "w": 25.12,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t14",
+      "type": "text",
+      "style": "fine",
+      "bind": "t14",
+      "x": 56.52,
+      "y": 243.54,
+      "w": 40.17,
+      "with": {
+        "tracking": 0.0,
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t15",
+      "type": "text",
+      "style": "fine",
+      "bind": "t15",
+      "x": 101.13,
+      "y": 243.33,
+      "w": 43.13,
       "with": {
         "wrap": "nowrap"
       },
@@ -326,64 +336,70 @@
       "t03",
       "t04",
       "t05",
+      "t12",
       "t06",
       "t07",
       "t08",
       "t09",
       "t10",
       "t11",
-      "t12",
-      "t13"
+      "t13",
+      "t14",
+      "t15"
     ],
     "labels": {
       "t01": "Body 1",
       "t02": "Body 2",
       "t03": "Body 3",
       "t04": "Body 4",
-      "t05": "Display 1",
-      "t06": "Body strong inter b 1",
-      "t07": "Body strong inter 1",
-      "t08": "Body strong inter b 2",
-      "t09": "Body caps inter tight 1",
-      "t10": "Small 1",
-      "t11": "Caption 1",
-      "t12": "Fine 1",
-      "t13": "Fine 2"
+      "t05": "Body 5",
+      "t06": "Body 6",
+      "t07": "Body 7",
+      "t08": "Body 8",
+      "t09": "Body 9",
+      "t10": "Body 10",
+      "t11": "Body light caps 1",
+      "t12": "Caption 1",
+      "t13": "Small 1",
+      "t14": "Fine 1",
+      "t15": "Fine 2"
     }
   },
   "harvest": {
-    "score": 77.8,
-    "live": 0.293,
+    "score": 79.1,
+    "live": 0.283,
+    "type_match": 0.691,
     "notes": [
       "No contrasting surround; the whole image is the sheet.",
       "Paper: 4:5, 200 x 250 mm.",
       "Kept 2 unreadable text areas as art.",
-      "The paper is not flat; kept it as a paper image under everything."
+      "The paper is not flat; kept it as a paper image under everything.",
+      "Letter match 0.691 with the chosen faces (the best face per block alone: 0.704)."
     ],
     "history": [
       {
         "round": 0,
-        "score": 77.8
+        "score": 78.9
       },
       {
         "round": 1,
-        "score": 77.8,
-        "moved": 12,
+        "score": 79.1,
+        "moved": 14,
         "kept": "position"
       },
       {
         "round": 2,
-        "score": 77.8,
-        "moved": 5,
+        "score": 79.1,
+        "moved": 6,
         "kept": "position"
       },
       {
         "round": 3,
-        "score": 77.8,
-        "moved": 1,
+        "score": 79.1,
+        "moved": 6,
         "kept": "position"
       }
     ],
-    "seconds": 34.6
+    "seconds": 54.2
   }
 }

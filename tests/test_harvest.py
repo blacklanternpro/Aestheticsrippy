@@ -81,11 +81,14 @@ def test_type_is_recognised(ripped):
     title = next(s for t, s in by_text.items() if "field notes" in t)
     body = next(s for t, s in by_text.items() if "harbour" in t)
     note = next(s for t, s in by_text.items() if "uncoated" in t)
-    assert title["font"] in ("Archivo", "Archivo Black", "Oswald") and title["weight"] >= 600
-    assert body["font"] in ("Inter", "Inter Tight", "Arimo")
+    from engine.typecase import family
+    # With 167 families the exact face may lose to a near twin; the kind of face must be right.
+    assert family(title["font"])["category"] in ("condensed", "grotesque") and title["weight"] >= 600
+    assert title.get("stretch", 100) <= 90 or family(title["font"])["category"] == "condensed"
+    assert family(body["font"])["category"] in ("neo-grotesque", "grotesque", "geometric")
     # The A5 sheet snaps to A4 proportions, so sizes scale; their ratio must hold.
     assert abs(body["size"] / title["size"] - 10 / 44) < 0.03
-    assert note["font"] in ("Courier Prime", "Space Mono", "JetBrains Mono")
+    assert family(note["font"])["category"] in ("mono", "typewriter")
 
 
 def test_art_comes_back(ripped):
@@ -144,3 +147,89 @@ def test_paper_colour_ignores_big_type():
     img = np.full((400, 300, 3), 235, np.uint8)
     img[60:340, 40:260] = 30  # a huge dark letterform in the middle
     assert art.paper_colour(img) == (235, 235, 235)
+
+
+# ------------------------------------------------------------ lists, angles, posters
+
+KNOWN2 = {
+    "rip": 1, "id": "known2", "name": "Known 2", "page": {"width_mm": 148, "height_mm": 210, "paper": "paper", "ink": "ink"},
+    "tokens": {"paper": "#ffffff", "ink": "#111111"},
+    "styles": {
+        "row": {"font": "Inter", "weight": 400, "size": 11, "leading": 1.2, "color": "ink"},
+        "poster": {"font": "Archivo", "weight": 800, "size": 30, "leading": 1.0, "color": "ink", "case": "upper"},
+        "angled": {"font": "Inter", "weight": 600, "size": 16, "leading": 1.0, "color": "ink"},
+    },
+    "frames": [
+        {"id": "p1", "type": "text", "style": "poster", "bind": "p1", "x": 20, "y": 14, "w": 108,
+         "with": {"align": "center", "wrap": "nowrap"}},
+        {"id": "p2", "type": "text", "style": "poster", "bind": "p2", "x": 20, "y": 27, "w": 108,
+         "with": {"align": "center", "wrap": "nowrap", "tracking": 0.32}},
+        {"id": "rows", "type": "repeat", "bind": "rows", "x": 16, "y": 60, "gap": 4, "item": {
+            "type": "row", "cols": [80, 36], "children": [
+                {"type": "text", "style": "row", "bind": ".item"},
+                {"type": "text", "style": "row", "bind": ".price", "with": {"align": "right"}}]}},
+        {"id": "tilt", "type": "text", "style": "angled", "bind": "tilt", "x": 40, "y": 160, "w": 80,
+         "rotate": -30, "with": {"wrap": "nowrap"}},
+    ],
+}
+DATA2 = {
+    "p1": "Tom of England", "p2": "Ivan Berko",
+    "rows": [{"item": "Oak dining table", "price": "1,200"}, {"item": "Linen armchair", "price": "950"},
+             {"item": "Walnut shelving unit", "price": "1,100"}, {"item": "Brass floor lamp", "price": "650"}],
+    "tilt": "SEASON CLOSING SALE",
+}
+
+
+@pytest.fixture(scope="module")
+def ripped2(tmp_path_factory):
+    from engine.harvest.pipeline import harvest
+    from engine.render import Renderer
+    from engine.rip import loader_html
+
+    work = tmp_path_factory.mktemp("known2")
+    page = work / "known2.html"
+    page.write_text(loader_html(KNOWN2, DATA2, work, [work]), encoding="utf-8")
+    with Renderer() as r:
+        (work / "known2.png").write_bytes(r.render_file(page, pdf=False).png)
+        return harvest(work / "known2.png", "Known 2", out_dir=work / "pack", renderer=r, refine_rounds=1)
+
+
+def test_rows_become_a_list(ripped2):
+    lists = [v for v in ripped2.data.values() if isinstance(v, list)]
+    assert lists, ripped2.data
+    rows = lists[0]
+    assert len(rows) == 4
+    assert [list(r.values())[0] for r in rows][:2] == ["Oak dining table", "Linen armchair"]
+    rep = next(f for f in ripped2.rip["frames"] if f.get("type") == "repeat")
+    cells = [c for c in rep["item"]["children"] if c.get("type") == "text"]
+    assert cells[-1]["with"].get("align") == "right"
+
+
+def test_angled_type_is_read_and_rotated(ripped2):
+    rot = [f for f in ripped2.rip["frames"] if f.get("rotate")]
+    assert rot, "no rotated frame"
+    texts = {ripped2.data[f["bind"]] for f in rot}
+    assert any("CLOSING" in t for t in texts), texts
+    assert all(abs(abs(f["rotate"]) - 30) < 4 for f in rot)
+
+
+def test_forced_width_lines_get_their_own_tracking(ripped2):
+    frames = {ripped2.data[f["bind"]].upper(): f for f in ripped2.rip["frames"]
+              if f.get("type") == "text" and isinstance(ripped2.data.get(f["bind"]), str)}
+    tom = next(f for t, f in frames.items() if "ENGLAND" in t)
+    ivan = next(f for t, f in frames.items() if "BERKO" in t)
+    assert tom is not ivan
+    st = ripped2.rip["styles"]
+    track = lambda f: (f.get("with") or {}).get("tracking", st[f["style"]].get("tracking", 0))  # noqa: E731
+    assert track(ivan) - track(tom) > 0.15
+
+
+def test_cabinet_is_complete():
+    import json
+    cat = json.loads((ROOT / "fonts" / "catalogue.json").read_text())
+    assert len(cat["families"]) >= 150
+    for fam in cat["families"]:
+        for face in fam["faces"]:
+            assert (ROOT / "fonts" / face["file"]).exists(), face["file"]
+    css = (ROOT / "fonts" / "fonts.css").read_text()
+    assert css.count("@font-face") == sum(len(f["faces"]) for f in cat["families"])
