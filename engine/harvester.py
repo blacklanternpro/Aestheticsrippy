@@ -21,8 +21,6 @@ import io
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.append(str(BASE_DIR))
 
-from engine.boutique_glyphs import generate_glyph_lockup
-
 import time
 
 # Available models in order of priority (including flash-lite with generous quota)
@@ -37,28 +35,16 @@ GEMINI_MODELS = [
 
 DEFAULT_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 
-# Fallback: check known local .env locations if no env key
+# Fallback: a .env file in the project root (never outside it).
 if not DEFAULT_API_KEY:
-    potential_envs = [
-        BASE_DIR / ".env",
-        Path("C:/Users/edtli/dell-estate-flow/.env"),
-        Path("C:/Users/edtli/r1i-sales-intel/.env")
-    ]
-    for env_path in potential_envs:
-        if env_path.exists():
-            try:
-                with open(env_path, "r", encoding="utf-8") as f:
-                    for line in f:
-                        line = line.strip()
-                        if line.startswith("GEMINI_API_KEY=") or line.startswith("VITE_GEMINI_API_KEY="):
-                            val = line.split("=", 1)[1].strip().strip('"').strip("'")
-                            if val:
-                                DEFAULT_API_KEY = val
-                                break
-            except Exception:
-                pass
-        if DEFAULT_API_KEY:
-            break
+    _env_path = BASE_DIR / ".env"
+    if _env_path.exists():
+        for _line in _env_path.read_text(encoding="utf-8").splitlines():
+            _line = _line.strip()
+            if _line.startswith(("GEMINI_API_KEY=", "VITE_GEMINI_API_KEY=")):
+                DEFAULT_API_KEY = _line.split("=", 1)[1].strip().strip('"').strip("'")
+                if DEFAULT_API_KEY:
+                    break
 
 def build_harvest_prompt(aspect: float, auto_format: str, w_mm: int, h_mm: int) -> str:
     orientation = "landscape" if w_mm > h_mm else "portrait"
@@ -165,42 +151,6 @@ CRITICAL ARCHITECTURAL & DESIGN DECONSTRUCTION RULES:
          </div>
          ```
          CSS: `.date-triptych {{ display: flex; justify-content: space-between; width: 100%; font-weight: 900; margin-bottom: 2px; }}`
-     * **K. Contoured / Nested Acronym Lockups (`L S D` / `LAST SATURDAY DANCE`)**:
-       - Visual cue: Large display letters with smaller text running inside them or contouring along their paths.
-       - Structure as a Vector Boutique Glyph Lockup with dual-layer chromatic screenprint registration:
-         ```html
-         <div class="glyph-lockup visual-object ac-movable">
-           <div class="glyph-vector">
-             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 91" width="100%" height="100%">
-               <g fill="#ff6600" transform="translate(-3.5, 3.5)">
-                 <path class="shadow-l" d="M 8 14 L 7 25 L 8 44 L 7 77 L 8 78 L 8 86 L 59 86 L 59 72 L 24 71 L 24 14 Z" fill-rule="evenodd"/>
-                 <path class="shadow-s" d="M 84 15 L 73 21 L 68 27 L 66 32 L 67 43 L 69 47 L 77 53 L 104 60 L 108 67 L 102 73 L 90 73 L 85 71 L 80 64 L 64 64 L 65 70 L 68 77 L 78 85 L 85 87 L 104 87 L 116 81 L 122 73 L 122 56 L 112 47 L 85 40 L 82 36 L 82 33 L 84 30 L 90 27 L 101 27 L 107 32 L 108 35 L 122 34 L 119 23 L 111 16 L 96 13 Z" fill-rule="evenodd"/>
-                 <path class="shadow-d" d="M 165 16 L 159 14 L 148 13 L 135 14 L 136 60 L 135 85 L 136 87 L 153 87 L 159 86 L 170 82 L 178 75 L 182 68 L 184 60 L 184 47 L 182 36 L 177 26 L 175 24 L 171 24 L 172 21 Z M 149 29 L 155 29 L 159 30 L 162 32 L 166 36 L 169 42 L 170 49 L 170 55 L 168 63 L 166 66 L 162 70 L 158 72 L 154 73 L 147 72 Z" fill-rule="evenodd"/>
-               </g>
-               <g fill="#000000">
-                 <path class="main-l" d="M 8 14 L 7 25 L 8 44 L 7 77 L 8 78 L 8 86 L 59 86 L 59 72 L 24 71 L 24 14 Z" fill-rule="evenodd"/>
-                 <path class="main-s" d="M 84 15 L 73 21 L 68 27 L 66 32 L 67 43 L 69 47 L 77 53 L 104 60 L 108 67 L 102 73 L 90 73 L 85 71 L 80 64 L 64 64 L 65 70 L 68 77 L 78 85 L 85 87 L 104 87 L 116 81 L 122 73 L 122 56 L 112 47 L 85 40 L 82 36 L 82 33 L 84 30 L 90 27 L 101 27 L 107 32 L 108 35 L 122 34 L 119 23 L 111 16 L 96 13 Z" fill-rule="evenodd"/>
-                 <path class="main-d" d="M 165 16 L 159 14 L 148 13 L 135 14 L 136 60 L 135 85 L 136 87 L 153 87 L 159 86 L 170 82 L 178 75 L 182 68 L 184 60 L 184 47 L 182 36 L 177 26 L 175 24 L 171 24 L 172 21 Z M 149 29 L 155 29 L 159 30 L 162 32 L 166 36 L 169 42 L 170 49 L 170 55 L 168 63 L 166 66 L 162 70 L 158 72 L 154 73 L 147 72 Z" fill-rule="evenodd"/>
-               </g>
-             </svg>
-           </div>
-           <div class="inner-chars inner-l">
-             <span class="char-l1">L</span><span class="char-l2">A</span><span class="char-l3">S</span><span class="char-l4">T</span>
-           </div>
-           <div class="inner-chars inner-s">
-             <span class="char-s1">S</span><span class="char-s2">A</span><span class="char-s3">T</span><span class="char-s4">U</span><span class="char-s5">R</span><span class="char-s6">D</span><span class="char-s7">A</span><span class="char-s8">Y</span>
-           </div>
-           <div class="inner-chars inner-d">
-             <span class="char-d1">D</span><span class="char-d2">A</span><span class="char-d3">N</span><span class="char-d4">C</span><span class="char-d5">E</span>
-           </div>
-         </div>
-         ```
-       - CSS:
-         `.glyph-lockup {{ position: relative; width: 100%; max-width: 570px; margin: 0 auto; aspect-ratio: 190 / 91; }}`
-         `.glyph-vector {{ position: absolute; inset: 0; pointer-events: none; }}`
-         `.inner-chars {{ position: absolute; inset: 0; pointer-events: auto; }}`
-         `.inner-chars span {{ position: absolute; font-family: 'Inter', sans-serif; font-weight: 900; font-size: 27px; color: var(--page-bg); line-height: 1; transform: translate(-50%, -50%); cursor: text; text-shadow: 0.5px 0.5px 0px rgba(255, 102, 0, 0.7); }}`
-
        L. Monospace Receipt / Thermal Printer Typography
        - Visual cue: Thermal receipt paper with monospace body text, dot-matrix headers, right-aligned currency amounts.
        - The body MUST use `font-family: 'Space Mono', 'Courier New', monospace`.
@@ -483,11 +433,11 @@ def call_gemini_vision(
     
     last_err = None
     for model_name in models_to_try:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
         req = urllib.request.Request(
             url,
             data=json.dumps(payload).encode("utf-8"),
-            headers={"Content-Type": "application/json"}
+            headers={"Content-Type": "application/json", "x-goog-api-key": key}
         )
         for attempt in range(4):
             try:
@@ -577,764 +527,121 @@ def ensure_dom_text_completeness(html_content: str, default_data: Dict[str, Any]
     html_content = re.sub(pattern, replacer, html_content)
     return html_content
 
+PRIMITIVES_CSS_PATH = Path(__file__).resolve().parent / "primitives.css"
+
+GOOGLE_FONTS_LINK = (
+    '<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue'
+    '&family=Barlow+Condensed:wght@700;800;900&family=Archivo+Narrow:wght@600;700'
+    '&family=Archivo+Black&family=Syne:wght@700;800;900&family=Montserrat:wght@800;900'
+    '&family=Inter:wght@400;600;700;800;900&family=Space+Mono:wght@400;700'
+    '&family=Playfair+Display+SC:wght@900&family=Cinzel+Decorative:wght@700;900'
+    '&display=swap" rel="stylesheet">'
+)
+
+PRIMITIVES_MARKER = "/* === AESTHETICSRIPPY PRIMITIVES === */"
+
+
 def normalize_typographic_structures(html_content: str, css_content: str) -> Tuple[str, str]:
     """
-    Guarantees publication-grade typographic deconstruction:
-    1. Upgrades compound date/number rows (e.g. index 01 + giant date 10.04 + artist name + underline).
-    2. Enforces headline text underlines to wrap text width rather than whole column width.
-    3. Synthesizes authentic vector QR and logo badges for inset cards.
-    4. Guarantees complete Google Fonts links in <head>.
-    5. Injects standard Typographic DNA classes into CSS (--typo-scale-y, .date-hero, .artist-title, etc.).
+    Generic structural clean-up of model output. Every rule here must apply to
+    any reference: nothing may key on a specific design's words.
+
+    1. Compound index + date rows become discrete, styleable spans.
+    2. Header underlines hug the text rather than the column.
+    3. Flat "month day year" lines become a three-point triptych.
+    4. Flat "label    amount" receipt lines become two-column rows.
+    5. Rotated edge text gets proper writing-mode classes.
+    6. Unclassed tables get the invoice-grid class.
+    7. The shared font link and the scoped primitives layer are ensured.
     """
     if not html_content:
         return html_content, css_content
 
-    # 1. Normalize compound date listing rows if LLM output <div class="entry"><span>01</span> 10.04<br><strong>...</strong></div>
+    # 1. Compound date listing rows.
     def repl_entry(m):
-        idx = m.group(1).strip()
-        date_str = m.group(2).strip()
-        title = m.group(3).strip()
+        idx, date_str, title = (g.strip() for g in m.groups())
         return (
-            f'<div class="calendar-item visual-object ac-movable">\n'
-            f'  <div class="date-row">\n'
+            '<div class="calendar-item visual-object ac-movable">\n'
+            '  <div class="date-row">\n'
             f'    <span class="idx">{idx}</span>\n'
             f'    <span class="date-hero typo-condensed-tall">{date_str}</span>\n'
-            f'  </div>\n'
+            '  </div>\n'
             f'  <div class="artist-title">{title}</div>\n'
-            f'</div>'
+            '</div>'
         )
 
-    # Pattern A: <div class="entry">\s*<span>(\d+)</span>\s*([0-9\.\-\/]+)\s*<br\s*/?>\s*(?:<strong>)?(.*?)(?:</strong>)?\s*</div>
-    pattern_a = r'<div class="entry">\s*<span>(\d+)</span>\s*([0-9\.\-\/]+)\s*<br\s*/?>\s*(?:<strong>)?(.*?)(?:</strong>)?\s*</div>'
-    html_content = re.sub(pattern_a, repl_entry, html_content, flags=re.IGNORECASE)
+    for pattern in (
+        r'<div class="entry">\s*<span>(\d+)</span>\s*([0-9.\-/]+)\s*<br\s*/?>\s*(?:<strong>)?(.*?)(?:</strong>)?\s*</div>',
+        r'<div class="entry">\s*(\d{1,2})\s+([0-9.\-/]+)\s*<br\s*/?>\s*(?:<strong>)?(.*?)(?:</strong>)?\s*</div>',
+    ):
+        html_content = re.sub(pattern, repl_entry, html_content, flags=re.IGNORECASE)
 
-    # Pattern B: <div class="entry">\s*(\d{1,2})\s+([0-9\.\-\/]+)\s*<br\s*/?>\s*(?:<strong>)?(.*?)(?:</strong>)?\s*</div>
-    pattern_b = r'<div class="entry">\s*(\d{1,2})\s+([0-9\.\-\/]+)\s*<br\s*/?>\s*(?:<strong>)?(.*?)(?:</strong>)?\s*</div>'
-    html_content = re.sub(pattern_b, repl_entry, html_content, flags=re.IGNORECASE)
-
-    # 2. Header text underline wrapping: <h2 class="header">JANUARY</h2> -> <h2 class="header"><span class="header-text">JANUARY</span></h2>
+    # 2. Header underline wrapping.
     def repl_header(m):
-        tag = m.group(1)
-        attrs = m.group(2)
-        text = m.group(3)
-        if '<span' not in text:
-            return f'<{tag}{attrs}><span class="header-text">{text}</span></{tag}>'
-        return m.group(0)
+        tag, attrs, text = m.groups()
+        if "<span" in text:
+            return m.group(0)
+        return f'<{tag}{attrs}><span class="header-text">{text}</span></{tag}>'
 
-    pattern_header = r'<(h[1-4])([^>]*class=[\'"][^\'"]*header[^\'"]*[\'"][^>]*)>(.*?)</\1>'
-    html_content = re.sub(pattern_header, repl_header, html_content, flags=re.IGNORECASE)
+    html_content = re.sub(
+        r'<(h[1-4])([^>]*class=[\'"][^\'"]*header[^\'"]*[\'"][^>]*)>(.*?)</\1>',
+        repl_header, html_content, flags=re.IGNORECASE,
+    )
 
-    # 3. Vector QR code and logo SVG in breakout brick if placeholder text [QR] or [R] present
-    qr_svg = '''<svg class="qr-code-svg visual-object" width="34" height="34" viewBox="0 0 34 34" fill="#000" style="display:block;margin-bottom:4px;background:#fff;padding:2px;border:1px solid #000;">
-  <rect x="2" y="2" width="10" height="10" fill="none" stroke="#000" stroke-width="2"/>
-  <rect x="5" y="5" width="4" height="4"/>
-  <rect x="22" y="2" width="10" height="10" fill="none" stroke="#000" stroke-width="2"/>
-  <rect x="25" y="5" width="4" height="4"/>
-  <rect x="2" y="22" width="10" height="10" fill="none" stroke="#000" stroke-width="2"/>
-  <rect x="5" y="25" width="4" height="4"/>
-  <rect x="14" y="2" width="4" height="4"/>
-  <rect x="14" y="8" width="4" height="4"/>
-  <rect x="2" y="14" width="4" height="4"/>
-  <rect x="8" y="14" width="4" height="4"/>
-  <rect x="14" y="14" width="6" height="6"/>
-  <rect x="22" y="14" width="4" height="4"/>
-  <rect x="28" y="14" width="4" height="4"/>
-  <rect x="14" y="22" width="4" height="8"/>
-  <rect x="22" y="22" width="8" height="4"/>
-  <rect x="24" y="28" width="4" height="4"/>
-</svg>'''
-
-    logo_r_svg = '''<svg class="logo-r-svg visual-object" width="34" height="34" viewBox="0 0 34 34" fill="#000" style="display:block;margin-bottom:4px;">
-  <path d="M6 4h12c5 0 9 3.5 9 8.5 0 4-2.5 7-6.5 8l7.5 9.5h-5.5L16 20.5H11V30H6V4zm5 4.5v7.5h7c2.8 0 4.8-1.5 4.8-3.8s-2-3.7-4.8-3.7h-7z"/>
-  <ellipse cx="18" cy="12" rx="4" ry="2.5" fill="#fff"/>
-  <circle cx="18" cy="12" r="1.5" fill="#000"/>
-</svg>'''
-
-    html_content = html_content.replace('[QR]', qr_svg)
-    html_content = html_content.replace('[R]', logo_r_svg)
-
-    # 4. Symmetrical 3-Point Date Triptych Normalizer (e.g. 3 26 16, 4 30 16, 5 28 16)
-    # 4. Symmetrical 3-Point Date Triptych Normalizer (e.g. 3 26 16, 4 30 16, 5 28 16)
+    # 3. Three-point date triptych.
     def repl_triptych(m):
-        m1, d1, y1 = m.group(1).strip(), m.group(2).strip(), m.group(3).strip()
+        a, b, c = (g.strip() for g in m.groups())
         return (
-            f'<div class="date-triptych visual-object ac-movable">\n'
-            f'  <span class="trip-col trip-left">{m1}</span>\n'
-            f'  <span class="trip-col trip-center">{d1}</span>\n'
-            f'  <span class="trip-col trip-right">{y1}</span>\n'
-            f'</div>'
+            '<div class="date-triptych visual-object ac-movable">\n'
+            f'  <span class="trip-col trip-left">{a}</span>\n'
+            f'  <span class="trip-col trip-center">{b}</span>\n'
+            f'  <span class="trip-col trip-right">{c}</span>\n'
+            '</div>'
         )
 
-    pattern_trip_div = r'<(?:div|p)[^>]*>\s*(\d{1,2})\s+(\d{1,2})\s+(\d{2,4})\s*</(?:div|p)>'
-    html_content = re.sub(pattern_trip_div, repl_triptych, html_content, flags=re.IGNORECASE)
-
-    # Multi-line artist title and location normalizations
-    if 'BLAZER SOUND SYSTEM' in html_content:
-        html_content = re.sub(
-            r'(<div[^>]*class=[\'"][^\'"]*typo-wide[^\'"]*[\'"][^>]*>)\s*BLAZER\s+SOUND\s+SYSTEM\s*(</div>)',
-            r'\1BLAZER\2\n    \1SOUND SYSTEM\2',
-            html_content,
-            flags=re.IGNORECASE
-        )
-    if 'BK. NY.' in html_content:
-        html_content = re.sub(
-            r'(<div[^>]*class=[\'"][^\'"]*location[^\'"]*[\'"][^>]*>)\s*(?:<span>)?\s*BK\.\s*(?:</span>)?\s*(?:<span>)?\s*NY\.\s*(?:</span>)?\s*(</div>)',
-            r'\1<span>BK.</span><span>NY.</span>\2',
-            html_content,
-            flags=re.IGNORECASE
-        )
-    if 'TOM OF ENGLAND' in html_content:
-        html_content = html_content.replace('TOM OF ENGLAND', 'TOM of ENGLAND')
-
-    # S glyph inner chars normalization (ensure all 8 letters S-A-T-U-R-D-A-Y are present)
-    if 'inner-s' in html_content:
-        html_content = re.sub(
-            r'(<span class="inner-chars inner-s">)\s*<span>A</span>\s*<span>T</span>\s*<span>U</span>\s*<span>R</span>\s*<span>D</span>\s*<span>A</span>\s*<span>Y</span>\s*(</span>)',
-            r'\1<span>S</span><span>A</span><span>T</span><span>U</span><span>R</span><span>D</span><span>A</span><span>Y</span>\2',
-            html_content,
-            flags=re.IGNORECASE
-        )
-
-    # 5. Contoured / Nested Acronym Lockup Normalizer (e.g. LSD / LAST SATURDAY DANCE)
-    if 'glyph-lockup' in html_content or (re.search(r'\bL\s*S\s*D\b', html_content, re.IGNORECASE) and ('LAST' in html_content or 'DANCE' in html_content)):
-        # If vector SVG is not already present, synthesize boutique vector lockup
-        if 'glyph-vector' not in html_content:
-            lockup = generate_glyph_lockup()
-            if 'glyph-lockup' in html_content:
-                html_content = re.sub(
-                    r'<div class="glyph-lockup[^"]*"[^>]*>.*?</div>\s*(?=(?:<div class="event-list"|<div class="calendar|<main|<section|$))',
-                    lockup["html"],
-                    html_content,
-                    flags=re.DOTALL
-                )
-            else:
-                html_content = re.sub(
-                    r'<(?:div|h[1-3])[^>]*>\s*L\s*S\s*D\s*<br\s*/?>\s*(?:LAST\s*(?:SATURDAY\s*)?DANCE)?\s*</(?:div|h[1-3])>',
-                    lockup["html"],
-                    html_content,
-                    flags=re.IGNORECASE
-                )
-
-    # 8. Receipt Line Normalizer: restructure flat price lines into receipt-line format
-    # Pattern: text followed by a number (price) at end of line, separated by spaces
-    def repl_receipt_line(m):
-        label = m.group(1).strip()
-        amount = m.group(2).strip()
-        return f'<div class="receipt-line"><span>{label}</span><span class="amount">{amount}</span></div>'
-    
-    # Match lines like "1 Medges Ale   89,00" or "Net Total:   89.00"
-    pattern_receipt = r'<div[^>]*>\s*([^<]+?)\s{2,}([\d,.]+(?:\s*/\w+)?)\s*</div>'
-    if 'receipt' in html_content.lower() or 'monospace' in css_content.lower() or 'thermal' in css_content.lower():
-        html_content = re.sub(pattern_receipt, repl_receipt_line, html_content)
-
-    # 9. Sidebar Text Normalizer: ensure vertical edge text has proper writing-mode classes
-    # If we detect text with transform: rotate(90deg) or rotate(-90deg), upgrade to sidebar-text
-    def ensure_sidebar_classes(m):
-        content = m.group(2)
-        side = 'left' if 'left' in m.group(1).lower() else 'right'
-        return f'<div class="sidebar-text sidebar-{side} visual-object ac-movable">{content}</div>'
-    
-    pattern_sidebar = r'<div([^>]*(?:rotate\((?:90|-90|270)deg\)|writing-mode)[^>]*)>([^<]+)</div>'
-    html_content = re.sub(pattern_sidebar, ensure_sidebar_classes, html_content, flags=re.IGNORECASE)
-
-    # 10. Invoice Table Normalizer: ensure tables have invoice-grid class for proper borders
-    if '<table' in html_content and 'invoice-grid' not in html_content:
-        html_content = re.sub(
-            r'<table([^>]*)class="([^"]*)"',
-            lambda m: f'<table{m.group(1)}class="{m.group(2)} invoice-grid"' if 'invoice-grid' not in m.group(2) else m.group(0),
-            html_content
-        )
-        # Also catch tables without any class
-        html_content = re.sub(
-            r'<table(?![^>]*class=)([^>]*)>',
-            r'<table class="invoice-grid visual-object ac-movable"\1>',
-            html_content
-        )
-
-    # 11. Barcode SVG Generator: replace barcode text/placeholders with SVG barcode
-    barcode_svg = '<div class="barcode visual-object ac-movable"><svg class="barcode-svg" viewBox="0 0 200 40" preserveAspectRatio="none" style="width:60%;height:30px;display:block;margin:4px auto;">'
-    # Generate pseudo-random barcode bars
-    bars = ''
-    x = 0
-    pattern_vals = [2,1,1,3,1,2,1,1,2,3,1,1,2,1,3,1,2,1,1,2,1,3,2,1,1,2,1,1,3,1,2,1,1,2,3,1,2,1,1,2,1]
-    for i, w in enumerate(pattern_vals):
-        if i % 2 == 0:  # black bar
-            bars += f'<rect x="{x}" y="0" width="{w*2}" height="40" fill="#000"/>'
-        x += w * 2
-    barcode_svg += bars + '</svg></div>'
-    
-    # Replace various barcode representations
     html_content = re.sub(
-        r'<div[^>]*class="[^"]*barcode[^"]*"[^>]*>[^<]*(?:<[^/][^>]*>[^<]*)*</div>',
-        barcode_svg,
+        r'<(?:div|p)[^>]*>\s*(\d{1,2})\s+(\d{1,2})\s+(\d{2,4})\s*</(?:div|p)>',
+        repl_triptych, html_content, flags=re.IGNORECASE,
+    )
+
+    # 4. Receipt lines (only when the design is monospace / receipt-like).
+    if "receipt" in html_content.lower() or "monospace" in css_content.lower():
+        html_content = re.sub(
+            r'<div[^>]*>\s*([^<]+?)\s{2,}([\d,.]+(?:\s*/\w+)?)\s*</div>',
+            lambda m: (
+                f'<div class="receipt-line"><span>{m.group(1).strip()}</span>'
+                f'<span class="amount">{m.group(2).strip()}</span></div>'
+            ),
+            html_content,
+        )
+
+    # 5. Rotated edge text.
+    def repl_sidebar(m):
+        side = "left" if "left" in m.group(1).lower() else "right"
+        return f'<div class="sidebar-text sidebar-{side} visual-object ac-movable">{m.group(2)}</div>'
+
+    html_content = re.sub(
+        r'<div([^>]*(?:rotate\((?:90|-90|270)deg\)|writing-mode)[^>]*)>([^<]+)</div>',
+        repl_sidebar, html_content, flags=re.IGNORECASE,
+    )
+
+    # 6. Unclassed tables.
+    html_content = re.sub(
+        r'<table(?![^>]*class=)([^>]*)>',
+        r'<table class="invoice-grid visual-object ac-movable"\1>',
         html_content,
-        flags=re.IGNORECASE
-    )
-    # Also replace literal barcode characters (|||||||)
-    html_content = re.sub(
-        r'(?:<div[^>]*>)?\s*(?:\|{4,}[^<]*)+\s*(?:</div>)?',
-        barcode_svg,
-        html_content
     )
 
-    # 12. Die-cut / Serrated Edge Normalizer
-    # If the page-sheet itself appears to be a tag/ticket (narrow format, specific categories),
-    # inject serrated edge styling
-    if any(kw in html_content.lower() for kw in ['purchase ticket', 'merchandising', 'books & fun', 'cat. of items']):
-        if 'die-cut-container' not in html_content:
-            html_content = html_content.replace(
-                '<main class="page-sheet">', 
-                '<main class="page-sheet die-cut-container serrated">'
-            )
-
-    # 6. Ensure comprehensive Google Fonts in <head>
-    google_fonts_link = '<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Barlow+Condensed:wght@700;800;900&family=Archivo+Narrow:wght@600;700&family=Archivo+Black&family=Syne:wght@700;800;900&family=Montserrat:wght@800;900&family=Inter:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&family=Playfair+Display+SC:wght@900&family=Cinzel+Decorative:wght@700;900&display=swap" rel="stylesheet">'
-    if '<head>' in html_content and 'family=Syne' not in html_content:
-        html_content = html_content.replace('<head>', f'<head>\n  {google_fonts_link}')
-
-    # 7. Inject Typographic DNA System CSS
-    typo_css = """
-/* === HARVEST ENGINE TYPOGRAPHIC DNA SYSTEM === */
-:root {
-  --typo-scale-y: 1.18;
-  --typo-scale-x: 1.25;
-  --typo-tracking: -0.025em;
-  --typo-leading: 0.88;
-  --shadow-color: #ff6600;
-  --shadow-offset-x: -3.5px;
-  --shadow-offset-y: 3.5px;
-  --page-bg: #ff2a8d;
-}
-
-.typo-condensed-tall, .date-hero {
-  font-family: 'Anton', 'Bebas Neue', 'Barlow Condensed', sans-serif !important;
-  font-weight: 900 !important;
-  letter-spacing: var(--typo-tracking, -0.03em) !important;
-  line-height: var(--typo-leading, 0.85) !important;
-  text-transform: uppercase;
-  display: inline-block !important;
-  transform: scaleY(var(--typo-scale-y, 1.18));
-  transform-origin: left bottom;
-}
-
-.typo-wide {
-  font-family: 'Syne', 'Archivo Black', 'Montserrat', sans-serif !important;
-  font-weight: 900 !important;
-  letter-spacing: 0.04em !important;
-  display: block !important;
-  line-height: 1.05 !important;
-  word-break: break-word !important;
-}
-
-.chromatic-shadow,
-.date-triptych span,
-.trip-col,
-.event-row .typo-wide,
-.event-row > div:not(.date-triptych),
-.venue,
-.hosted-by,
-.details span,
-.location span {
-  text-shadow: var(--shadow-offset-x, -3.5px) var(--shadow-offset-y, 3.5px) 0px var(--shadow-color, #ff6600) !important;
-}
-
-.date-hero {
-  font-size: 28px !important;
-}
-
-.idx {
-  font-family: 'Inter', sans-serif;
-  font-size: 11px !important;
-  font-weight: 900 !important;
-  line-height: 1.1 !important;
-  letter-spacing: -0.02em !important;
-  vertical-align: top;
-  margin-right: 3px;
-  display: inline-block;
-}
-
-.date-row {
-  display: flex !important;
-  align-items: flex-start !important;
-  gap: 3px !important;
-  line-height: 0.85 !important;
-  margin-bottom: 2px !important;
-}
-
-.date-triptych {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  width: 100% !important;
-  margin-bottom: 4px !important;
-  margin-top: 10px !important;
-}
-
-.date-triptych span, .trip-col {
-  display: inline-block !important;
-  font-family: 'Inter', 'Montserrat', sans-serif !important;
-  font-size: 26px !important;
-  font-weight: 900 !important;
-  letter-spacing: -0.02em !important;
-}
-
-.event-list {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-evenly !important;
-  flex: 1 !important;
-  margin: 10px 0 !important;
-}
-
-.event-row {
-  margin-bottom: 0px !important;
-}
-
-.event-row .typo-wide, .event-row > div:not(.date-triptych) {
-  font-size: 34px !important;
-  font-weight: 900 !important;
-  line-height: 1.05 !important;
-}
-
-.artist-title, .entry strong {
-  font-family: 'Inter', sans-serif !important;
-  font-size: 14.5px !important;
-  font-weight: 900 !important;
-  letter-spacing: -0.035em !important;
-  line-height: 1.05 !important;
-  display: block !important;
-  padding-bottom: 2.5px !important;
-  border-bottom: 2px solid #000 !important;
-  margin-top: 1px !important;
-}
-
-.calendar-item {
-  margin-bottom: 7px !important;
-  line-height: 1 !important;
-}
-
-.header {
-  font-family: 'Anton', 'Bebas Neue', 'Barlow Condensed', sans-serif !important;
-  font-size: 26px !important;
-  letter-spacing: -0.02em !important;
-  line-height: 0.9 !important;
-  margin-bottom: 8px !important;
-  border-bottom: none !important;
-}
-
-.header-text, .header span {
-  display: inline-block !important;
-  border-bottom: 3px solid #000 !important;
-  padding-bottom: 2px !important;
-  transform: scaleY(1.15);
-  transform-origin: left bottom;
-}
-
-/* Boutique Vector Glyph Lockup */
-.glyph-lockup {
-  position: relative !important;
-  width: 100% !important;
-  max-width: 570px !important;
-  margin: 0 auto !important;
-  aspect-ratio: 190 / 91 !important;
-  display: block !important;
-}
-
-.glyph-vector {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  z-index: 1 !important;
-  pointer-events: none !important;
-}
-
-.glyph-vector svg {
-  width: 100% !important;
-  height: 100% !important;
-  display: block !important;
-}
-
-.inner-chars {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  z-index: 2 !important;
-  pointer-events: auto !important;
-}
-
-.inner-chars span {
-  position: absolute !important;
-  font-family: 'Inter', 'Montserrat', sans-serif !important;
-  font-weight: 900 !important;
-  font-size: 27px !important;
-  color: var(--page-bg, #ff2a8d) !important;
-  line-height: 1 !important;
-  user-select: text !important;
-  cursor: text !important;
-  text-shadow: 0.5px 0.5px 0px rgba(255, 102, 0, 0.7) !important;
-  min-width: 1ch !important;
-}
-
-/* L (LAST) */
-.inner-l .char-l1 { left: 7.3% !important; top: 21.6% !important; transform: translate(-50%, -50%) !important; }
-.inner-l .char-l2 { left: 7.5% !important; top: 54.2% !important; transform: translate(-50%, -50%) rotate(-90deg) !important; }
-.inner-l .char-l3 { left: 8.0% !important; top: 85.7% !important; transform: translate(-50%, -50%) !important; }
-.inner-l .char-l4 { left: 23.9% !important; top: 85.1% !important; transform: translate(-50%, -50%) !important; }
-
-/* S (SATURDAY) */
-.inner-s .char-s1 { left: 39.8% !important; top: 80.0% !important; transform: translate(-50%, -50%) rotate(-30deg) !important; }
-.inner-s .char-s2 { left: 50.1% !important; top: 88.5% !important; transform: translate(-50%, -50%) !important; }
-.inner-s .char-s3 { left: 58.6% !important; top: 79.0% !important; transform: translate(-50%, -50%) rotate(35deg) !important; }
-.inner-s .char-s4 { left: 57.1% !important; top: 59.2% !important; transform: translate(-50%, -50%) rotate(35deg) !important; }
-.inner-s .char-s5 { left: 45.6% !important; top: 53.3% !important; transform: translate(-50%, -50%) rotate(-45deg) !important; }
-.inner-s .char-s6 { left: 39.2% !important; top: 37.4% !important; transform: translate(-50%, -50%) rotate(-90deg) !important; }
-.inner-s .char-s7 { left: 48.6% !important; top: 23.3% !important; transform: translate(-50%, -50%) !important; }
-.inner-s .char-s8 { left: 59.5% !important; top: 29.1% !important; transform: translate(-50%, -50%) rotate(30deg) !important; }
-
-/* D (DANCE) */
-.inner-d .char-d1 { left: 78.7% !important; top: 23.0% !important; transform: translate(-50%, -50%) !important; }
-.inner-d .char-d2 { left: 91.3% !important; top: 39.2% !important; transform: translate(-50%, -50%) rotate(-45deg) !important; }
-.inner-d .char-d3 { left: 91.2% !important; top: 72.6% !important; transform: translate(-50%, -50%) rotate(-45deg) !important; }
-.inner-d .char-d4 { left: 78.9% !important; top: 87.3% !important; transform: translate(-50%, -50%) rotate(90deg) !important; }
-.inner-d .char-d5 { left: 74.4% !important; top: 54.4% !important; transform: translate(-50%, -50%) !important; }
-
-
-.footer-info {
-  margin-top: auto !important;
-  width: 100% !important;
-  text-align: center !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-}
-
-.hosted-by {
-  font-family: 'Inter', sans-serif !important;
-  font-size: 13.5px !important;
-  font-weight: 900 !important;
-  letter-spacing: 0.08em !important;
-  text-transform: uppercase !important;
-  margin-bottom: 6px !important;
-}
-
-.venue {
-  font-family: 'Syne', 'Archivo Black', 'Montserrat', sans-serif !important;
-  font-size: 54px !important;
-  font-weight: 900 !important;
-  letter-spacing: 0.06em !important;
-  text-transform: uppercase !important;
-  line-height: 0.95 !important;
-  margin: 4px 0 16px 0 !important;
-}
-
-.details {
-  display: flex !important;
-  justify-content: space-between !important;
-  width: 100% !important;
-  font-family: 'Inter', sans-serif !important;
-  font-size: 14.5px !important;
-  font-weight: 900 !important;
-  letter-spacing: 0.05em !important;
-  text-transform: uppercase !important;
-  margin-bottom: 8px !important;
-}
-
-.location {
-  display: flex !important;
-  justify-content: space-between !important;
-  width: 100% !important;
-  font-family: 'Inter', sans-serif !important;
-  font-size: 15px !important;
-  font-weight: 900 !important;
-  letter-spacing: 0.06em !important;
-  text-transform: uppercase !important;
-  padding: 0 45px !important;
-  box-sizing: border-box !important;
-}
-
-.breakout-brick {
-  background: #ff007f !important;
-  border: 2px solid #000 !important;
-  padding: 10px 12px !important;
-  box-sizing: border-box !important;
-}
-
-.breakout-brick h3 {
-  font-family: 'Inter', sans-serif !important;
-  font-size: 13px !important;
-  font-weight: 900 !important;
-  letter-spacing: -0.02em !important;
-  display: inline-block !important;
-  border-bottom: 2.5px solid #000 !important;
-  padding-bottom: 1px !important;
-  margin-bottom: 4px !important;
-  line-height: 1 !important;
-}
-
-.breakout-brick h1 {
-  font-family: 'Inter', sans-serif !important;
-  font-size: 38px !important;
-  font-weight: 900 !important;
-  letter-spacing: -0.05em !important;
-  line-height: 0.82 !important;
-  display: inline-block !important;
-  border-bottom: 3.5px solid #000 !important;
-  padding-bottom: 4px !important;
-  margin-bottom: 8px !important;
-}
-
-.footer-grid {
-  display: flex !important;
-  justify-content: space-between !important;
-  gap: 12px !important;
-  margin-top: 8px !important;
-  border-top: 2px solid #000 !important;
-  padding-top: 6px !important;
-}
-
-.footer-grid .left, .footer-grid .right {
-  flex: 1 !important;
-  font-size: 9.5px !important;
-  font-weight: 700 !important;
-  line-height: 1.15 !important;
-}
-
-.fine-print {
-  font-size: 6px !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.04em !important;
-  margin-top: 8px !important;
-  line-height: 1.2 !important;
-}
-
-.bottom-section {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: flex-start !important;
-  gap: 16px !important;
-  margin-top: 10px !important;
-}
-
-.typo-bunched {
-  letter-spacing: -0.05em !important;
-  line-height: 0.88 !important;
-  font-weight: 900 !important;
-  word-spacing: -0.04em !important;
-}
-
-.typo-spread {
-  letter-spacing: 0.22em !important;
-  text-transform: uppercase !important;
-}
-
-.typo-warped {
-  display: inline-block !important;
-  transform: skewX(-7deg) scaleY(1.15) !important;
-  transform-origin: left bottom !important;
-}
-
-[class*="typo-"], .date-hero, .idx, .artist-title, .header-text, .trip-col, .main-glyph, .inner-chars span {
-  min-width: 1ch;
-}
-
-/* === RECEIPT / THERMAL PRINTER === */
-.typo-mono, .receipt-body {
-  font-family: 'Space Mono', 'Courier New', monospace !important;
-  font-size: 13px !important;
-  line-height: 1.4 !important;
-}
-
-.receipt-line {
-  display: flex !important;
-  justify-content: space-between !important;
-  padding: 1px 0 !important;
-  font-family: 'Space Mono', 'Courier New', monospace !important;
-}
-
-.receipt-line .amount {
-  text-align: right !important;
-  font-weight: 700 !important;
-  white-space: nowrap !important;
-}
-
-.receipt-separator {
-  border-top: 1px dashed #000 !important;
-  margin: 4px 0 !important;
-}
-
-.receipt-header {
-  text-align: center !important;
-  font-family: 'Space Mono', 'Courier New', monospace !important;
-  font-weight: 700 !important;
-  margin-bottom: 8px !important;
-}
-
-/* === PIXEL ART HEADER === */
-.pixel-header {
-  text-align: center !important;
-  margin-bottom: 12px !important;
-}
-
-.pixel-art {
-  max-width: 80% !important;
-  height: auto !important;
-  display: inline-block !important;
-}
-
-/* === SIDEBAR / EDGE TEXT === */
-.sidebar-text {
-  position: absolute !important;
-  writing-mode: vertical-rl !important;
-  font-family: 'Inter', sans-serif !important;
-  font-size: 10px !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.15em !important;
-  text-transform: uppercase !important;
-  top: 0 !important;
-  bottom: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  z-index: 5 !important;
-}
-
-.sidebar-left {
-  left: 4px !important;
-  transform: rotate(180deg) !important;
-  color: #cc3333 !important;
-}
-
-.sidebar-right {
-  right: 4px !important;
-  color: #cc3333 !important;
-}
-
-/* === BARCODE === */
-.barcode {
-  text-align: center !important;
-  margin: 6px 0 !important;
-}
-
-.barcode-svg {
-  display: block !important;
-  margin: 0 auto !important;
-}
-
-/* === DIE-CUT / SERRATED EDGES === */
-.die-cut-container.serrated {
-  --notch-size: 6px;
-  position: relative !important;
-}
-
-.die-cut-container.serrated::before,
-.die-cut-container.serrated::after {
-  content: '' !important;
-  position: absolute !important;
-  left: 0 !important;
-  right: 0 !important;
-  height: var(--notch-size) !important;
-  background: repeating-conic-gradient(#000 0% 25%, transparent 0% 50%) 0 0 / var(--notch-size) var(--notch-size) !important;
-  z-index: 10 !important;
-}
-
-.die-cut-container.serrated::before {
-  top: 0 !important;
-}
-
-.die-cut-container.serrated::after {
-  bottom: 0 !important;
-}
-
-/* === DECORATIVE HEADER === */
-.typo-decorative-header {
-  font-family: 'Playfair Display SC', 'Cinzel Decorative', serif !important;
-  font-size: 48px !important;
-  font-weight: 900 !important;
-  letter-spacing: 0.06em !important;
-  text-transform: uppercase !important;
-  text-align: center !important;
-  line-height: 0.95 !important;
-  position: relative !important;
-}
-
-/* === INVOICE GRID TABLE === */
-.invoice-grid {
-  width: 100% !important;
-  border-collapse: collapse !important;
-  font-family: 'Inter', sans-serif !important;
-  font-size: 13px !important;
-}
-
-.invoice-grid th,
-.invoice-grid td {
-  border: 1px solid currentColor !important;
-  padding: 6px 10px !important;
-  text-align: left !important;
-  vertical-align: top !important;
-}
-
-.invoice-grid th {
-  font-weight: 700 !important;
-  font-size: 11px !important;
-}
-
-.invoice-grid tfoot td {
-  font-weight: 700 !important;
-  border-top: 2px solid currentColor !important;
-}
-
-/* === SPEC GRID (Key-Value Pairs) === */
-.spec-grid {
-  display: grid !important;
-  grid-template-columns: auto 1fr !important;
-  gap: 2px 12px !important;
-  font-family: 'Space Mono', 'Courier New', monospace !important;
-  font-size: 11px !important;
-}
-
-.spec-key {
-  font-style: italic !important;
-}
-
-.spec-val {
-  font-weight: 700 !important;
-}
-
-/* === PURCHASE TICKET / TEAR-OFF === */
-.purchase-ticket {
-  border: 2px solid #000 !important;
-  padding: 12px !important;
-  display: flex !important;
-  gap: 16px !important;
-  justify-content: space-between !important;
-  margin-top: 10px !important;
-  font-family: 'Inter', sans-serif !important;
-}
-
-.ticket-price {
-  text-align: right !important;
-  flex-shrink: 0 !important;
-}
-
-.price-amount {
-  font-size: 32px !important;
-  font-weight: 900 !important;
-  line-height: 1 !important;
-  display: block !important;
-}
-
-.price-label {
-  font-size: 14px !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.1em !important;
-}
-"""
-    if '/* === HARVEST ENGINE TYPOGRAPHIC DNA SYSTEM === */' not in css_content:
-        css_content = css_content + "\n" + typo_css
+    # 7. Fonts + scoped primitives layer.
+    if "<head>" in html_content and "family=Syne" not in html_content:
+        html_content = html_content.replace("<head>", f"<head>\n  {GOOGLE_FONTS_LINK}", 1)
+
+    if PRIMITIVES_MARKER not in css_content and PRIMITIVES_CSS_PATH.exists():
+        primitives = PRIMITIVES_CSS_PATH.read_text(encoding="utf-8")
+        css_content = f"{PRIMITIVES_MARKER}\n{primitives}\n\n{css_content}"
 
     return html_content, css_content
+
 
 def scaffold_design_pack(
     harvest_data: Dict[str, Any],
@@ -1345,9 +652,9 @@ def scaffold_design_pack(
 ) -> Dict[str, Any]:
     """
     Scaffolds a publication-grade Design Pack folder:
-    - pack.json and manifest.json
+    - pack.json
     - template.html
-    - styles.css and style.css
+    - styles.css
     - default-data.json
     - assets/reference.<ext>
     """
@@ -1394,27 +701,6 @@ def scaffold_design_pack(
 
     # Apply Typographic DNA normalization filter to guarantee exactness
     html_content, css_content = normalize_typographic_structures(html_content, css_content)
-
-    # Architectural Archetype Normalization Pass
-    try:
-        from engine.archetype_normalizers import normalize_archetype_structures, detect_archetype
-        arch = detect_archetype(html_content, css_content, text_inventory)
-        if arch != "unknown":
-            print(f"[*] Architectural Archetype Detected: '{arch}' -> applying specialized normalizer...", flush=True)
-            norm_html, norm_css, _ = normalize_archetype_structures(html_content, css_content, image_bytes=image_bytes, text_inventory=text_inventory)
-            html_content = norm_html
-            css_content = norm_css
-            # If the archetype normalizer specified dimensions in @page, update target dims accordingly
-            m_page = re.search(r'@page\s*\{\s*size:\s*(\d+)mm\s+(\d+)mm', css_content)
-            if m_page:
-                w_mm = int(m_page.group(1))
-                h_mm = int(m_page.group(2))
-                dims = spec.setdefault("target", {}).setdefault("dimensions", {})
-                dims["width_mm"] = w_mm
-                dims["height_mm"] = h_mm
-                print(f"[*] Updated pack target dimensions to archetype size: {w_mm}x{h_mm}mm", flush=True)
-    except Exception as e:
-        print(f"[!] Archetype normalizer pass warning: {e}", flush=True)
 
     # Ensure styles.css link is present
     if "styles.css" not in html_content and "</head>" in html_content:
@@ -1501,12 +787,9 @@ def scaffold_design_pack(
         if "overflow: hidden" not in css_content:
             css_content = css_content.replace(".page-sheet {", f".page-sheet {{\n  box-sizing: border-box;\n  max-height: {h_mm}mm;\n  overflow: hidden;")
 
-    # 4. Write pack.json & manifest.json
+    # 4. Write pack.json
     pack_json_file = pack_dir / "pack.json"
-    manifest_file = pack_dir / "manifest.json"
     with open(pack_json_file, "w", encoding="utf-8") as f:
-        json.dump(spec, f, indent=2)
-    with open(manifest_file, "w", encoding="utf-8") as f:
         json.dump(spec, f, indent=2)
 
     # 5. Write template.html
@@ -1514,12 +797,9 @@ def scaffold_design_pack(
     with open(template_file, "w", encoding="utf-8") as f:
         f.write(html_content)
 
-    # 6. Write styles.css & style.css
+    # 6. Write styles.css
     styles_file = pack_dir / "styles.css"
-    style_file = pack_dir / "style.css"
     with open(styles_file, "w", encoding="utf-8") as f:
-        f.write(css_content)
-    with open(style_file, "w", encoding="utf-8") as f:
         f.write(css_content)
 
     # 7. Write default-data.json

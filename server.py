@@ -13,7 +13,9 @@ import urllib.parse
 import base64
 from pathlib import Path
 
-PORT = 8080
+PORT = int(os.environ.get("AC_PORT", "8080"))
+# Bind to loopback by default: the harvest endpoint writes files to disk.
+HOST = os.environ.get("AC_HOST", "127.0.0.1")
 BASE_DIR = Path(__file__).resolve().parent
 sys.path.append(str(BASE_DIR))
 
@@ -60,8 +62,6 @@ class StudioHandler(http.server.SimpleHTTPRequestHandler):
                 for p in sorted(packs_dir.iterdir()):
                     if p.is_dir():
                         spec_file = p / "pack.json"
-                        if not spec_file.exists():
-                            spec_file = p / "manifest.json"
                         if spec_file.exists():
                             try:
                                 with open(spec_file, "r", encoding="utf-8") as f:
@@ -163,31 +163,13 @@ class StudioHandler(http.server.SimpleHTTPRequestHandler):
             }).encode('utf-8'))
             return
 
-        elif parsed.path == '/api/ai/rewrite':
-            text = payload.get("text", "")
-            instruction = payload.get("instruction", "make punchier")
-            print(f"[*] Local AI Rewrite: '{text}' ({instruction})")
-            
-            rewritten = text.strip()
-            if "punchier" in instruction.lower():
-                rewritten = " ".join(text.split()[:max(1, int(len(text.split()) * 0.8))])
-                
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps({
-                "status": "success",
-                "rewritten": rewritten
-            }).encode('utf-8'))
-            return
-
         self.send_response(404)
         self.end_headers()
 
 def run_server():
-    socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(("", PORT), StudioHandler) as httpd:
-        print(f"[OK] Aesthetic Compiler Studio Server running at http://localhost:{PORT}/studio/")
+    socketserver.ThreadingTCPServer.allow_reuse_address = True
+    with socketserver.ThreadingTCPServer((HOST, PORT), StudioHandler) as httpd:
+        print(f"[OK] Aesthetic Compiler Studio Server running at http://{HOST}:{PORT}/studio/")
         httpd.serve_forever()
 
 if __name__ == '__main__':

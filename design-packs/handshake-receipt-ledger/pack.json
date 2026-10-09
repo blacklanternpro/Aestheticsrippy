@@ -6,9 +6,9 @@
   "description": "A thermal-receipt inspired typographic ledger featuring high-contrast serif display headers and structured monospace data grids. It utilizes a die-cut serrated aesthetic to mimic physical point-of-sale ephemera.",
   "target": {
     "dimensions": {
-      "format": "Card-Square",
-      "width_mm": 180,
-      "height_mm": 180,
+      "format": "Custom",
+      "width_mm": 85,
+      "height_mm": 145,
       "orientation": "portrait"
     },
     "margins_mm": {

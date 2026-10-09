@@ -1,0 +1,6 @@
+# Core
+pillow>=10.0
+numpy>=1.26
+opencv-python-headless>=4.9
+playwright>=1.45   # then run: python -m playwright install chromium
+pytest>=8        # dev: python -m pytest -q

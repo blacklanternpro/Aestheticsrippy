@@ -1,0 +1,168 @@
+/*
+ * Aestheticsrippy — typographic & ephemera primitives
+ *
+ * A small, scoped vocabulary the harvester can reference by class name.
+ * Everything lives in a cascade layer, so a pack's own CSS always wins
+ * without importance hacks. Tunables are custom properties so the studio
+ * (and later the Rip renderer) can adjust them per element.
+ */
+@layer primitives {
+
+  /* --- Type treatments ------------------------------------------------ */
+
+  /* Vertically stretched woodtype: tall, squeezed, condensed. */
+  .typo-condensed-tall,
+  .date-hero {
+    font-family: var(--typo-condensed-font, 'Anton', 'Bebas Neue', 'Barlow Condensed', sans-serif);
+    font-weight: 900;
+    text-transform: uppercase;
+    display: inline-block;
+    letter-spacing: var(--typo-tracking, -0.025em);
+    line-height: var(--typo-leading, 0.85);
+    transform: scaleY(var(--typo-scale-y, 1.18));
+    transform-origin: left bottom;
+  }
+
+  /* Extended / wide grotesque. */
+  .typo-wide {
+    font-family: var(--typo-wide-font, 'Syne', 'Archivo Black', 'Montserrat', sans-serif);
+    font-weight: 800;
+    text-transform: uppercase;
+    display: inline-block;
+    letter-spacing: var(--typo-tracking, 0.06em);
+    transform: scaleX(var(--typo-scale-x, 1));
+    transform-origin: left center;
+  }
+
+  /* Packed, brutalist pacing. */
+  .typo-bunched {
+    letter-spacing: var(--typo-tracking, -0.05em);
+    word-spacing: -0.04em;
+    line-height: var(--typo-leading, 0.88);
+    font-weight: 800;
+  }
+
+  /* Wide-tracked labels and metadata. */
+  .typo-spread {
+    letter-spacing: var(--typo-tracking, 0.28em);
+    text-transform: uppercase;
+  }
+
+  /* Skewed / slanted stamp. */
+  .typo-warped {
+    display: inline-block;
+    transform: skewX(var(--typo-skew, -7deg)) scaleY(var(--typo-scale-y, 1.1));
+    transform-origin: left bottom;
+  }
+
+  /* Off-register screenprint shadow. */
+  .chromatic-shadow {
+    text-shadow:
+      var(--shadow-offset-x, 3px) var(--shadow-offset-y, 3px) 0 var(--shadow-color, #ff6600);
+  }
+
+  /* Monospace receipt body. */
+  .typo-mono,
+  .receipt-body {
+    font-family: var(--typo-mono-font, 'Space Mono', 'Courier New', monospace);
+  }
+
+  .typo-decorative-header {
+    font-family: var(--typo-decorative-font, 'Playfair Display SC', 'Cinzel Decorative', serif);
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 0.95;
+  }
+
+  /* Underline that hugs the text, not the column. */
+  .header-text {
+    display: inline-block;
+    border-bottom: var(--rule-weight, 3px) solid currentColor;
+    padding-bottom: 2px;
+  }
+
+  /* --- Structures ----------------------------------------------------- */
+
+  .date-triptych {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    width: 100%;
+  }
+
+  .date-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 3px;
+    line-height: 0.85;
+  }
+
+  .receipt-line,
+  .receipt-total {
+    display: flex;
+    justify-content: space-between;
+    gap: 1em;
+  }
+
+  .receipt-line .amount,
+  .receipt-total .amount {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .receipt-separator {
+    border-top: 1px dashed currentColor;
+    margin: 0.4em 0;
+  }
+
+  .sidebar-text {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    writing-mode: vertical-rl;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+
+  .sidebar-left { left: 8px; transform: rotate(180deg); }
+  .sidebar-right { right: 8px; }
+
+  .invoice-grid {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .invoice-grid th,
+  .invoice-grid td {
+    border: 1px solid currentColor;
+    padding: 0.4em 0.7em;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .invoice-grid tfoot td {
+    font-weight: 700;
+    border-top-width: 2px;
+  }
+
+  .spec-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2px 12px;
+  }
+
+  .barcode-svg {
+    display: block;
+    width: 60%;
+    height: 30px;
+    margin: 4px auto;
+  }
+
+  .pixel-art {
+    max-width: 80%;
+    height: auto;
+  }
+}

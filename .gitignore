@@ -48,3 +48,8 @@ cloudflared.exe
 *.part
 *.tmp
 *.log
+
+# Generated output (render with `python -m engine.compiler` / `python -m eval.run`)
+export/*
+!export/.gitkeep
+eval/out/

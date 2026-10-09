@@ -1,107 +1,92 @@
 """
-Aesthetic Compiler - CLI Engine
-Compiles Design Packs and Data Payloads into pixel-perfect HTML and Vector PDFs.
+Aestheticsrippy - CLI compiler.
+
+Renders Design Packs to vector PDF (and a PNG preview) with headless Chromium.
+
+    python -m engine.compiler --pack studio-neue
+    python -m engine.compiler --all
+    python -m engine.compiler --pack studio-neue --output ~/Desktop/invoice.pdf --png
 """
 
-import os
-import sys
-import json
+from __future__ import annotations
+
 import argparse
-import subprocess
-import re
+import json
+import sys
 from pathlib import Path
+from typing import Dict, List, Optional
 
-# Add parent directory to path
 BASE_DIR = Path(__file__).resolve().parent.parent
-sys.path.append(str(BASE_DIR))
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 
-from engine.schema import DesignPackSpec
+from engine.render import Renderer  # noqa: E402
+from engine.schema import DesignPackSpec  # noqa: E402
 
-CHROME_BIN = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
+PACKS_DIR = BASE_DIR / "design-packs"
+EXPORT_DIR = BASE_DIR / "export"
 
-def list_packs():
-    packs_dir = BASE_DIR / "design-packs"
-    return [p.name for p in packs_dir.iterdir() if p.is_dir() and (p / "pack.json").exists()]
+
+def list_packs() -> List[str]:
+    return sorted(p.name for p in PACKS_DIR.iterdir()
+                  if p.is_dir() and (p / "pack.json").exists())
+
 
 def validate_pack(pack_id: str) -> DesignPackSpec:
-    pack_path = BASE_DIR / "design-packs" / pack_id / "pack.json"
-    if not pack_path.exists():
-        raise FileNotFoundError(f"Pack '{pack_id}' not found at {pack_path}")
-    
-    with open(pack_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    
-    spec = DesignPackSpec.from_dict(data)
-    return spec
+    spec_path = PACKS_DIR / pack_id / "pack.json"
+    if not spec_path.exists():
+        raise FileNotFoundError(f"Pack '{pack_id}' not found at {spec_path}")
+    return DesignPackSpec.from_dict(json.loads(spec_path.read_text(encoding="utf-8")))
 
-def compile_pack(pack_id: str, output_pdf: Optional[str] = None):
+
+def compile_pack(renderer: Renderer, pack_id: str, output_pdf: Optional[Path] = None,
+                 png: bool = False) -> Dict:
     spec = validate_pack(pack_id)
-    print(f"[*] Validated Design Pack: '{spec.name}' ({spec.id})")
-    
-    pack_dir = BASE_DIR / "design-packs" / pack_id
-    template_path = pack_dir / "template.html"
-    
-    if not template_path.exists():
-        raise FileNotFoundError(f"Template not found at {template_path}")
-        
-    export_dir = BASE_DIR / "export"
-    export_dir.mkdir(exist_ok=True)
-    
-    if not output_pdf:
-        output_pdf = export_dir / f"{pack_id}.pdf"
-    else:
-        output_pdf = Path(output_pdf)
+    result = renderer.render_pack(PACKS_DIR / pack_id, pdf=True)
 
-    # Compile using Headless Chromium
-    print(f"[*] Rendering vector PDF with headless Chromium: {output_pdf.name}")
-    cmd = [
-        CHROME_BIN,
-        "--headless=new",
-        "--disable-gpu",
-        f"--print-to-pdf={output_pdf}",
-        "--no-pdf-header-footer",
-        template_path.as_uri()
-    ]
-    subprocess.run(cmd, check=True)
-    
-    # Verify Page Count
-    with open(output_pdf, "rb") as f:
-        content = f.read().decode("latin1", errors="ignore")
-    page_count = len(re.findall(r"/Type\s*/Page\b", content))
-    
-    status = "SUCCESS (Strict 1-Sheet Locked)" if page_count == 1 else f"WARNING ({page_count} Pages)"
-    print(f"[OK] Compiled {spec.name} -> {output_pdf} [{status}]")
-    return output_pdf, page_count
+    EXPORT_DIR.mkdir(exist_ok=True)
+    output_pdf = Path(output_pdf).expanduser() if output_pdf else EXPORT_DIR / f"{pack_id}.pdf"
+    output_pdf.write_bytes(result.pdf)
+    if png:
+        output_pdf.with_suffix(".png").write_bytes(result.png)
 
-def compile_all():
-    packs = list_packs()
-    print(f"Found {len(packs)} Design Packs: {', '.join(packs)}")
-    results = {}
-    for p in packs:
-        _, pages = compile_pack(p)
-        results[p] = pages
-    
-    print("\n--- Summary ---")
-    all_single_sheet = True
-    for p, pages in results.items():
-        print(f"  • {p}: {pages} page(s)")
-        if pages > 1:
-            all_single_sheet = False
-    
-    if all_single_sheet:
-        print("\nAll Design Packs verified strictly single-sheet!")
-    else:
-        print("\nSome Design Packs exceeded 1 sheet.")
+    dims = spec.target.dimensions
+    size_ok = (abs(result.width_mm - dims.width_mm) < 1.0
+               and abs(result.height_mm - dims.height_mm) < 1.0)
+    status = "OK" if result.single_sheet and size_ok else "WARN"
+    notes = []
+    if result.pages != 1:
+        notes.append(f"{result.pages} pages")
+    if result.overflow:
+        notes.append("content overflows sheet")
+    if not size_ok:
+        notes.append(f"sheet {result.width_mm}x{result.height_mm}mm, "
+                     f"spec {dims.width_mm}x{dims.height_mm}mm")
+    notes += result.errors
+    print(f"[{status}] {pack_id:34s} -> {output_pdf.name}"
+          + (f"  ({'; '.join(notes)})" if notes else ""))
+    return {"pack": pack_id, "status": status, "pages": result.pages, "notes": notes}
+
+
+def main(argv: Optional[List[str]] = None) -> int:
+    parser = argparse.ArgumentParser(description="Aestheticsrippy compiler")
+    parser.add_argument("--pack", help="Design Pack id to compile")
+    parser.add_argument("--all", action="store_true", help="Compile every pack")
+    parser.add_argument("--output", help="Output PDF path (single pack only)")
+    parser.add_argument("--png", action="store_true", help="Also write a PNG preview")
+    args = parser.parse_args(argv)
+
+    packs = [args.pack] if args.pack and not args.all else list_packs()
+    with Renderer() as renderer:
+        results = [compile_pack(renderer, p,
+                                args.output if len(packs) == 1 else None,
+                                png=args.png)
+                   for p in packs]
+
+    warned = [r for r in results if r["status"] != "OK"]
+    print(f"\n{len(results) - len(warned)}/{len(results)} packs compiled to a single clean sheet.")
+    return 1 if warned else 0
+
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Aesthetic Compiler CLI")
-    parser.add_argument("--pack", type=str, help="Design Pack ID to compile")
-    parser.add_argument("--all", action="store_true", help="Compile all available packs")
-    parser.add_argument("--output", type=str, help="Path to output PDF")
-    
-    args = parser.parse_args()
-    
-    if args.all or not args.pack:
-        compile_all()
-    else:
-        compile_pack(args.pack, args.output)
+    sys.exit(main())
