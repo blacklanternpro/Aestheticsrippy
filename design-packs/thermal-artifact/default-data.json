@@ -1,0 +1,29 @@
+{
+  "title": "ASTROWORLD",
+  "artist": "TRAVIS SCOTT",
+  "album": "ASTROWORLD",
+  "tracks": [
+    { "name": "STARGAZING", "duration": "4:31" },
+    { "name": "CAROUSEL", "duration": "3:00" },
+    { "name": "SICKO MODE", "duration": "5:13" },
+    { "name": "R.I.P. SCREW", "duration": "3:06" },
+    { "name": "STOP TRYING TO BE GOD", "duration": "5:38" },
+    { "name": "NO BYSTANDERS", "duration": "3:38" },
+    { "name": "SKELETONS", "duration": "2:26" },
+    { "name": "WAKE UP", "duration": "3:52" },
+    { "name": "5% TINT", "duration": "3:16" },
+    { "name": "NC-17", "duration": "2:37" },
+    { "name": "ASTROTHUNDER", "duration": "2:23" },
+    { "name": "YOSEMITE", "duration": "2:30" },
+    { "name": "CAN'T SAY", "duration": "3:18" },
+    { "name": "WHO? WHAT!", "duration": "2:57" },
+    { "name": "BUTTERFLY EFFECT", "duration": "3:11" },
+    { "name": "HOUSTONFORNICATION", "duration": "3:38" },
+    { "name": "COFFEE BEAN", "duration": "3:29" }
+  ],
+  "totalDuration": "58:38",
+  "date": "03.08.2018",
+  "time": "12:01",
+  "orderNumber": "#9 7838 1556 8361",
+  "legal": "COPYRIGHT 2018 EPIC RECORDS, A DIVISION OF SONY MUSIC ENTERTAINMENT WITH CACTUS JACK AND GRAND HUSTLE. PRODUCERS: TRAVIS SCOTT, JASON GETER, T.I., MIKE DEAN, HIT-BOY, TAME IMPALA, THUNDERCAT, MURDA BEATZ."
+}

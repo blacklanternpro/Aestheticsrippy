@@ -1,0 +1,40 @@
+{
+  "id": "studio-neue",
+  "name": "Studio Neue Invoice",
+  "version": "1.0.0",
+  "category": "Invoice & Billing",
+  "description": "Ultra-clean Swiss modern graphic design studio invoice with oversized grotesque typography, tight tabular ledger, folio stamp, and ink signature.",
+  "target": {
+    "dimensions": {
+      "format": "A4",
+      "width_mm": 210,
+      "height_mm": 297,
+      "orientation": "portrait"
+    },
+    "margins_mm": {
+      "top": 18,
+      "right": 20,
+      "bottom": 16,
+      "left": 20
+    }
+  },
+  "typography": {
+    "primaryFont": "Inter",
+    "displayFont": "Inter Tight",
+    "monospaceFont": "Space Mono",
+    "modularScale": 1.25,
+    "lineHeightBase": 1.45
+  },
+  "colorTokens": {
+    "background": "#ffffff",
+    "textPrimary": "#0a0a0a",
+    "textSecondary": "#555555",
+    "textMuted": "#888888",
+    "borderHairline": "#e5e5e5"
+  },
+  "spatialBudget": {
+    "maxLineItems": 9,
+    "maxNotesChars": 240,
+    "strictSinglePage": true
+  }
+}

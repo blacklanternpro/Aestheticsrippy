@@ -1,0 +1,29 @@
+{
+  "headlineLines": [
+    "LOCAL",
+    "GLOBAL",
+    "PERSONAL",
+    "PUBLIC",
+    "SELFISH",
+    "SELFLESS"
+  ],
+  "photoUrl": "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=600&auto=format&fit=crop",
+  "badgeText": "SAN FRANCISCO DESIGN WEEK",
+  "metadataColumns": [
+    {
+      "title": "POWER",
+      "subtitle": "SAN FRANCISCO DESIGN WEEK",
+      "dates": "2021 JUNE 7-13"
+    },
+    {
+      "title": "POWER",
+      "subtitle": "SAN FRANCISCO DESIGN WEEK",
+      "dates": "2021 JUNE 7-13"
+    },
+    {
+      "title": "POWER",
+      "subtitle": "SAN FRANCISCO DESIGN WEEK",
+      "dates": "2021 JUNE 7-13"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "manifesto-red",
+  "name": "Manifesto Red Poster",
+  "version": "1.0.0",
+  "category": "Editorial & Poster",
+  "description": "Swiss high-contrast editorial poster with giant stacked red grotesque typography, an asymmetrical photo cutout window, and 3-column micro-metadata.",
+  "target": {
+    "dimensions": {
+      "format": "A4",
+      "width_mm": 210,
+      "height_mm": 297,
+      "orientation": "portrait"
+    },
+    "margins_mm": {
+      "top": 16,
+      "right": 16,
+      "bottom": 14,
+      "left": 16
+    }
+  },
+  "typography": {
+    "primaryFont": "Inter",
+    "displayFont": "Inter Tight",
+    "monospaceFont": "Space Mono",
+    "modularScale": 1.414,
+    "lineHeightBase": 0.88
+  },
+  "colorTokens": {
+    "background": "#ffffff",
+    "primaryRed": "#ea2328",
+    "textPrimary": "#ea2328",
+    "textMuted": "#ea2328"
+  },
+  "spatialBudget": {
+    "maxHeadlineLines": 6,
+    "strictSinglePage": true
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "invoiceTitle": "Invoice",
+  "invoiceNumber": "0-0024",
+  "from": {
+    "name": "Company One Name Ltd",
+    "email": "company.one@gmail.com",
+    "vat": "GB0890623800",
+    "address": "Fulham Rd., London SW6 1HS, United Kingdom"
+  },
+  "to": {
+    "name": "Company Two Name Inc.",
+    "email": "company.two@gmail.com",
+    "vat": "FR5221180054",
+    "address": "24 Rue du Commandant Guilbaud Porte L, 75016 Paris, France"
+  },
+  "dates": {
+    "invoiceDate": "March 11, 2024",
+    "dueDate": "Within 7 Days"
+  },
+  "bankDetails": {
+    "name": "JP Morgan Chase Bank",
+    "iban": "GB951052990210082003055889018",
+    "swift": "CHASUS33",
+    "address": "1 Cabot Square, London E14 4QJ, United Kingdom"
+  },
+  "sectionTitle": "Services",
+  "items": [
+    { "desc": "UX Research", "qty": 1, "price": 3560.00, "total": 3560.00 },
+    { "desc": "Web Application Design & Development", "qty": 1, "price": 45350.00, "total": 45350.00 },
+    { "desc": "Design System & Guidelines", "qty": 2, "price": 5650.00, "total": 11300.00 },
+    { "desc": "Website Design & Development", "qty": 1, "price": 40150.00, "total": 40150.00 },
+    { "desc": "Website & Web App Support", "qty": 1, "price": 5635.00, "total": 5635.00 },
+    { "desc": "Branding", "qty": 1, "price": 32965.00, "total": 32965.00 },
+    { "desc": "SMM & Advertisement", "qty": 3, "price": 8450.00, "total": 25350.00 }
+  ],
+  "summary": {
+    "subtotal": 164310.00,
+    "discount": 1643.00,
+    "tax": 827.30,
+    "total": 163494.30
+  },
+  "folio": "P1",
+  "folioSuperscript": "(2)"
+}

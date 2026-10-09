@@ -1,0 +1,37 @@
+{
+  "id": "fidele-invoice-0123-1",
+  "name": "IMG 2873",
+  "version": "1.0.0",
+  "category": "Editorial & Ledger",
+  "description": "A clean, Swiss-inspired typographic invoice utilizing high-contrast blue-on-white grid architecture. Features a structured tabular layout and a modular footer block with precise alignment.",
+  "target": {
+    "dimensions": {
+      "format": "A4",
+      "width_mm": 210,
+      "height_mm": 297,
+      "orientation": "portrait"
+    },
+    "margins_mm": {
+      "top": 15,
+      "right": 15,
+      "bottom": 15,
+      "left": 15
+    }
+  },
+  "typography": {
+    "primaryFont": "Inter",
+    "displayFont": "Inter",
+    "monospaceFont": "Courier New",
+    "modularScale": 1.1,
+    "lineHeightBase": 1.2
+  },
+  "colorTokens": {
+    "background": "#ffffff",
+    "textPrimary": "#000000",
+    "textSecondary": "#0033cc",
+    "accent": "#0033cc"
+  },
+  "spatialBudget": {
+    "strictSinglePage": true
+  }
+}

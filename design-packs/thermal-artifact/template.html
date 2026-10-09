@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Astroworld | Thermal Artifact Receipt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <main class="page-sheet" id="receipt-sheet">
+    
+    <!-- Red Rubber Stamp Smiley Overlay -->
+    <div class="th-rubber-stamp">
+      <svg class="th-stamp-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Transparent hit area for reliable click-to-select anywhere in bounds -->
+        <rect width="100" height="100" fill="rgba(0,0,0,0.001)" pointer-events="all"/>
+        <!-- Distressed circular border -->
+        <circle cx="50" cy="50" r="42" stroke="#e83828" stroke-width="4.5" stroke-dasharray="140 10 30 5" opacity="0.9"/>
+        <!-- Eyes -->
+        <ellipse cx="36" cy="42" rx="4.5" ry="7" fill="#e83828"/>
+        <ellipse cx="64" cy="42" rx="4.5" ry="7" fill="#e83828"/>
+        <!-- Smile -->
+        <path d="M 32 62 Q 50 78 68 62" stroke="#e83828" stroke-width="5" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+
+    <!-- Header -->
+    <header class="th-header">
+      <h1 class="th-logo-title" data-field="title">ASTROWORLD</h1>
+      <div class="th-artist-meta">
+        <div data-field="artist">TRAVIS SCOTT</div>
+        <div data-field="album">ASTROWORLD</div>
+      </div>
+    </header>
+
+    <!-- Tracklist -->
+    <section class="th-tracklist">
+      <div class="th-track-row"><span class="th-track-name">STARGAZING</span><span class="th-track-time">4:31</span></div>
+      <div class="th-track-row"><span class="th-track-name">CAROUSEL</span><span class="th-track-time">3:00</span></div>
+      <div class="th-track-row"><span class="th-track-name">SICKO MODE</span><span class="th-track-time">5:13</span></div>
+      <div class="th-track-row"><span class="th-track-name">R.I.P. SCREW</span><span class="th-track-time">3:06</span></div>
+      <div class="th-track-row"><span class="th-track-name">STOP TRYING TO BE GOD</span><span class="th-track-time">5:38</span></div>
+      <div class="th-track-row"><span class="th-track-name">NO BYSTANDERS</span><span class="th-track-time">3:38</span></div>
+      <div class="th-track-row"><span class="th-track-name">SKELETONS</span><span class="th-track-time">2:26</span></div>
+      <div class="th-track-row"><span class="th-track-name">WAKE UP</span><span class="th-track-time">3:52</span></div>
+      <div class="th-track-row"><span class="th-track-name">5% TINT</span><span class="th-track-time">3:16</span></div>
+      <div class="th-track-row"><span class="th-track-name">NC-17</span><span class="th-track-time">2:37</span></div>
+      <div class="th-track-row"><span class="th-track-name">ASTROTHUNDER</span><span class="th-track-time">2:23</span></div>
+      <div class="th-track-row"><span class="th-track-name">YOSEMITE</span><span class="th-track-time">2:30</span></div>
+      <div class="th-track-row"><span class="th-track-name">CAN'T SAY</span><span class="th-track-time">3:18</span></div>
+      <div class="th-track-row"><span class="th-track-name">WHO? WHAT!</span><span class="th-track-time">2:57</span></div>
+      <div class="th-track-row"><span class="th-track-name">BUTTERFLY EFFECT</span><span class="th-track-time">3:11</span></div>
+      <div class="th-track-row"><span class="th-track-name">HOUSTONFORNICATION</span><span class="th-track-time">3:38</span></div>
+      <div class="th-track-row"><span class="th-track-name">COFFEE BEAN</span><span class="th-track-time">3:29</span></div>
+    </section>
+
+    <!-- Total & Meta -->
+    <section class="th-totals-section">
+      <div class="th-divider"></div>
+      
+      <div class="th-total-row">
+        <span>TOTAL [ MIN ]</span>
+        <span data-field="totalDuration">58:38</span>
+      </div>
+
+      <div class="th-meta-stamp-row">
+        <span data-field="date">03.08.2018</span>
+        <span data-field="time">12:01</span>
+        <span data-field="orderNumber">#9 7838 1556 8361</span>
+      </div>
+    </section>
+
+    <!-- Legal Copyright Block -->
+    <footer class="th-legal-block" data-field="legal">
+      COPYRIGHT 2018 EPIC RECORDS, A DIVISION OF SONY MUSIC ENTERTAINMENT WITH CACTUS JACK AND GRAND HUSTLE. PRODUCERS: TRAVIS SCOTT, JASON GETER, T.I., ALLEN RITTER, MIKE DEAN, HIT-BOY, TAME IMPALA, THUNDERCAT, MURDA BEATZ, NINETEEN85, OZ, SEVN THOMAS, SONNY DIGITAL.
+    </footer>
+
+  </main>
+
+</body>
+</html>

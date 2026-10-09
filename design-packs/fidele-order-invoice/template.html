@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Barlow+Condensed:wght@700;800;900&family=Archivo+Narrow:wght@600;700&family=Archivo+Black&family=Syne:wght@700;800;900&family=Montserrat:wght@800;900&family=Inter:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&family=Playfair+Display+SC:wght@900&family=Cinzel+Decorative:wght@700;900&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main class="page-sheet">
+  <!-- TOP MESSAGE HEADER -->
+  <header class="top-header visual-object ac-movable">
+    <p class="header-msg">Thank you for your ourchase at the Fidèle online shop.<br>This is your order invoice. Please write us with any questions or tips.</p>
+  </header>
+
+  <!-- INVOICE HERO TITLE & NUMBER -->
+  <section class="hero-section visual-object ac-movable">
+    <div class="hero-row">
+      <h1 class="invoice-title">Invoice</h1>
+      <span class="invoice-num">0123</span>
+    </div>
+    <div class="date-line">Date: Month 00, 2020</div>
+  </section>
+
+  <!-- MAIN CONTENT GRID SECTION -->
+  <section class="main-grid visual-object ac-movable">
+    <!-- LEFT COLUMN: ADDRESSES -->
+    <div class="address-column">
+      <div class="address-block">
+        <div class="block-label">Ship to:</div>
+        <div class="address-text">
+          Name Surname<br>
+          00 Street Name,<br>
+          00000 City
+        </div>
+      </div>
+      <div class="address-block bill-to">
+        <div class="block-label">Bill to:</div>
+        <div class="address-text">
+          Name Surname<br>
+          00 Street Name,<br>
+          00000 City
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: ITEMIZED INVOICE TABLE -->
+    <div class="table-column">
+      <!-- TABLE HEADERS -->
+      <div class="table-row table-header">
+        <div class="col-item">Item:</div>
+        <div class="col-qty">Qty:</div>
+        <div class="col-cost">Cost:</div>
+      </div>
+
+      <!-- LINE ITEMS -->
+      <div class="table-row">
+        <div class="col-item">Aliquam tincidunt mauris risus</div>
+        <div class="col-qty">1</div>
+        <div class="col-cost">€00,00</div>
+      </div>
+      <div class="table-row">
+        <div class="col-item">Vestibulum auctor dapibus</div>
+        <div class="col-qty">1</div>
+        <div class="col-cost">€00,00</div>
+      </div>
+      <div class="table-row">
+        <div class="col-item">Nunc dignissim risus id metu</div>
+        <div class="col-qty">1</div>
+        <div class="col-cost">€00,00</div>
+      </div>
+
+      <!-- FLEX SPACER TO PUSH TOTALS TO BOTTOM -->
+      <div class="table-spacer"></div>
+
+      <!-- TOTALS SECTION -->
+      <div class="totals-block">
+        <div class="table-row summary-row">
+          <div class="col-item">Subtotal</div>
+          <div class="col-qty"></div>
+          <div class="col-cost">€00,00</div>
+        </div>
+        <div class="table-row summary-row">
+          <div class="col-item">VAT</div>
+          <div class="col-qty">+00%</div>
+          <div class="col-cost">€00,00</div>
+        </div>
+        <div class="table-row summary-row">
+          <div class="col-item">Shipping</div>
+          <div class="col-qty"></div>
+          <div class="col-cost">€00,00</div>
+        </div>
+        <div class="table-row summary-row total-row">
+          <div class="col-item">Total</div>
+          <div class="col-qty"></div>
+          <div class="col-cost">€00,00</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOTTOM LOGO & FOOTER SECTION -->
+  <footer class="footer-section visual-object ac-movable">
+    <!-- BRAND LOGO -->
+    <div class="brand-logo">Fidèle</div>
+
+    <!-- FOOTER INFO GRID TABLE -->
+    <div class="footer-grid">
+      <!-- BOX 1: ADDRESS & PHONE -->
+      <div class="footer-cell cell-address">
+        <div class="sub-row top-sub">4a Villa du Lavoir, 75010 Paris</div>
+        <div class="sub-row">+33 1 48 03 06 70</div>
+      </div>
+
+      <!-- BOX 2: SOCIAL & PRESS -->
+      <div class="footer-cell cell-social">
+        <div class="sub-row top-sub">
+          <span>I: @studio_fidele</span>
+          <span class="label-right">for studio:</span>
+        </div>
+        <div class="sub-row">
+          <span>F: fidele.editions</span>
+          <span class="label-right">for press:</span>
+        </div>
+      </div>
+
+      <!-- BOX 3: CONTACT & PRINT CONTROL BAR -->
+      <div class="footer-cell cell-contact">
+        <div class="sub-row top-sub">
+          <span>studio@ fidele-editions.com</span>
+        </div>
+        <div class="sub-row color-strip-row">
+          <span>editions@</span>
+          <!-- PRINT CONTROL COLOR BAR -->
+          <div class="color-bar">
+            <span class="c-step c1"></span>
+            <span class="c-step c2"></span>
+            <span class="c-step c3"></span>
+            <span class="c-step c4"></span>
+            <span class="c-step c5"></span>
+            <span class="c-step c6"></span>
+            <span class="c-step c7"></span>
+            <span class="c-step c8"></span>
+            <span class="c-step c9"></span>
+            <span class="c-step c10"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+</main>
+</body>
+</html>

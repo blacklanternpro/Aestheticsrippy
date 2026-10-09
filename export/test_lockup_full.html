@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@900&family=Montserrat:wght@900&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #ff2a8d;
+  margin: 0;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.glyph-lockup {
+  position: relative;
+  width: 580px;
+  aspect-ratio: 190 / 91;
+  display: block;
+}
+
+.glyph-vector {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.inner-chars {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+.inner-chars span {
+  position: absolute;
+  font-family: 'Inter', 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 26px;
+  color: #ff2a8d;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+  user-select: text;
+  cursor: text;
+  text-shadow: 0.5px 0.5px 0px rgba(255, 102, 0, 0.4);
+}
+
+/* L (LAST) */
+.inner-l .char-l1 { left: 11.0%; top: 24.0%; }
+.inner-l .char-l2 { left: 11.0%; top: 46.0%; transform: translate(-50%, -50%) rotate(-90deg); }
+.inner-l .char-l3 { left: 11.0%; top: 78.0%; }
+.inner-l .char-l4 { left: 23.5%; top: 78.0%; }
+
+/* S (SATURDAY) */
+.inner-s .char-s1 { left: 40.5%; top: 77.0%; transform: translate(-50%, -50%) rotate(-20deg); }
+.inner-s .char-s2 { left: 51.5%; top: 84.0%; }
+.inner-s .char-s3 { left: 61.0%; top: 74.0%; transform: translate(-50%, -50%) rotate(35deg); }
+.inner-s .char-s4 { left: 57.0%; top: 54.0%; transform: translate(-50%, -50%) rotate(-30deg); }
+.inner-s .char-s5 { left: 46.5%; top: 44.0%; transform: translate(-50%, -50%) rotate(-60deg); }
+.inner-s .char-s6 { left: 41.5%; top: 28.0%; transform: translate(-50%, -50%) rotate(-20deg); }
+.inner-s .char-s7 { left: 51.5%; top: 18.0%; }
+.inner-s .char-s8 { left: 61.0%; top: 24.0%; transform: translate(-50%, -50%) rotate(30deg); }
+
+/* D (DANCE) */
+.inner-d .char-d1 { left: 77.0%; top: 18.0%; }
+.inner-d .char-d2 { left: 88.5%; top: 29.0%; transform: translate(-50%, -50%) rotate(35deg); }
+.inner-d .char-d3 { left: 91.0%; top: 52.0%; transform: translate(-50%, -50%) rotate(75deg); }
+.inner-d .char-d4 { left: 83.5%; top: 76.0%; transform: translate(-50%, -50%) rotate(125deg); }
+.inner-d .char-d5 { left: 74.5%; top: 49.0%; }
+</style>
+</head>
+<body>
+
+<div class="glyph-lockup visual-object ac-movable">
+  <div class="glyph-vector">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 91" width="100%" height="100%">
+  <!-- Orange Screenprint Registration Shadow Layer -->
+  <g fill="#ff6600" transform="translate(-3.5, 3.5)">
+    <path class="shadow-l" d="M 8 14 L 7 25 L 8 44 L 7 77 L 8 78 L 8 86 L 59 86 L 59 72 L 24 71 L 24 14 Z" fill-rule="evenodd"/>
+    <path class="shadow-s" d="M 84 15 L 73 21 L 68 27 L 66 32 L 67 43 L 69 47 L 77 53 L 104 60 L 108 67 L 102 73 L 90 73 L 85 71 L 80 64 L 64 64 L 65 70 L 68 77 L 78 85 L 85 87 L 104 87 L 116 81 L 122 73 L 122 56 L 112 47 L 85 40 L 82 36 L 82 33 L 84 30 L 90 27 L 101 27 L 107 32 L 108 35 L 122 34 L 119 23 L 111 16 L 96 13 Z" fill-rule="evenodd"/>
+    <path class="shadow-d" d="M 165 16 L 159 14 L 148 13 L 135 14 L 136 60 L 135 85 L 136 87 L 153 87 L 159 86 L 170 82 L 178 75 L 182 68 L 184 60 L 184 47 L 182 36 L 177 26 L 175 24 L 171 24 L 172 21 Z M 149 29 L 155 29 L 159 30 L 162 32 L 166 36 L 169 42 L 170 49 L 170 55 L 168 63 L 166 66 L 162 70 L 158 72 L 154 73 L 147 72 Z" fill-rule="evenodd"/>
+  </g>
+  <!-- Black Ink Layer -->
+  <g fill="#000000">
+    <path class="main-l" d="M 8 14 L 7 25 L 8 44 L 7 77 L 8 78 L 8 86 L 59 86 L 59 72 L 24 71 L 24 14 Z" fill-rule="evenodd"/>
+    <path class="main-s" d="M 84 15 L 73 21 L 68 27 L 66 32 L 67 43 L 69 47 L 77 53 L 104 60 L 108 67 L 102 73 L 90 73 L 85 71 L 80 64 L 64 64 L 65 70 L 68 77 L 78 85 L 85 87 L 104 87 L 116 81 L 122 73 L 122 56 L 112 47 L 85 40 L 82 36 L 82 33 L 84 30 L 90 27 L 101 27 L 107 32 L 108 35 L 122 34 L 119 23 L 111 16 L 96 13 Z" fill-rule="evenodd"/>
+    <path class="main-d" d="M 165 16 L 159 14 L 148 13 L 135 14 L 136 60 L 135 85 L 136 87 L 153 87 L 159 86 L 170 82 L 178 75 L 182 68 L 184 60 L 184 47 L 182 36 L 177 26 L 175 24 L 171 24 L 172 21 Z M 149 29 L 155 29 L 159 30 L 162 32 L 166 36 L 169 42 L 170 49 L 170 55 L 168 63 L 166 66 L 162 70 L 158 72 L 154 73 L 147 72 Z" fill-rule="evenodd"/>
+  </g>
+</svg>
+  </div>
+  <div class="inner-chars inner-l">
+    <span class="char-l1">L</span>
+    <span class="char-l2">A</span>
+    <span class="char-l3">S</span>
+    <span class="char-l4">T</span>
+  </div>
+  <div class="inner-chars inner-s">
+    <span class="char-s1">S</span>
+    <span class="char-s2">A</span>
+    <span class="char-s3">T</span>
+    <span class="char-s4">U</span>
+    <span class="char-s5">R</span>
+    <span class="char-s6">D</span>
+    <span class="char-s7">A</span>
+    <span class="char-s8">Y</span>
+  </div>
+  <div class="inner-chars inner-d">
+    <span class="char-d1">D</span>
+    <span class="char-d2">A</span>
+    <span class="char-d3">N</span>
+    <span class="char-d4">C</span>
+    <span class="char-d5">E</span>
+  </div>
+</div>
+
+</body>
+</html>

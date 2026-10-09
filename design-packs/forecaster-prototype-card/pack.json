@@ -1,0 +1,37 @@
+{
+  "id": "forecaster-prototype-card",
+  "name": "Origami Fortune Teller",
+  "version": "1.0.0",
+  "category": "Ephemera",
+  "description": "A brutalist typographic composition utilizing a centered pyramid structure and diagonal angular text paths. The design balances strict geometric hierarchy with playful, non-conformist orientation to mimic industrial instruction manuals.",
+  "target": {
+    "dimensions": {
+      "format": "Card-Square",
+      "width_mm": 180,
+      "height_mm": 180,
+      "orientation": "portrait"
+    },
+    "margins_mm": {
+      "top": 12,
+      "right": 12,
+      "bottom": 12,
+      "left": 12
+    }
+  },
+  "typography": {
+    "primaryFont": "Inter",
+    "displayFont": "Inter",
+    "monospaceFont": "Space Mono",
+    "modularScale": 1.2,
+    "lineHeightBase": 1.15
+  },
+  "colorTokens": {
+    "background": "#ffffff",
+    "textPrimary": "#000000",
+    "textSecondary": "#555555",
+    "accent": "#000000"
+  },
+  "spatialBudget": {
+    "strictSinglePage": true
+  }
+}

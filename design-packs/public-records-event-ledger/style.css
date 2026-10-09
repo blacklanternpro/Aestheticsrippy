@@ -1,0 +1,198 @@
+@page { size: 148mm 210mm; margin: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { display: flex; justify-content: center; background: #ccc; }
+.page-sheet { width: 148mm; height: 210mm; padding: 12mm; background: #f8f5ee; color: #000; position: relative; overflow: hidden; }
+.calendar-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+.typo-condensed-tall { font-family: 'Anton', sans-serif; font-size: 24px; transform: scaleY(1.2); transform-origin: left bottom; margin-bottom: 8px; border-bottom: 2px solid #000; display: inline-block; }
+.calendar-item { margin-bottom: 10px; }
+.date-row { display: flex; align-items: baseline; gap: 4px; }
+.idx { font-family: 'Inter', sans-serif; font-weight: 900; font-size: 10px; }
+.date-hero { font-family: 'Anton', sans-serif; font-size: 20px; transform: scaleY(1.2); transform-origin: left bottom; }
+.artist-title { font-family: 'Inter', sans-serif; font-weight: 900; font-size: 13px; border-bottom: 1px solid #000; padding-bottom: 2px; }
+.breakout-brick { background: #ff00ff; padding: 10px; width: 45%; border: 2px solid #000; }
+.brick-header { font-weight: 900; font-size: 12px; border-bottom: 2px solid #000; }
+.brick-title { font-family: 'Anton', sans-serif; font-size: 32px; line-height: 0.8; margin: 5px 0; }
+.fine-print { font-size: 6px; font-family: 'Inter', sans-serif; margin-top: 10px; }
+
+/* === HARVEST ENGINE TYPOGRAPHIC DNA SYSTEM === */
+:root {
+  --typo-scale-y: 1.18;
+  --typo-tracking: -0.025em;
+  --typo-leading: 0.88;
+}
+
+.typo-condensed-tall, .date-hero {
+  font-family: 'Anton', 'Bebas Neue', 'Barlow Condensed', sans-serif !important;
+  font-weight: 900 !important;
+  letter-spacing: var(--typo-tracking, -0.03em) !important;
+  line-height: var(--typo-leading, 0.85) !important;
+  text-transform: uppercase;
+  display: inline-block !important;
+  transform: scaleY(var(--typo-scale-y, 1.18));
+  transform-origin: left bottom;
+}
+
+.date-hero {
+  font-size: 28px !important;
+}
+
+.idx {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.02em !important;
+  vertical-align: top;
+  margin-right: 3px;
+  display: inline-block;
+}
+
+.date-row {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 3px !important;
+  line-height: 0.85 !important;
+  margin-bottom: 2px !important;
+}
+
+.artist-title, .entry strong {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 14.5px !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.035em !important;
+  line-height: 1.05 !important;
+  display: block !important;
+  padding-bottom: 2.5px !important;
+  border-bottom: 2px solid #000 !important;
+  margin-top: 1px !important;
+}
+
+.calendar-item {
+  margin-bottom: 7px !important;
+  line-height: 1 !important;
+}
+
+.header {
+  font-family: 'Anton', 'Bebas Neue', 'Barlow Condensed', sans-serif !important;
+  font-size: 26px !important;
+  letter-spacing: -0.02em !important;
+  line-height: 0.9 !important;
+  margin-bottom: 8px !important;
+  border-bottom: none !important;
+}
+
+.header-text, .header span {
+  display: inline-block !important;
+  border-bottom: 3px solid #000 !important;
+  padding-bottom: 2px !important;
+  transform: scaleY(1.15);
+  transform-origin: left bottom;
+}
+
+.breakout-brick {
+  background: #ff007f !important;
+  border: 2px solid #000 !important;
+  padding: 10px 12px !important;
+  box-sizing: border-box !important;
+}
+
+.breakout-brick h3 {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.02em !important;
+  display: inline-block !important;
+  border-bottom: 2.5px solid #000 !important;
+  padding-bottom: 1px !important;
+  margin-bottom: 4px !important;
+  line-height: 1 !important;
+}
+
+.breakout-brick h1 {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 38px !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.05em !important;
+  line-height: 0.82 !important;
+  display: inline-block !important;
+  border-bottom: 3.5px solid #000 !important;
+  padding-bottom: 4px !important;
+  margin-bottom: 8px !important;
+}
+
+.footer-grid {
+  display: flex !important;
+  justify-content: flex-start; gap: 24px !important;
+  gap: 12px !important;
+  margin-top: 8px !important;
+  border-top: 2px solid #000 !important;
+  padding-top: 6px !important;
+}
+
+.footer-grid .left, .footer-grid .right {
+  flex: 1 !important;
+  font-size: 9.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+}
+
+.fine-print {
+  font-size: 6px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  margin-top: 8px !important;
+  line-height: 1.2 !important;
+}
+
+.bottom-section {
+  display: flex !important;
+  justify-content: flex-start; gap: 24px !important;
+  align-items: flex-start !important;
+  gap: 16px !important;
+  margin-top: 10px !important;
+}
+
+.typo-bunched {
+  letter-spacing: -0.05em !important;
+  line-height: 0.88 !important;
+  font-weight: 900 !important;
+  word-spacing: -0.04em !important;
+}
+
+.typo-spread {
+  letter-spacing: 0.22em !important;
+  text-transform: uppercase !important;
+}
+
+.typo-warped {
+  display: inline-block !important;
+  transform: skewX(-7deg) scaleY(1.15) !important;
+  transform-origin: left bottom !important;
+}
+
+[class*="typo-"], .date-hero, .idx, .artist-title, .header-text {
+  min-width: 1ch;
+}
+
+
+@media print {
+  html, body {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+  }
+  .page-sheet {
+    box-shadow: none !important;
+    margin: 0 !important;
+    width: 148mm !important;
+    height: 210mm !important;
+    max-height: 210mm !important;
+    overflow: hidden !important;
+    border: none !important;
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}

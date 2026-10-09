@@ -1,0 +1,59 @@
+@page { size: 180mm 180mm; margin: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { display: flex; justify-content: center; font-family: 'Inter', sans-serif; font-weight: 700; text-transform: uppercase; }
+.page-sheet { width: 180mm; height: 180mm; padding: 12mm; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.pyramid-block { text-align: center; line-height: 1.1; }
+.mid-row { display: flex; align-items: center; gap: 15px; margin: 10px 0; }
+.glyph-circle { border: 2px solid #000; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; }
+.prototype-row { display: flex; gap: 20px; margin-bottom: 20px; }
+.diagonal-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+  position: relative;
+  margin-top: 35px;
+  min-height: 140px;
+}
+.left-diag {
+  transform: rotate(45deg);
+  transform-origin: bottom left;
+  text-align: left;
+  font-size: 10.5px;
+  line-height: 1.25;
+}
+.right-diag {
+  transform: rotate(-45deg);
+  transform-origin: bottom right;
+  text-align: right;
+  font-size: 10.5px;
+  line-height: 1.25;
+}
+.center-block {
+  text-align: center;
+  font-size: 10.5px;
+  line-height: 1.25;
+  margin-bottom: 5px;
+}
+
+@media print {
+  html, body {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+  }
+  .page-sheet {
+    box-shadow: none !important;
+    margin: 0 !important;
+    width: 180mm !important;
+    height: 180mm !important;
+    max-height: 180mm !important;
+    overflow: hidden !important;
+    border: none !important;
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}

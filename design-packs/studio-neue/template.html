@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice 0-0024 | Studio Neue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <main class="page-sheet" id="invoice-sheet">
+    
+    <!-- Top Header -->
+    <header class="sn-header">
+      <h1 class="sn-invoice-title" data-field="invoiceTitle">Invoice</h1>
+      <div class="sn-invoice-number" data-field="invoiceNumber">0-0024</div>
+    </header>
+
+    <!-- Metadata Grid -->
+    <section class="sn-meta-grid">
+      
+      <!-- Left Column: From -->
+      <div class="sn-meta-col-left">
+        <div class="sn-meta-sec-title">From</div>
+        <div class="sn-field-row">
+          <span class="sn-field-label">Name</span>
+          <span class="sn-field-value" data-field="from.name">Company One Name Ltd</span>
+        </div>
+        <div class="sn-field-row">
+          <span class="sn-field-label">Email</span>
+          <span class="sn-field-value" data-field="from.email">company.one@gmail.com</span>
+        </div>
+        <div class="sn-field-row">
+          <span class="sn-field-label">VAT</span>
+          <span class="sn-field-value" data-field="from.vat">GB0890623800</span>
+        </div>
+        <div class="sn-field-row">
+          <span class="sn-field-label">Address</span>
+          <span class="sn-field-value" data-field="from.address">Fulham Rd., London SW6 1HS, United Kingdom</span>
+        </div>
+      </div>
+
+      <!-- Right Column: To, Date, Bank Details -->
+      <div class="sn-meta-col-right">
+        
+        <div class="sn-meta-block">
+          <div class="sn-meta-sec-title">To</div>
+          <div class="sn-field-row">
+            <span class="sn-field-label">Name</span>
+            <span class="sn-field-value" data-field="to.name">Company Two Name Inc.</span>
+          </div>
+          <div class="sn-field-row">
+            <span class="sn-field-label">Email</span>
+            <span class="sn-field-value" data-field="to.email">company.two@gmail.com</span>
+          </div>
+          <div class="sn-field-row">
+            <span class="sn-field-label">VAT</span>
+            <span class="sn-field-value" data-field="to.vat">FR5221180054</span>
+          </div>
+          <div class="sn-field-row">
+            <span class="sn-field-label">Address</span>
+            <span class="sn-field-value" data-field="to.address">24 Rue du Commandant Guilbaud Porte L, 75016 Paris, France</span>
+          </div>
+        </div>
+
+        <div class="sn-meta-block">
+          <div class="sn-meta-sec-title">Date</div>
+          <div class="sn-field-row">
+            <span class="sn-field-label">Invoice Date</span>
+            <span class="sn-field-value" data-field="dates.invoiceDate">March 11, 2024</span>
+          </div>
+          <div class="sn-field-row">
+            <span class="sn-field-label">Due Date</span>
+            <span class="sn-field-value" data-field="dates.dueDate">Within 7 Days</span>
+          </div>
+        </div>
+
+        <div class="sn-meta-block">
+          <div class="sn-meta-sec-title">Bank Details</div>
+          <div class="sn-field-row">
+            <span class="sn-field-label">Name</span>
+            <span class="sn-field-value" data-field="bankDetails.name">JP Morgan Chase Bank</span>
+          </div>
+          <div class="sn-field-row">
+            <span class="sn-field-label">IBAN</span>
+            <span class="sn-field-value" data-field="bankDetails.iban">GB951052990210082003055889018</span>
+          </div>
+          <div class="sn-field-row">
+            <span class="sn-field-label">SWIFT Code</span>
+            <span class="sn-field-value" data-field="bankDetails.swift">CHASUS33</span>
+          </div>
+          <div class="sn-field-row">
+            <span class="sn-field-label">Address</span>
+            <span class="sn-field-value" data-field="bankDetails.address">1 Cabot Square, London E14 4QJ, United Kingdom</span>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- Services Table Section -->
+    <section class="sn-services-container">
+      <h2 class="sn-services-title" data-field="sectionTitle">Services</h2>
+
+      <div class="sn-table">
+        <div class="sn-table-head">
+          <div class="sn-th-desc"></div>
+          <div class="sn-th-qty">Qty</div>
+          <div class="sn-th-price">Price</div>
+          <div class="sn-th-total">Total</div>
+        </div>
+
+        <div class="sn-table-body" id="invoice-items">
+          <div class="sn-table-row">
+            <div class="sn-td-desc">UX Research</div>
+            <div class="sn-td-qty">1</div>
+            <div class="sn-td-price">$3,560.00</div>
+            <div class="sn-td-total">$3,560.00</div>
+          </div>
+          <div class="sn-table-row">
+            <div class="sn-td-desc">Web Application Design &amp; Development</div>
+            <div class="sn-td-qty">1</div>
+            <div class="sn-td-price">$45,350.00</div>
+            <div class="sn-td-total">$45,350.00</div>
+          </div>
+          <div class="sn-table-row">
+            <div class="sn-td-desc">Design System &amp; Guidelines</div>
+            <div class="sn-td-qty">2</div>
+            <div class="sn-td-price">$5,650.00</div>
+            <div class="sn-td-total">$11,300.00</div>
+          </div>
+          <div class="sn-table-row">
+            <div class="sn-td-desc">Website Design &amp; Development</div>
+            <div class="sn-td-qty">1</div>
+            <div class="sn-td-price">$40,150.00</div>
+            <div class="sn-td-total">$40,150.00</div>
+          </div>
+          <div class="sn-table-row">
+            <div class="sn-td-desc">Website &amp; Web App Support</div>
+            <div class="sn-td-qty">1</div>
+            <div class="sn-td-price">$5,635.00</div>
+            <div class="sn-td-total">$5,635.00</div>
+          </div>
+          <div class="sn-table-row">
+            <div class="sn-td-desc">Branding</div>
+            <div class="sn-td-qty">1</div>
+            <div class="sn-td-price">$32,965.00</div>
+            <div class="sn-td-total">$32,965.00</div>
+          </div>
+          <div class="sn-table-row">
+            <div class="sn-td-desc">SMM &amp; Advertisement</div>
+            <div class="sn-td-qty">3</div>
+            <div class="sn-td-price">$8,450.00</div>
+            <div class="sn-td-total">$25,350.00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Totals Breakdown -->
+      <div class="sn-summary-wrap">
+        <div class="sn-summary-box">
+          <div class="sn-summary-row">
+            <span class="sn-summary-label">Subtotal:</span>
+            <span class="sn-summary-val" data-field="summary.subtotal">$164,310.00</span>
+          </div>
+          <div class="sn-summary-row">
+            <span class="sn-summary-label">Discount:</span>
+            <span class="sn-summary-val" data-field="summary.discount">$1,643.00</span>
+          </div>
+          <div class="sn-summary-row">
+            <span class="sn-summary-label">Tax:</span>
+            <span class="sn-summary-val" data-field="summary.tax">$827.30</span>
+          </div>
+
+          <div class="sn-grand-total-row">
+            <span class="sn-grand-total-label">Total</span>
+            <span class="sn-grand-total-val" data-field="summary.total">$163,494.30</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Bottom Bar: Folio & Signature -->
+    <footer class="sn-bottom-bar">
+      <div class="sn-folio-block">
+        <span class="sn-folio-p" data-field="folio">P1</span>
+        <sup class="sn-folio-sub" data-field="folioSuperscript">(2)</sup>
+      </div>
+
+      <div class="sn-signature-wrap">
+        <!-- Authentic organic signature matching reference -->
+        <svg class="sn-signature-svg" viewBox="0 0 220 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 48 C 28 42, 45 15, 58 22 C 72 29, 65 52, 78 48 C 92 44, 98 28, 110 32 C 122 36, 128 46, 142 42 C 160 36, 178 39, 212 36" stroke="#000000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M42 45 C 55 35, 68 12, 72 25 C 76 38, 52 48, 88 44" stroke="#000000" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </footer>
+
+  </main>
+
+</body>
+</html>

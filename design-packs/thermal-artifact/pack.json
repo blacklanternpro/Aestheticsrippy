@@ -1,0 +1,36 @@
+{
+  "id": "thermal-artifact",
+  "name": "Thermal Artifact Receipt",
+  "version": "1.0.0",
+  "category": "Artifact & Ephemera",
+  "description": "Distressed thermal paper receipt with warped psych display header, monospace tracklist ledger, rubber stamp bleed, and jagged tear-off edge.",
+  "target": {
+    "dimensions": {
+      "format": "Thermal-80mm",
+      "width_mm": 80,
+      "height_mm": 200,
+      "orientation": "portrait"
+    },
+    "margins_mm": {
+      "top": 10,
+      "right": 8,
+      "bottom": 12,
+      "left": 8
+    }
+  },
+  "typography": {
+    "primaryFont": "Space Mono",
+    "displayFont": "Inter Tight",
+    "monospaceFont": "Courier Prime",
+    "modularScale": 1.2,
+    "lineHeightBase": 1.25
+  },
+  "colorTokens": {
+    "background": "#f8f7f2",
+    "textPrimary": "#111111",
+    "stampRed": "#e83828"
+  },
+  "spatialBudget": {
+    "strictSinglePage": true
+  }
+}

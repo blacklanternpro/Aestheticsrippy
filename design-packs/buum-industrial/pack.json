@@ -1,0 +1,36 @@
+{
+  "id": "buum-industrial",
+  "name": "Buum Industrial Production Slip",
+  "version": "1.0.0",
+  "category": "Branding & Production",
+  "description": "Raw brutalist film production slip with corner registration marks, monospace tracking, high-contrast script centerpiece, and massive running footer type.",
+  "target": {
+    "dimensions": {
+      "format": "Card-Vertical",
+      "width_mm": 148,
+      "height_mm": 210,
+      "orientation": "portrait"
+    },
+    "margins_mm": {
+      "top": 12,
+      "right": 14,
+      "bottom": 12,
+      "left": 14
+    }
+  },
+  "typography": {
+    "primaryFont": "Inter",
+    "displayFont": "Inter Tight",
+    "monospaceFont": "Space Mono",
+    "modularScale": 1.333,
+    "lineHeightBase": 1.2
+  },
+  "colorTokens": {
+    "background": "#f4f3ec",
+    "textPrimary": "#050505",
+    "cropMarks": "#444444"
+  },
+  "spatialBudget": {
+    "strictSinglePage": true
+  }
+}

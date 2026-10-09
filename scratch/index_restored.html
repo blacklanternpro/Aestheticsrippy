@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aesthetic Compiler | Design Pack Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Inter+Tight:wght@700;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="studio.css">
+</head>
+<body>
+
+  <!-- Top Studio Header -->
+  <header class="studio-header">
+    <div class="header-inner">
+      
+      <!-- Brand -->
+      <div class="brand-badge">
+        <div class="brand-icon">AC</div>
+        <div>
+          <div class="brand-title">Aesthetic Compiler</div>
+          <div class="brand-subtitle">Design Pack Engine</div>
+        </div>
+      </div>
+
+      <!-- Design Pack Switcher Tabs -->
+      <nav class="pack-tabs">
+        <button class="pack-tab-btn active" data-pack="studio-neue">
+          <span>📄</span> Studio Neue
+        </button>
+        <button class="pack-tab-btn" data-pack="manifesto-red">
+          <span>🟥</span> Manifesto Red
+        </button>
+        <button class="pack-tab-btn" data-pack="buum-industrial">
+          <span>🎬</span> Buum Industrial
+        </button>
+        <button class="pack-tab-btn" data-pack="thermal-artifact">
+          <span>🧾</span> Thermal Artifact
+        </button>
+      </nav>
+
+      <!-- Actions -->
+      <div class="studio-actions">
+        <button class="action-btn" id="edit-btn">✏️ Edit Mode</button>
+        <button class="action-btn" id="reset-btn">🔄 Reset</button>
+        <button class="action-btn" id="settings-btn">⚙️ Settings</button>
+        <button class="action-btn btn-primary" id="print-btn">🖨️ Print / Vector PDF</button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Interactive Artboard Stage -->
+  <main class="studio-stage">
+    <div class="artboard-viewport">
+      <iframe class="pack-frame" id="pack-frame" title="Design Pack Artboard"></iframe>
+    </div>
+  </main>
+
+  <!-- Bottom Floating Spatial HUD -->
+  <footer class="studio-hud">
+    <div class="hud-item">
+      <span>Format:</span>
+      <span class="hud-value" id="hud-format">A4 (210 × 297mm)</span>
+    </div>
+    <div class="hud-item">
+      <div class="hud-indicator" id="hud-indicator"></div>
+      <span class="hud-value" id="hud-status">Strict 1-Sheet Locked</span>
+    </div>
+  </footer>
+
+  <!-- Settings Modal (Mobile BYOK & Model Selector) -->
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">Studio AI &amp; Engine Settings</div>
+        <button class="modal-close-btn" id="close-settings-btn">&times;</button>
+      </div>
+
+      <div class="status-badge" id="local-status-badge">
+        Checking local engine...
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="gemini-key-input">Google Gemini API Key (for Mobile / Web)</label>
+        <input class="form-input" id="gemini-key-input" type="password" placeholder="AIzaSy...">
+        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">
+          Saved securely in your browser's localStorage. Zero key required when running locally on localhost.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="model-select">Gemini Model Generation</label>
+        <select class="form-select" id="model-select">
+          <option value="gemini-3.6-flash" selected>Gemini 3.6 Flash (Fast &amp; High-Fidelity - Free Tier)</option>
+          <option value="gemini-3.8">Gemini 3.8 (Flagship Pro Reasoning &amp; High-Res Output)</option>
+          <option value="gemini-3.1-pro">Gemini 3.1 Pro (Advanced Multimodal)</option>
+          <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button class="action-btn" id="save-key-btn">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="ai.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
