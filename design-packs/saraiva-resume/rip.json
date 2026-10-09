@@ -498,5 +498,52 @@
         }
       }
     }
+  },
+  "fields": {
+    "order": [
+      "person",
+      "contact",
+      "summary",
+      "center",
+      "left",
+      "left_lower",
+      "right",
+      "closing"
+    ],
+    "labels": {
+      "person": "Name",
+      "person.first": "First name",
+      "person.last": "Last name",
+      "contact": "Contact",
+      "contact.*": "Contact block",
+      "summary": "Summary",
+      "center": "Middle column",
+      "center.title": "Heading",
+      "center.items": "Entries",
+      "left": "Left column",
+      "left.title": "Heading",
+      "left.items": "Entries",
+      "left_lower": "Left column, lower",
+      "left_lower.title": "Heading",
+      "left_lower.items": "Entries",
+      "right": "Right column",
+      "right.title": "Heading",
+      "right.items": "Entries",
+      "*.items.*.when": "Date or label",
+      "*.items.*.title": "Title lines",
+      "*.items.*.text": "Text",
+      "*.items.*.lines": "Lines",
+      "*.items.*.lead": "Lead (italic)",
+      "*.items.*.body": "Paragraphs",
+      "closing": "Closing line"
+    },
+    "frames": {
+      "col-center": "the middle column",
+      "col-left": "the left column",
+      "col-left-lower": "the lower left block",
+      "col-right": "the right column",
+      "summary": "the summary",
+      "contact": "the contact block"
+    }
   }
 }

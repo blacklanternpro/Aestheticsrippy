@@ -91,13 +91,18 @@ def _rel(path: Path, out_dir: Path) -> str:
 
 
 def loader_html(rip: Dict, data: Dict, out_dir: Path, asset_dirs: Iterable[Path],
-                variant: Optional[str] = None, styles: Optional[Dict] = None) -> str:
-    """A self-contained page that renders `data` through `rip` with the shared renderer."""
+                variant: Optional[str] = None, styles: Optional[Dict] = None,
+                tokens: Optional[Dict] = None, extra_assets: Optional[Dict[str, str]] = None) -> str:
+    """
+    A self-contained page that renders `data` through `rip` with the shared renderer.
+    `extra_assets` maps refs used in the data (e.g. "asset:3f9a") to URLs or data URLs,
+    which is how photos uploaded in the studio travel to export.
+    """
     if variant and variant not in rip.get("variants", {}):
         raise RipError(f"unknown variant '{variant}' (have: {', '.join(rip.get('variants', {})) or 'none'})")
     payload = json.dumps({
-        "rip": rip, "data": data, "variant": variant, "styles": styles or {},
-        "assets": find_assets(data, asset_dirs, out_dir),
+        "rip": rip, "data": data, "variant": variant, "styles": styles or {}, "tokens": tokens or {},
+        "assets": {**find_assets(data, asset_dirs, out_dir), **(extra_assets or {})},
     }, ensure_ascii=False).replace("</", "<\\/")
     title = rip.get("name", rip.get("id", "Rip")).replace("<", "&lt;")
     return f"""<!DOCTYPE html>
@@ -114,8 +119,8 @@ def loader_html(rip: Dict, data: Dict, out_dir: Path, asset_dirs: Iterable[Path]
 <script id="rip-data" type="application/json">{payload}</script>
 <script>
 var D = JSON.parse(document.getElementById("rip-data").textContent);
-Rip.mountPage(document, D.rip, D.data, {{variant: D.variant, styles: D.styles, assets: D.assets,
-                                        hyphenation: window.RIP_HYPH_EN_GB}});
+Rip.mountPage(document, D.rip, D.data, {{variant: D.variant, styles: D.styles, tokens: D.tokens,
+                                        assets: D.assets, hyphenation: window.RIP_HYPH_EN_GB}});
 </script>
 </body>
 </html>
@@ -123,13 +128,14 @@ Rip.mountPage(document, D.rip, D.data, {{variant: D.variant, styles: D.styles, a
 
 
 def build_html(pack_dir: Path, data: Dict, out_path: Path, data_dir: Optional[Path] = None,
-               variant: Optional[str] = None, styles: Optional[Dict] = None) -> str:
+               variant: Optional[str] = None, styles: Optional[Dict] = None,
+               tokens: Optional[Dict] = None, extra_assets: Optional[Dict[str, str]] = None) -> str:
     pack_dir = Path(pack_dir)
     rip = load_rip(pack_dir)
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     page = loader_html(rip, data, out_path.parent, [data_dir, pack_dir / "assets", pack_dir],
-                       variant=variant, styles=styles)
+                       variant=variant, styles=styles, tokens=tokens, extra_assets=extra_assets)
     out_path.write_text(page, encoding="utf-8")
     return page
 
@@ -171,13 +177,15 @@ def rip_packs() -> List[Path]:
 
 
 def render_pdf(pack: str, data: Dict, data_dir: Optional[Path] = None, variant: Optional[str] = None,
-               styles: Optional[Dict] = None, png: bool = False, renderer=None):
+               styles: Optional[Dict] = None, tokens: Optional[Dict] = None,
+               extra_assets: Optional[Dict[str, str]] = None, renderer=None):
     """Render to PDF (and optionally PNG) in memory. Returns the RenderResult."""
     from engine.render import Renderer
 
     pack_dir = PACKS_DIR / pack
     tmp = pack_dir / f".render-{os.getpid()}.html"
-    build_html(pack_dir, data, tmp, data_dir=data_dir, variant=variant, styles=styles)
+    build_html(pack_dir, data, tmp, data_dir=data_dir, variant=variant, styles=styles, tokens=tokens,
+               extra_assets=extra_assets)
     try:
         if renderer is not None:
             return renderer.render_file(tmp, pack_id=pack)

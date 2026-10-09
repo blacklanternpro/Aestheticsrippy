@@ -195,5 +195,34 @@
         }
       ]
     }
-  ]
+  ],
+  "fields": {
+    "order": [
+      "person",
+      "contact",
+      "letter"
+    ],
+    "labels": {
+      "person": "You",
+      "person.first": "First name",
+      "person.last": "Last name",
+      "person.photo": "Photo",
+      "person.signoff_name": "Name under sign-off",
+      "person.signature": "Signature (script)",
+      "person.role": "Role line",
+      "contact": "Contact line",
+      "contact.*": "Contact item",
+      "letter": "Letter",
+      "letter.date": "Date",
+      "letter.recipient": "Recipient",
+      "letter.salutation": "Salutation",
+      "letter.paragraphs": "Paragraphs",
+      "letter.signoff": "Sign-off"
+    },
+    "frames": {
+      "letter": "the letter body",
+      "meta": "the date and address",
+      "name": "the name"
+    }
+  }
 }

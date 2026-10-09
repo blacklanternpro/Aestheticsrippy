@@ -1,7 +1,7 @@
 let PACKS = {
   'studio-neue': {
     name: 'Studio Neue Invoice',
-    path: '../design-packs/studio-neue/template.html',
+    path: '/design-packs/studio-neue/template.html',
     format: 'A4',
     widthMm: 210,
     heightMm: 297,
@@ -9,7 +9,7 @@ let PACKS = {
   },
   'manifesto-red': {
     name: 'Manifesto Red Poster',
-    path: '../design-packs/manifesto-red/template.html',
+    path: '/design-packs/manifesto-red/template.html',
     format: 'A4',
     widthMm: 210,
     heightMm: 297,
@@ -17,7 +17,7 @@ let PACKS = {
   },
   'buum-industrial': {
     name: 'Buum Industrial Slip',
-    path: '../design-packs/buum-industrial/template.html',
+    path: '/design-packs/buum-industrial/template.html',
     format: 'A5',
     widthMm: 148,
     heightMm: 210,
@@ -25,7 +25,7 @@ let PACKS = {
   },
   'thermal-artifact': {
     name: 'Thermal Artifact Receipt',
-    path: '../design-packs/thermal-artifact/template.html',
+    path: '/design-packs/thermal-artifact/template.html',
     format: 'Thermal 80mm',
     widthMm: 80,
     heightMm: 205,

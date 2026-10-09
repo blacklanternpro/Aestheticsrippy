@@ -2,7 +2,7 @@
 
 A lab for ripping high-end typographic print design — posters, receipts, invoices, résumés — into documents you can edit and print at full fidelity.
 
-The plan for the rebuild lives in the project doc *Aestheticsrippy — Review & Build Plan*. Phase 0 (clean and measure) and Phase 1 (the Rip core) are on the `rebuild` branch.
+The plan for the rebuild lives in the project doc *Aestheticsrippy — Review & Build Plan*. Phases 0–2 (clean and measure, the Rip core, the studio) are on the `rebuild` branch.
 
 ## Setup
 
@@ -17,7 +17,7 @@ Optional: put `GEMINI_API_KEY=...` in a `.env` file in the project root for the 
 
 | What | Command |
 | --- | --- |
-| Studio (editor) | `python server.py` → http://127.0.0.1:8080/studio/ |
+| Studio | `python server.py` → http://127.0.0.1:8080/studio/ (old editor: `/studio/legacy/`) |
 | Render a Rip pack with your own content | `python -m engine.rip render saraiva-resume --data content/private/me.json --out export/me.pdf --png` |
 | …with a layout variant | add `--variant dense` |
 | Rebuild Rip packs' previews | `python -m engine.rip build --all` |
@@ -26,17 +26,30 @@ Optional: put `GEMINI_API_KEY=...` in a `.env` file in the project root for the 
 | Score every pack against its reference | `python -m eval.run` |
 | Record new baseline scores | `python -m eval.run --save-baseline` |
 | Harvest a new reference | `python -m engine.harvester --image path/to/scan.jpg --name "My Poster"` |
-| Tests | `python -m pytest -q` |
+| Tests | `python -m pytest -q` (runs the renderer's node tests and a browser test of the studio) |
 
 The server binds to `127.0.0.1` by default; set `AC_HOST` / `AC_PORT` to change it.
 
+## Studio
+
+The studio edits Rip documents directly. Click any text on the sheet to select it and click again to type. The page reflows as you write, and every text keeps its pack's type style.
+
+- **Content panel:** every field in the document, labelled by the pack. Add, reorder, duplicate or remove entries here or from the toolbar that appears over a selected entry.
+- **Inspector:** switch layout variants, and adjust the selected text's type style (typeface, size, weight, width, tracking, leading, case, alignment) or the paper and ink colours. A style edit changes every text that uses that style.
+- **Fit status:** under the sheet, in plain words, with a one-click switch to a denser layout when something runs over.
+- **Undo and redo:** every change, kept in the browser with the document, so it survives a reload.
+- **Export PDF:** renders on the server with the same renderer as the canvas, so the PDF matches what you see.
+- **Files:** open your files from `content/private/`, and **Save to file** (Ctrl/Cmd+S) writes them back, including any style edits under `_rip`. Photos you add are kept with the document.
+
+On a phone the three panes become tabs.
+
 ## Rip packs
 
-A Rip pack (`rip.json`) separates a design into **styles** (named type styles in pt, em and mm), **frames** (millimetre-placed boxes with flowing stacks, rows and repeats) and **data** (plain JSON the frames bind to). Swap the data and the design holds. See the docstring at the top of `engine/rip.py` for the format.
+A Rip pack (`rip.json`) separates a design into **styles** (named type styles in pt, em and mm), **frames** (millimetre-placed boxes with flowing stacks, rows and repeats) and **data** (plain JSON the frames bind to). Swap the data and the design holds. See the header of `studio/js/rip-renderer.js` for the frame vocabulary.
 
 - Stacks with a fixed height shrink their type to fit, never below a declared minimum; frames in the same fit group share one scale so body text stays one size. Anything that still overflows is reported, never silently clipped.
 - Variants re-arrange the same type system for different amounts of content (`"variants"` in `rip.json`).
-- Justified text is hyphenated with soft hyphens (pyphen), so output is identical on every machine.
+- There is one renderer, `studio/js/rip-renderer.js`, used by the studio canvas and by headless export. Justified text is hyphenated with British English TeX patterns, so output is identical on every machine.
 - Fonts are self-hosted in `fonts/` (all SIL OFL).
 - `engine/fit.py` solves point sizes from widths and from a reference's line breaks; that is how the shipped packs were sized.
 
@@ -58,7 +71,7 @@ Baseline scores live in `eval/baseline.json`: the 15 original harvests averaged 
 
 ```
 engine/
-  rip.py          The Rip format: styles, frames, data binding, fit, variants, CLI
+  rip.py          Drives the shared renderer headlessly: build, render, CLI
   fit.py          Solve type sizes from measured widths and line breaks
   render.py       Playwright renderer: PNG + PDF + page count + fit report, any OS
   compiler.py     CLI over the renderer
@@ -72,6 +85,6 @@ eval/
 design-packs/<id>/  rip.json (Rip packs) or template.html + styles.css (legacy) · pack.json · default-data.json · assets/
 fonts/            Self-hosted variable fonts + fonts.css
 content/private/  Your own content and renders (git-ignored)
-studio/           The current editor (rebuilt in Phase 2)
+studio/           The studio: index.html, studio.css, js/ (renderer, store, canvas, panels); legacy/ is the old editor
 archive/          Legacy code kept for reference, not imported
 ```

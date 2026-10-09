@@ -429,7 +429,7 @@
     return out;
   }
 
-  /** Document-level style overrides (the studio's token edits) on top of the pack. */
+  /** Document-level style overrides (the studio's style edits) on top of the pack. */
   function applyStyleOverrides(rip, overrides) {
     if (!overrides || !Object.keys(overrides).length) return rip;
     const out = JSON.parse(JSON.stringify(rip));
@@ -439,20 +439,38 @@
     return out;
   }
 
+  /** Document-level colour token overrides (paper, ink, accents). */
+  function applyTokenOverrides(rip, tokens) {
+    if (!tokens || !Object.keys(tokens).length) return rip;
+    const out = JSON.parse(JSON.stringify(rip));
+    out.tokens = Object.assign({}, out.tokens || {}, tokens);
+    return out;
+  }
+
+  /** Pack + variant + the document's own style and token edits = what renders. */
+  function effectiveRip(rip, variant, styles, tokens) {
+    return applyTokenOverrides(applyStyleOverrides(applyVariant(rip, variant), styles), tokens);
+  }
+
   // -------------------------------------------------------------- document
 
-  function pageCss(rip) {
+  /** Sheet CSS. `scope` prefixes every selector so several sheets can share a page. */
+  function pageCss(rip, scope) {
     const p = rip.page, tokens = rip.tokens || {};
     const paper = colorValue(p.paper || "#ffffff", tokens);
     const ink = colorValue(p.ink || "ink", tokens) || "#000";
     const base = (rip.styles || {}).base ? styleCss(resolveStyle(rip.styles, "base"), tokens).join("; ") : "";
-    return `@page { size: ${num(p.width_mm)}mm ${num(p.height_mm)}mm; margin: 0; }
-.page-sheet, .page-sheet * { box-sizing: border-box; margin: 0; padding: 0; }
-.page-sheet { position: relative; width: ${num(p.width_mm)}mm; height: ${num(p.height_mm)}mm; overflow: hidden;
+    const sc = scope ? `${scope} ` : "";
+    const page = scope ? "" : `@page { size: ${num(p.width_mm)}mm ${num(p.height_mm)}mm; margin: 0; }\n`;
+    return `${page}${sc}.page-sheet, ${sc}.page-sheet * { box-sizing: border-box; margin: 0; padding: 0; }
+${sc}.page-sheet { position: relative; width: ${num(p.width_mm)}mm; height: ${num(p.height_mm)}mm; overflow: hidden;
+  font-size: 16px; font-weight: 400; font-style: normal; font-stretch: 100%; line-height: normal;
+  letter-spacing: normal; word-spacing: normal; text-align: left; text-transform: none; text-indent: 0;
+  white-space: normal; font-variation-settings: normal; font-feature-settings: normal;
   background: ${paper}; color: ${ink}; text-rendering: geometricPrecision; -webkit-font-smoothing: antialiased;
   font-kerning: normal; font-optical-sizing: auto; ${base} }
-.page-sheet .rip-text { overflow-wrap: break-word; }
-.page-sheet .rip-image img { user-select: none; }`;
+${sc}.page-sheet .rip-text { overflow-wrap: break-word; }
+${sc}.page-sheet .rip-image img { user-select: none; }`;
   }
 
   function renderSheet(rip, data, opts) {
@@ -501,7 +519,7 @@
   /** Build a whole standalone page (used for headless export). */
   function mountPage(doc, rip, data, opts) {
     opts = opts || {};
-    rip = applyStyleOverrides(applyVariant(rip, opts.variant), opts.styles);
+    rip = effectiveRip(rip, opts.variant, opts.styles, opts.tokens);
     const style = doc.createElement("style");
     style.textContent = `${pageCss(rip)}
 html, body { margin: 0; background: #d9d9d6; }
@@ -520,7 +538,8 @@ body { display: flex; justify-content: center; -webkit-print-color-adjust: exact
 
   return {
     MISSING, RipError, resolve, absolutePath, interpolate, isEmpty, resolveStyle, styleCss,
-    typeset, createHyphenator, applyVariant, applyStyleOverrides, pageCss, renderSheet,
+    typeset, createHyphenator, applyVariant, applyStyleOverrides, applyTokenOverrides, effectiveRip,
+    pageCss, renderSheet,
     runFit, mountPage, STYLE_KEYS: Array.from(STYLE_KEYS),
   };
 });
