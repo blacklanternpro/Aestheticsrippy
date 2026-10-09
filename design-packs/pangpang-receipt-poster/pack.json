@@ -1,37 +1,16 @@
 {
   "id": "pangpang-receipt-poster",
   "name": "PangPang Receipt",
-  "version": "1.0.0",
   "category": "Editorial & Poster | Industrial | Identity | Ledger",
-  "description": "A brutalist thermal-receipt aesthetic reproduction featuring pixel-art logo lockups and high-density monospace typography. The layout utilizes vertical-rl sidebar branding and a structured invoice grid to mimic authentic point-of-sale ephemera.",
+  "description": "Ripped from a reference by the harvester. 7 type styles, 15 text frames, 19 art frames.",
+  "format": "rip",
+  "variants": [],
   "target": {
     "dimensions": {
-      "format": "US-Letter",
-      "width_mm": 216,
-      "height_mm": 279,
+      "format": "4:5",
+      "width_mm": 200.0,
+      "height_mm": 250.0,
       "orientation": "portrait"
-    },
-    "margins_mm": {
-      "top": 12,
-      "right": 12,
-      "bottom": 12,
-      "left": 12
     }
-  },
-  "typography": {
-    "primaryFont": "Inter",
-    "displayFont": "Anton",
-    "monospaceFont": "Space Mono",
-    "modularScale": 1.2,
-    "lineHeightBase": 1.05
-  },
-  "colorTokens": {
-    "background": "#f8f5ee",
-    "textPrimary": "#000000",
-    "textSecondary": "#cc3333",
-    "accent": "#cc3333"
-  },
-  "spatialBudget": {
-    "strictSinglePage": true
   }
 }

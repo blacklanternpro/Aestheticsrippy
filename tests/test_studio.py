@@ -137,3 +137,63 @@ def test_static_files_are_locked_down(studio):
             urllib.request.urlopen(base + path)
         assert e.value.code == 404, path
     assert urllib.request.urlopen(base + "/fonts/fonts.css").status == 200
+
+
+def test_rip_an_image_from_the_studio(studio, tmp_path, monkeypatch):
+    """Upload a reference, watch it rip, open the new pack as a document."""
+    import server
+    import engine.harvest.pipeline as pipeline
+
+    packs = tmp_path / "packs"
+    packs.mkdir()
+    # Rip into a scratch pack folder; keep the shipped packs listed so the studio still boots.
+    for p in (ROOT / "design-packs").iterdir():
+        if (p / "rip.json").exists():
+            (packs / p.name).symlink_to(p)
+    monkeypatch.setattr(server, "PACKS_DIR", packs)
+    monkeypatch.setattr(pipeline, "PACKS_DIR", packs)
+    url, _ = studio
+    errors = []
+    with playwright.sync_playwright() as p:
+        browser = p.chromium.launch()
+        pg = browser.new_page(viewport={"width": 1440, "height": 900})
+        pg.on("pageerror", lambda e: errors.append(str(e)))
+        pg.goto(url)
+        pg.evaluate("indexedDB.databases().then(dbs => dbs.forEach(d => indexedDB.deleteDatabase(d.name)))")
+        pg.reload()
+        pg.wait_for_selector(".empty-card")
+        pg.click('.empty-card >> text=Rip an image')
+        pg.set_input_files(".rip-drop input[type=file]",
+                           str(ROOT / "design-packs" / "fidele-invoice-0123" / "assets" / "reference.jpg"))
+        pg.fill("#rip-name", "Test Rip")
+        pg.click("text=Rip it")
+        pg.wait_for_selector(".rip-steps li")
+        pg.wait_for_selector("text=Test Rip is ready", timeout=240_000)
+        score = float(pg.inner_text(".rip-score strong"))
+        assert score > 70
+        pg.click("text=Open it")
+        pg.wait_for_selector(".sheet-host .page-sheet [data-path]")
+        assert "Invoice" in pg.inner_text(".sheet-host .page-sheet")
+        browser.close()
+    assert (packs / "test-rip" / "rip.json").exists()
+    assert not errors, errors
+    for f in (ROOT / "content" / "uploads").glob("test-rip.*"):
+        f.unlink()
+
+
+def test_writes_need_json_from_the_studio(studio):
+    """A form or script on another site cannot start a rip or overwrite content."""
+    import urllib.error
+    import urllib.request
+    url, _ = studio
+    base = url.rsplit("/studio/", 1)[0]
+    cases = [
+        ("/api/rip", "text/plain", None),
+        ("/api/rip", "application/json", "https://evil.example"),
+    ]
+    for path, ctype, origin in cases:
+        req = urllib.request.Request(base + path, data=b'{"image": "", "name": "x"}', method="POST",
+                                     headers={"Content-Type": ctype, **({"Origin": origin} if origin else {})})
+        with pytest.raises(urllib.error.HTTPError) as e:
+            urllib.request.urlopen(req)
+        assert e.value.code == 400, (path, ctype, origin)

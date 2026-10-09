@@ -13,8 +13,8 @@
  *   Rip.runFit(rootElement)           -> shrink fit-stacks, return {fit, overflow}
  *   Rip.mountPage(document, rip, data, opts)  -> whole standalone page (export)
  *
- * opts: { assets: {ref: url}, assetBase: "url/prefix/", hyphenation: patterns,
- *         editable: bool }   editable adds data-path / data-item hooks for the studio.
+ * opts: { assets: {ref: url}, assetBase: "url/prefix/", packBase: "url/prefix/" (for frame
+ *         src art), hyphenation: patterns, editable: bool }   editable adds data-path / data-item hooks for the studio.
  */
 (function (root, factory) {
   const Rip = factory();
@@ -24,9 +24,14 @@
   "use strict";
 
   const MISSING = Symbol("missing");
-  const GENERIC = {
-    "Inter": "sans-serif", "Inter Tight": "sans-serif", "Archivo": "sans-serif",
-    "Jost": "sans-serif", "Mrs Saint Delafield": "cursive",
+  const GENERIC = { // generated from fonts/catalogue.json
+    "Inter": "sans-serif", "Inter Tight": "sans-serif", "Arimo": "sans-serif",
+    "Archivo": "sans-serif", "Archivo Black": "sans-serif", "Space Grotesk": "sans-serif",
+    "Jost": "sans-serif", "Unbounded": "sans-serif", "Oswald": "sans-serif", "Anton": "sans-serif",
+    "Big Shoulders Display": "sans-serif", "Big Shoulders Stencil Display": "sans-serif",
+    "Tinos": "serif", "Newsreader": "serif", "EB Garamond": "serif", "Bodoni Moda": "serif",
+    "JetBrains Mono": "monospace", "Space Mono": "monospace", "Courier Prime": "monospace",
+    "Mrs Saint Delafield": "cursive",
   };
   const STYLE_KEYS = new Set([
     "font", "size", "weight", "stretch", "italic", "leading", "tracking", "case",
@@ -305,11 +310,16 @@
   };
 
   Builder.prototype.r_image = function (f, ctx, absolute) {
-    const ref = ("bind" in f || "text" in f) ? this.boundValue(f, ctx) : (f.src === undefined ? MISSING : f.src);
+    const bound = "bind" in f || "text" in f;
+    const ref = bound ? this.boundValue(f, ctx) : (f.src === undefined ? MISSING : f.src);
     if (isEmpty(ref)) return "";
-    const src = this.findAsset(String(ref));
+    // Art the pack owns (src) lives with the pack even when content comes from elsewhere.
+    const src = !bound && this.opts.packBase && !/^(https?:|data:|blob:)/.test(String(ref))
+      ? this.opts.packBase + ref : this.findAsset(String(ref));
     if (!src) throw new RipError(`image asset not found: ${ref}`);
     const css = this.placeCss(f, absolute);
+    if (f.opacity !== undefined) css.push(`opacity: ${num(f.opacity)}`);
+    if (f.blend) css.push(`mix-blend-mode: ${f.blend}`);
     const img = [`object-fit: ${f.fit || "cover"}`, `object-position: ${f.position || "center"}`,
       "width: 100%", "height: 100%", "display: block"];
     if (f.filter === "grayscale") img.push("filter: grayscale(1)");
@@ -332,6 +342,21 @@
     if (align === "center") css.push("margin-left: auto; margin-right: auto");
     else if (align === "right") css.push("margin-left: auto");
     return `<div ${this.attrs(f, "rule", css, "", ctx)}></div>`;
+  };
+
+  // A plain shape: a filled panel, an outlined box, a pill or an ellipse.
+  Builder.prototype.r_box = function (f, ctx, absolute) {
+    const css = this.placeCss(f, absolute);
+    if (f.fill !== undefined && f.fill !== null) css.push(`background: ${colorValue(f.fill, this.tokens)}`);
+    if (f.stroke !== undefined && f.stroke !== null) {
+      css.push(`border: ${num(f.stroke_weight === undefined ? 0.5 : f.stroke_weight)}pt solid ${colorValue(f.stroke, this.tokens)}`);
+    }
+    if (f.radius === "ellipse") css.push("border-radius: 50%");
+    else if (f.radius !== undefined) css.push(`border-radius: ${mm(f.radius)}`);
+    if (f.opacity !== undefined) css.push(`opacity: ${num(f.opacity)}`);
+    if (f.blend) css.push(`mix-blend-mode: ${f.blend}`);
+    css.push("box-sizing: border-box");
+    return `<div ${this.attrs(f, "box", css, "", ctx)}></div>`;
   };
 
   Builder.prototype.r_space = function (f) {

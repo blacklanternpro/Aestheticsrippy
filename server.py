@@ -12,7 +12,8 @@ Serves the studio and a small JSON API:
   GET  /api/content/<name>         one content file
   PUT  /api/content/<name>         save a content file (JSON only)
   POST /api/export                 render {pack, data, variant, styles, tokens} to PDF
-  POST /api/harvest                vision-harvest an image into a legacy pack
+  POST /api/rip                    rip a reference image into a new Rip pack (starts a job)
+  GET  /api/rip/<job>              that job's progress and result
   POST /api/ai/replace-image       legacy studio image helper
 
 Only the folders the studio needs are served as static files, dotfiles never
@@ -86,6 +87,10 @@ class RenderWorker:
 
 
 RENDER = RenderWorker()
+JOBS = {}          # rip jobs: id -> {status, steps, pack, score, error}
+JOBS_LOCK = threading.Lock()
+RIP_LOCK = threading.Lock()
+IMAGE_EXT = {"image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp"}
 
 
 class StudioHandler(http.server.SimpleHTTPRequestHandler):
@@ -114,7 +119,24 @@ class StudioHandler(http.server.SimpleHTTPRequestHandler):
     def send_error_json(self, status, message):
         self.send_json({"status": "error", "error": message}, status)
 
+    def same_origin(self) -> bool:
+        """Writes must come from the studio itself: JSON from a loopback page, not a form on another site."""
+        ctype = (self.headers.get("Content-Type") or "").split(";")[0].strip().lower()
+        if ctype != "application/json":
+            return False
+        host = (self.headers.get("Host") or "").rsplit(":", 1)[0].strip("[]")
+        if host not in ("127.0.0.1", "localhost", "::1", HOST):
+            return False
+        origin = self.headers.get("Origin")
+        if origin:
+            o = urllib.parse.urlparse(origin).hostname or ""
+            if o not in ("127.0.0.1", "localhost", "::1", HOST):
+                return False
+        return True
+
     def read_json(self):
+        if not self.same_origin():
+            raise ValueError("Requests must be JSON from the studio.")
         length = int(self.headers.get("Content-Length", 0))
         if length > MAX_BODY:
             raise ValueError("Request is too large.")
@@ -146,6 +168,8 @@ class StudioHandler(http.server.SimpleHTTPRequestHandler):
             return self.api_content_list()
         if path.startswith("/api/content/"):
             return self.api_content_get(urllib.parse.unquote(path[len("/api/content/"):]))
+        if path.startswith("/api/rip/"):
+            return self.api_rip_status(path[len("/api/rip/"):])
         if path.startswith("/api/"):
             return self.send_error_json(404, "No such endpoint.")
         if path.startswith("/content/private/"):
@@ -168,13 +192,7 @@ class StudioHandler(http.server.SimpleHTTPRequestHandler):
         self.wfile.write(body)
 
     def api_health(self):
-        from engine.harvester import DEFAULT_API_KEY, GEMINI_MODELS
-        self.send_json({
-            "status": "ok", "mode": "local",
-            "defaultModel": os.environ.get("GEMINI_MODEL", GEMINI_MODELS[0]),
-            "hasKey": bool(DEFAULT_API_KEY or os.environ.get("GEMINI_API_KEY")),
-            "availableModels": GEMINI_MODELS,
-        })
+        self.send_json({"status": "ok", "mode": "local", "harvester": "rip"})
 
     def api_packs(self):
         packs = []
@@ -203,14 +221,19 @@ class StudioHandler(http.server.SimpleHTTPRequestHandler):
         for p in sorted(PACKS_DIR.iterdir()):
             if not (p / "rip.json").exists():
                 continue
-            rip = json.loads((p / "rip.json").read_text(encoding="utf-8"))
-            data_file = p / "default-data.json"
+            try:
+                rip = json.loads((p / "rip.json").read_text(encoding="utf-8"))
+                data_file = p / "default-data.json"
+                default = json.loads(data_file.read_text(encoding="utf-8")) if data_file.exists() else {}
+            except (OSError, ValueError) as e:  # a pack being written, or a broken one
+                print(f"[!] Skipping {p.name}: {e}")
+                continue
             packs.append({
                 "id": rip["id"], "name": rip.get("name", rip["id"]),
                 "category": rip.get("category", ""),
                 "description": rip.get("description", ""),
                 "rip": rip,
-                "defaultData": json.loads(data_file.read_text(encoding="utf-8")) if data_file.exists() else {},
+                "defaultData": default,
                 "assetBase": f"/design-packs/{p.name}/assets/",
             })
         self.send_json({"status": "success", "packs": packs})
@@ -275,8 +298,8 @@ class StudioHandler(http.server.SimpleHTTPRequestHandler):
 
         if path == "/api/export":
             return self.api_export(payload)
-        if path == "/api/harvest":
-            return self.api_harvest(payload)
+        if path == "/api/rip":
+            return self.api_rip_start(payload)
         if path == "/api/ai/replace-image":
             prompt = payload.get("prompt", "").strip() or "avant-garde graphic"
             url = (f"https://image.pollinations.ai/prompt/{urllib.parse.quote_plus(prompt)}"
@@ -313,25 +336,61 @@ class StudioHandler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(res.pdf)
 
-    def api_harvest(self, payload):
-        from engine.harvester import harvest_image
+    def api_rip_start(self, payload):
+        """Save the upload, then harvest it on the render worker in the background."""
+        import uuid
+        from engine.harvest.pipeline import slug
         try:
-            image_b64 = payload.get("imageBase64", "")
-            if "," in image_b64:
-                image_b64 = image_b64.split(",", 1)[1]
-            if not image_b64:
-                raise ValueError("No image data provided.")
-            meta = harvest_image(
-                image_bytes=base64.b64decode(image_b64),
-                mime_type=payload.get("mimeType", "image/png"),
-                name_hint=payload.get("packName") or "Harvested Design Pack",
-                api_key=payload.get("apiKey"), model_override=payload.get("model"),
-                base_dir=BASE_DIR,
-            )
-            self.send_json({"status": "success", "pack": meta})
-        except Exception as e:
-            traceback.print_exc()
-            self.send_error_json(500, str(e))
+            data_url = payload.get("image", "")
+            m = re.match(r"^data:(image/(?:png|jpeg|webp));base64,(.+)$", data_url, re.S)
+            if not m:
+                raise ValueError("Send the image as a PNG, JPEG or WebP data URL.")
+            raw = base64.b64decode(m.group(2))
+            name = (payload.get("name") or "").strip()[:80] or "Ripped reference"
+        except (ValueError, base64.binascii.Error) as e:
+            return self.send_error_json(400, str(e))
+        base = slug(name)
+        job = uuid.uuid4().hex[:12]
+        with JOBS_LOCK:  # reserve the id against folders on disk and rips still running
+            busy = {j["pack"] for j in JOBS.values() if j["status"] == "running"}
+            pack_id, n = base, 2
+            while (PACKS_DIR / pack_id).exists() or pack_id in busy:
+                pack_id, n = f"{base}-{n}", n + 1
+            JOBS[job] = {"status": "running", "steps": ["Queued"], "pack": pack_id, "name": name}
+        uploads = BASE_DIR / "content" / "uploads"
+        uploads.mkdir(parents=True, exist_ok=True)
+        src = uploads / f"{job}{IMAGE_EXT[m.group(1)]}"
+        src.write_bytes(raw)
+
+        def step(msg):
+            with JOBS_LOCK:
+                JOBS[job]["steps"].append(msg)
+
+        def work():
+            # Rips run one at a time on their own browser, so exports never queue behind them.
+            from engine.harvest.pipeline import harvest
+            try:
+                with RIP_LOCK:
+                    res = harvest(src, name, out_dir=PACKS_DIR / pack_id, pack_id=pack_id, progress=step)
+                with JOBS_LOCK:
+                    JOBS[job].update(status="done", score=round(res.score or 0, 1), live=round(res.live * 100),
+                                     notes=res.notes, seconds=round(res.seconds))
+            except Exception as e:
+                traceback.print_exc()
+                with JOBS_LOCK:
+                    JOBS[job].update(status="error", error=str(e))
+
+        threading.Thread(target=work, name=f"rip-{job}", daemon=True).start()
+        self.send_json({"status": "success", "job": job, "pack": pack_id})
+
+    def api_rip_status(self, job):
+        with JOBS_LOCK:
+            info = JOBS.get(job)
+            info = dict(info, steps=list(info["steps"])) if info else None
+        if not info:
+            return self.send_error_json(404, "No such job.")
+        self.send_json({"status": "success", "job": job, **{k: v for k, v in info.items() if k != "status"},
+                        "state": info["status"]})
 
 
 def run_server():

@@ -1,0 +1,872 @@
+{
+  "rip": 1,
+  "id": "handshake-receipt-ledger",
+  "name": "Handshake Tag",
+  "category": "Editorial & Ephemera",
+  "description": "Ripped from a reference by the harvester. 11 type styles, 25 text frames, 32 art frames.",
+  "reference": {
+    "image": "assets/reference.jpg"
+  },
+  "page": {
+    "width_mm": 210.0,
+    "height_mm": 297.0,
+    "format": "A4",
+    "paper": "paper",
+    "ink": "ink"
+  },
+  "tokens": {
+    "paper": "#fafafa",
+    "ink": "#191919",
+    "ink-2": "#464646",
+    "ink-3": "#5d5d5d",
+    "ink-4": "#fdfdfd"
+  },
+  "styles": {
+    "display": {
+      "font": "Archivo",
+      "size": 34.0,
+      "weight": 400,
+      "leading": 1.2,
+      "color": "ink",
+      "stretch": 62,
+      "case": "upper"
+    },
+    "heading": {
+      "font": "Archivo",
+      "size": 29.9,
+      "weight": 800,
+      "leading": 1.2,
+      "tracking": -0.065,
+      "color": "ink-4",
+      "stretch": 62,
+      "case": "upper"
+    },
+    "title": {
+      "font": "Big Shoulders Display",
+      "size": 33.2,
+      "weight": 900,
+      "leading": 1.2,
+      "color": "ink",
+      "case": "upper"
+    },
+    "lead": {
+      "font": "Archivo",
+      "size": 28.4,
+      "weight": 400,
+      "leading": 1.13,
+      "tracking": 0.04,
+      "color": "ink",
+      "stretch": 62,
+      "case": "upper"
+    },
+    "body": {
+      "font": "Archivo",
+      "size": 25.6,
+      "weight": 400,
+      "leading": 1.48,
+      "tracking": -0.02,
+      "color": "ink",
+      "stretch": 75
+    },
+    "caption": {
+      "font": "Big Shoulders Display",
+      "size": 18.2,
+      "weight": 400,
+      "leading": 1.2,
+      "tracking": -0.01,
+      "color": "ink",
+      "case": "upper"
+    },
+    "body-ink-2": {
+      "font": "Archivo",
+      "size": 26.9,
+      "weight": 400,
+      "leading": 1.06,
+      "tracking": -0.03,
+      "color": "ink-2",
+      "stretch": 75
+    },
+    "subheading": {
+      "font": "Archivo",
+      "size": 28.6,
+      "weight": 400,
+      "leading": 1.68,
+      "color": "ink-2",
+      "stretch": 62,
+      "case": "upper"
+    },
+    "small": {
+      "font": "Archivo",
+      "size": 22.2,
+      "weight": 400,
+      "leading": 1.09,
+      "color": "ink",
+      "stretch": 62
+    },
+    "body-ink-2-big-shoulders-display": {
+      "font": "Big Shoulders Display",
+      "size": 24.4,
+      "weight": 400,
+      "leading": 0.93,
+      "color": "ink-2"
+    },
+    "heading-b": {
+      "font": "Big Shoulders Display",
+      "size": 28.0,
+      "weight": 400,
+      "leading": 1.2,
+      "tracking": -0.07,
+      "color": "ink-3"
+    }
+  },
+  "frames": [
+    {
+      "id": "art01",
+      "x": 9.83,
+      "y": 97.85,
+      "w": 186.32,
+      "h": 8.49,
+      "z": 0,
+      "type": "box",
+      "fill": "#141414"
+    },
+    {
+      "id": "art02",
+      "x": 0.0,
+      "y": 0.0,
+      "w": 21.89,
+      "h": 4.02,
+      "z": 0,
+      "type": "image",
+      "src": "mark-02.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art03",
+      "x": 23.23,
+      "y": 0.0,
+      "w": 20.11,
+      "h": 4.02,
+      "z": 0,
+      "type": "image",
+      "src": "mark-03.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art04",
+      "x": 56.74,
+      "y": 0.0,
+      "w": 20.11,
+      "h": 4.02,
+      "z": 0,
+      "type": "image",
+      "src": "mark-04.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art05",
+      "x": 90.26,
+      "y": 0.0,
+      "w": 20.11,
+      "h": 4.02,
+      "z": 0,
+      "type": "image",
+      "src": "mark-05.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art06",
+      "x": 111.26,
+      "y": 0.0,
+      "w": 20.11,
+      "h": 4.02,
+      "z": 0,
+      "type": "image",
+      "src": "mark-06.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art07",
+      "x": 165.77,
+      "y": 0.0,
+      "w": 20.11,
+      "h": 4.02,
+      "z": 0,
+      "type": "image",
+      "src": "mark-07.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art08",
+      "x": 186.77,
+      "y": 0.0,
+      "w": 20.11,
+      "h": 4.02,
+      "z": 0,
+      "type": "image",
+      "src": "mark-08.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art09",
+      "x": 6.7,
+      "y": 7.15,
+      "w": 192.57,
+      "h": 69.7,
+      "z": 0,
+      "type": "image",
+      "src": "mark-09.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art10",
+      "x": 7.15,
+      "y": 85.79,
+      "w": 192.57,
+      "h": 10.72,
+      "z": 0,
+      "type": "image",
+      "src": "mark-10.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art11",
+      "x": 6.7,
+      "y": 108.57,
+      "w": 20.55,
+      "h": 14.3,
+      "z": 0,
+      "type": "image",
+      "src": "mark-11.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art12",
+      "x": 7.15,
+      "y": 145.21,
+      "w": 71.94,
+      "h": 24.57,
+      "z": 0,
+      "type": "image",
+      "src": "mark-12.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art13",
+      "x": 30.83,
+      "y": 159.06,
+      "w": 9.83,
+      "h": 10.72,
+      "z": 0,
+      "type": "image",
+      "src": "mark-13.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art14",
+      "x": 94.72,
+      "y": 159.06,
+      "w": 9.38,
+      "h": 10.72,
+      "z": 0,
+      "type": "image",
+      "src": "mark-14.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art15",
+      "x": 118.4,
+      "y": 159.06,
+      "w": 9.38,
+      "h": 10.72,
+      "z": 0,
+      "type": "image",
+      "src": "mark-15.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art16",
+      "x": 174.26,
+      "y": 159.06,
+      "w": 9.38,
+      "h": 10.72,
+      "z": 0,
+      "type": "image",
+      "src": "mark-16.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art17",
+      "x": 189.89,
+      "y": 159.06,
+      "w": 9.38,
+      "h": 10.72,
+      "z": 0,
+      "type": "image",
+      "src": "mark-17.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art18",
+      "x": 189.0,
+      "y": 222.51,
+      "w": 10.72,
+      "h": 12.06,
+      "z": 0,
+      "type": "image",
+      "src": "mark-18.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art19",
+      "x": 127.34,
+      "y": 236.81,
+      "w": 75.06,
+      "h": 60.32,
+      "z": 0,
+      "type": "image",
+      "src": "mark-19.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art20",
+      "x": 130.02,
+      "y": 248.43,
+      "w": 16.09,
+      "h": 12.51,
+      "z": 0,
+      "type": "image",
+      "src": "mark-20.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art21",
+      "x": 6.7,
+      "y": 280.6,
+      "w": 73.72,
+      "h": 16.53,
+      "z": 0,
+      "type": "image",
+      "src": "mark-21.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art22",
+      "x": 81.77,
+      "y": 280.6,
+      "w": 39.77,
+      "h": 16.53,
+      "z": 0,
+      "type": "image",
+      "src": "mark-22.png",
+      "fit": "fill"
+    },
+    {
+      "id": "rule01",
+      "type": "rule",
+      "x": 8.94,
+      "y": 236.36,
+      "w": 188.11,
+      "weight": 3.79,
+      "color": "#5c5c5c",
+      "z": 0
+    },
+    {
+      "id": "rule02",
+      "type": "rule",
+      "x": 8.94,
+      "y": 276.13,
+      "w": 35.3,
+      "weight": 2.52,
+      "color": "#444444",
+      "z": 0
+    },
+    {
+      "id": "rule03",
+      "type": "rule",
+      "x": 67.02,
+      "y": 276.3,
+      "w": 130.02,
+      "weight": 2.81,
+      "color": "#444444",
+      "z": 0
+    },
+    {
+      "id": "rule04",
+      "type": "box",
+      "x": 8.94,
+      "y": 236.36,
+      "w": 1.33,
+      "h": 41.11,
+      "fill": "#828282",
+      "z": 0
+    },
+    {
+      "id": "rule05",
+      "type": "box",
+      "x": 55.42,
+      "y": 27.26,
+      "w": 2.65,
+      "h": 40.66,
+      "fill": "#191919",
+      "z": 0
+    },
+    {
+      "id": "rule06",
+      "type": "box",
+      "x": 69.31,
+      "y": 27.7,
+      "w": 2.13,
+      "h": 23.68,
+      "fill": "#1a1a1a",
+      "z": 0
+    },
+    {
+      "id": "rule07",
+      "type": "box",
+      "x": 75.51,
+      "y": 286.4,
+      "w": 1.79,
+      "h": 10.72,
+      "fill": "#151515",
+      "z": 0
+    },
+    {
+      "id": "rule08",
+      "type": "box",
+      "x": 121.53,
+      "y": 282.83,
+      "w": 2.68,
+      "h": 14.3,
+      "fill": "#151515",
+      "z": 0
+    },
+    {
+      "id": "rule09",
+      "type": "box",
+      "x": 195.71,
+      "y": 236.36,
+      "w": 1.33,
+      "h": 41.11,
+      "fill": "#5a5a5a",
+      "z": 0
+    },
+    {
+      "id": "rule10",
+      "type": "box",
+      "x": 208.66,
+      "y": 0.0,
+      "w": 1.34,
+      "h": 297.13,
+      "fill": "#181818",
+      "z": 0
+    },
+    {
+      "id": "t01",
+      "type": "text",
+      "style": "display",
+      "bind": "t01",
+      "x": 76.37,
+      "y": 73.69,
+      "w": 59.47,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t02",
+      "type": "text",
+      "style": "title",
+      "bind": "t02",
+      "x": 9.36,
+      "y": 95.24,
+      "w": 55.28,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t03",
+      "type": "text",
+      "style": "title",
+      "bind": "t03",
+      "x": 124.19,
+      "y": 95.24,
+      "w": 46.79,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t04",
+      "type": "text",
+      "style": "heading",
+      "bind": "t04",
+      "x": 86.71,
+      "y": 95.59,
+      "w": 15.27,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t05",
+      "type": "text",
+      "style": "lead",
+      "bind": "t05",
+      "x": 8.98,
+      "y": 109.84,
+      "w": 64.54,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t06",
+      "type": "text",
+      "style": "subheading",
+      "bind": "t06",
+      "x": 85.38,
+      "y": 107.01,
+      "w": 25.27,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t07",
+      "type": "text",
+      "style": "body",
+      "bind": "t07",
+      "x": 85.43,
+      "y": 109.85,
+      "w": 116.23,
+      "with": {
+        "wrap": "nowrap",
+        "leading": 1.326
+      },
+      "z": 2
+    },
+    {
+      "id": "t08",
+      "type": "text",
+      "style": "subheading",
+      "bind": "t08",
+      "x": 122.47,
+      "y": 107.01,
+      "w": 48.05,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t09",
+      "type": "text",
+      "style": "lead",
+      "bind": "t09",
+      "x": 8.98,
+      "y": 133.97,
+      "w": 60.97,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t10",
+      "type": "text",
+      "style": "body-ink-2",
+      "bind": "t10",
+      "x": 9.0,
+      "y": 170.52,
+      "w": 33.4,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t11",
+      "type": "text",
+      "style": "body",
+      "bind": "t11",
+      "x": 47.45,
+      "y": 177.96,
+      "w": 10.78,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t12",
+      "type": "text",
+      "style": "lead",
+      "bind": "t12",
+      "x": 51.38,
+      "y": 200.85,
+      "w": 44.88,
+      "with": {
+        "align": "right",
+        "wrap": "nowrap",
+        "leading": 0.981
+      },
+      "z": 2
+    },
+    {
+      "id": "t13",
+      "type": "text",
+      "style": "lead",
+      "bind": "t13",
+      "x": 71.09,
+      "y": 179.1,
+      "w": 29.69,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t14",
+      "type": "text",
+      "style": "body",
+      "bind": "t14",
+      "x": 109.11,
+      "y": 180.03,
+      "w": 41.61,
+      "with": {
+        "wrap": "nowrap",
+        "leading": 1.121
+      },
+      "z": 2
+    },
+    {
+      "id": "t15",
+      "type": "text",
+      "style": "lead",
+      "bind": "t15",
+      "x": 164.02,
+      "y": 179.1,
+      "w": 37.73,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t16",
+      "type": "text",
+      "style": "heading-b",
+      "bind": "t16",
+      "x": 109.07,
+      "y": 266.84,
+      "w": 41.67,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t17",
+      "type": "text",
+      "style": "subheading",
+      "bind": "t17",
+      "x": 109.51,
+      "y": 220.05,
+      "w": 41.8,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t18",
+      "type": "text",
+      "style": "body",
+      "bind": "t18",
+      "x": 132.79,
+      "y": 199.41,
+      "w": 16.59,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t19",
+      "type": "text",
+      "style": "body",
+      "bind": "t19",
+      "x": 156.47,
+      "y": 199.41,
+      "w": 14.8,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t20",
+      "type": "text",
+      "style": "body",
+      "bind": "t20",
+      "x": 164.1,
+      "y": 201.4,
+      "w": 32.23,
+      "with": {
+        "align": "right",
+        "wrap": "nowrap",
+        "leading": 1.039
+      },
+      "z": 2
+    },
+    {
+      "id": "t21",
+      "type": "text",
+      "style": "caption",
+      "bind": "t21",
+      "x": 184.28,
+      "y": 160.78,
+      "w": 7.87,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t22",
+      "type": "text",
+      "style": "body",
+      "bind": "t22",
+      "x": 9.02,
+      "y": 220.84,
+      "w": 88.97,
+      "with": {
+        "wrap": "nowrap",
+        "leading": 1.682
+      },
+      "z": 2
+    },
+    {
+      "id": "t23",
+      "type": "text",
+      "style": "body-ink-2",
+      "bind": "t23",
+      "x": 12.13,
+      "y": 265.69,
+      "w": 88.8,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t24",
+      "type": "text",
+      "style": "body-ink-2-big-shoulders-display",
+      "bind": "t24",
+      "x": 109.12,
+      "y": 250.49,
+      "w": 35.99,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t25",
+      "type": "text",
+      "style": "small",
+      "bind": "t25",
+      "x": 12.2,
+      "y": 248.24,
+      "w": 87.47,
+      "z": 2
+    }
+  ],
+  "fields": {
+    "order": [
+      "t01",
+      "t02",
+      "t03",
+      "t04",
+      "t05",
+      "t06",
+      "t07",
+      "t08",
+      "t09",
+      "t10",
+      "t11",
+      "t12",
+      "t13",
+      "t14",
+      "t15",
+      "t16",
+      "t17",
+      "t18",
+      "t19",
+      "t20",
+      "t21",
+      "t22",
+      "t23",
+      "t24",
+      "t25"
+    ],
+    "labels": {
+      "t01": "Display 1",
+      "t02": "Title 1",
+      "t03": "Title 2",
+      "t04": "Heading 1",
+      "t05": "Lead 1",
+      "t06": "Subheading 1",
+      "t07": "Body 1",
+      "t08": "Subheading 2",
+      "t09": "Lead 2",
+      "t10": "Body ink 2 1",
+      "t11": "Body 2",
+      "t12": "Lead 3",
+      "t13": "Lead 4",
+      "t14": "Body 3",
+      "t15": "Lead 5",
+      "t16": "Heading b 1",
+      "t17": "Subheading 3",
+      "t18": "Body 4",
+      "t19": "Body 5",
+      "t20": "Body 6",
+      "t21": "Caption 1",
+      "t22": "Body 7",
+      "t23": "Body ink 2 2",
+      "t24": "Body ink 2 big shoulders display 1",
+      "t25": "Small 1"
+    }
+  },
+  "harvest": {
+    "score": 86.5,
+    "live": 0.465,
+    "notes": [
+      "No contrasting surround; the whole image is the sheet.",
+      "Paper: A4, 210 x 297 mm.",
+      "Kept 6 unreadable text areas as art."
+    ],
+    "history": [
+      {
+        "round": 0,
+        "score": 86.5
+      },
+      {
+        "round": 1,
+        "score": 85.7,
+        "moved": 17,
+        "kept": null
+      }
+    ],
+    "seconds": 30.2
+  }
+}

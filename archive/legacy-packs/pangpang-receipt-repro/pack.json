@@ -1,0 +1,37 @@
+{
+  "id": "pangpang-receipt-repro",
+  "name": "PangPang Receipt (repro)",
+  "version": "1.0.0",
+  "category": "Editorial & Poster | Ephemera | Industrial | Ledger",
+  "description": "A faithful typographic reconstruction of a thermal receipt, utilizing monospaced grid alignment and high-contrast bitmap-style display typography. The layout maintains the vertical tension of a receipt roll with precise spatial mapping of the header, line items, and footer barcode.",
+  "target": {
+    "dimensions": {
+      "format": "US-Letter",
+      "width_mm": 216,
+      "height_mm": 279,
+      "orientation": "portrait"
+    },
+    "margins_mm": {
+      "top": 12,
+      "right": 12,
+      "bottom": 12,
+      "left": 12
+    }
+  },
+  "typography": {
+    "primaryFont": "Courier New, monospace",
+    "displayFont": "Arial, sans-serif",
+    "monospaceFont": "Courier New, monospace",
+    "modularScale": 1.0,
+    "lineHeightBase": 1.2
+  },
+  "colorTokens": {
+    "background": "#ffffff",
+    "textPrimary": "#000000",
+    "textSecondary": "#333333",
+    "accent": "#ff0000"
+  },
+  "spatialBudget": {
+    "strictSinglePage": true
+  }
+}

@@ -1,0 +1,664 @@
+{
+  "families": [
+    {
+      "family": "Inter",
+      "category": "neo-grotesque",
+      "generic": "sans-serif",
+      "faces": [
+        {
+          "file": "Inter-var.woff2",
+          "weight": [
+            100,
+            900
+          ],
+          "style": "normal"
+        },
+        {
+          "file": "Inter-Italic-var.woff2",
+          "weight": [
+            100,
+            900
+          ],
+          "style": "italic"
+        }
+      ],
+      "stretch": null,
+      "try": {
+        "weight": [
+          300,
+          400,
+          500,
+          600,
+          700,
+          800,
+          900
+        ]
+      },
+      "match": true,
+      "metrics": {
+        "upm": 2048,
+        "ascent": 0.9688,
+        "descent": 0.2412,
+        "cap": 0.7275,
+        "x": 0.5459
+      }
+    },
+    {
+      "family": "Inter Tight",
+      "category": "neo-grotesque",
+      "generic": "sans-serif",
+      "faces": [
+        {
+          "file": "InterTight-var.woff2",
+          "weight": [
+            100,
+            900
+          ],
+          "style": "normal"
+        }
+      ],
+      "stretch": null,
+      "try": {
+        "weight": [
+          400,
+          500,
+          700,
+          800,
+          900
+        ]
+      },
+      "match": true,
+      "metrics": {
+        "upm": 2048,
+        "ascent": 0.9688,
+        "descent": 0.2412,
+        "cap": 0.7275,
+        "x": 0.5459
+      }
+    },
+    {
+      "family": "Arimo",
+      "category": "neo-grotesque",
+      "generic": "sans-serif",
+      "faces": [
+        {
+          "file": "Arimo-var.woff2",
+          "weight": [
+            400,
+            700
+          ],
+          "style": "normal"
+        }
+      ],
+      "stretch": null,
+      "try": {
+        "weight": [
+          400,
+          700
+        ]
+      },
+      "match": true,
+      "metrics": {
+        "upm": 2048,
+        "ascent": 0.9053,
+        "descent": 0.2119,
+        "cap": 0.688,
+        "x": 0.5283
+      }
+    },
+    {
+      "family": "Archivo",
+      "category": "grotesque",
+      "generic": "sans-serif",
+      "faces": [
+        {
+          "file": "Archivo-var.woff2",
+          "weight": [
+            100,
+            900
+          ],
+          "style": "normal"
+        }
+      ],
+      "stretch": [
+        62,
+        125
+      ],
+      "try": {
+        "weight": [
+          400,
+          600,
+          800
+        ],
+        "stretch": [
+          62,
+          75,
+          100,
+          125
+        ]
+      },
+      "match": true,
+      "metrics": {
+        "upm": 1000,
+        "ascent": 0.878,
+        "descent": 0.21,
+        "cap": 0.686,
+        "x": 0.526
+      }
+    },
+    {
+      "family": "Archivo Black",
+      "category": "grotesque",
+      "generic": "sans-serif",
+      "faces": [
+        {
+          "file": "ArchivoBlack-Regular.woff2",
+          "weight": [
+            400,
+            400
+          ],
+          "style": "normal"
+        }
+      ],
+      "stretch": null,
+      "try": {
+        "weight": [
+          400
+        ]
+      },
+      "match": true,
+      "metrics": {
+        "upm": 1000,
+        "ascent": 0.878,
+        "descent": 0.21,
+        "cap": 0.688,
+        "x": 0.528
+      }
+    },
+    {
+      "family": "Space Grotesk",
+      "category": "grotesque",
+      "generic": "sans-serif",
+      "faces": [
+        {
+          "file": "SpaceGrotesk-var.woff2",
+          "weight": [
+            300,
+            700
+          ],
+          "style": "normal"
+        }
+      ],
+      "stretch": null,
+      "try": {
+        "weight": [
+          400,
+          700
+        ]
+      },
+      "match": true,
+      "metrics": {
+        "upm": 1000,
+        "ascent": 0.984,
+        "descent": 0.292,
+        "cap": 0.7,
+        "x": 0.486
+      }
+    },
+    {
+      "family": "Jost",
+      "category": "geometric",
+      "generic": "sans-serif",
+      "faces": [
+        {
+          "file": "Jost-var.woff2",
+          "weight": [
+            100,
+            900
+          ],
+          "style": "normal"
+        },
+        {
+          "file": "Jost-Italic-var.woff2",
+          "weight": [
+            100,
+            900
+          ],
+          "style": "italic"
+        }
+      ],
+      "stretch": null,
+      "try": {
+        "weight": [
+          300,
+          400,
+          500,
+          700
+        ]
+      },
+      "match": true,
+      "metrics": {
+        "upm": 1000,
+        "ascent": 1.07,
+        "descent": 0.375,
+        "cap": 0.7,
+        "x": 0.46
+      }
+    },
+    {
+      "family": "Unbounded",
+      "category": "wide",
+      "generic": "sans-serif",
+      "faces": [
+        {
+          "file": "Unbounded-var.woff2",
+          "weight": [
+            200,
+            900
+          ],
+          "style": "normal"
+        }
+      ],
+      "stretch": null,
+      "try": {
+        "weight": [
+          400,
+          700,
+          900
+        ]
+      },
+      "match": true,
+      "metrics": {
+        "upm": 1000,
+        "ascent": 0.995,
+        "descent": 0.245,
+        "cap": 0.75,
+        "x": 0.566
+      }
+    },
+    {
+      "family": "Oswald",
+      "category": "condensed",
+      "generic": "sans-serif",
+      "faces": [
+        {
+          "file": "Oswald-var.woff2",
+          "weight": [
+            200,
+            700
+          ],
+          "style": "normal"
+        }
+      ],
+      "stretch": null,
+      "try": {
+        "weight": [
+          300,
+          500,
+          700
+        ]
+      },
+      "match": true,
+      "metrics": {
+        "upm": 1000,
+        "ascent": 1.193,
+        "descent": 0.289,
+        "cap": 0.81,
+        "x": 0.578
+      }
+    },
+    {
+      "family": "Anton",
+      "category": "condensed",
+      "generic": "sans-serif",
+      "faces": [
+        {
+          "file": "Anton-Regular.woff2",
+          "weight": [
+            400,
+            400
+          ],
+          "style": "normal"
+        }
+      ],
+      "stretch": null,
+      "try": {
+        "weight": [
+          400
+        ]
+      },
+      "match": true,
+      "metrics": {
+        "upm": 2048,
+        "ascent": 1.1763,
+        "descent": 0.3291,
+        "cap": 0.8594,
+        "x": 0.7324
+      }
+    },
+    {
+      "family": "Big Shoulders Display",
+      "category": "condensed",
+      "generic": "sans-serif",
+      "faces": [
+        {
+          "file": "BigShouldersDisplay-var.woff2",
+          "weight": [
+            100,
+            900
+          ],
+          "style": "normal"
+        }
+      ],
+      "stretch": null,
+      "try": {
+        "weight": [
+          400,
+          700,
+          900
+        ]
+      },
+      "match": true,
+      "metrics": {
+        "upm": 2000,
+        "ascent": 0.984,
+        "descent": 0.213,
+        "cap": 0.8,
+        "x": 0.6
+      }
+    },
+    {
+      "family": "Big Shoulders Stencil Display",
+      "category": "stencil",
+      "generic": "sans-serif",
+      "faces": [
+        {
+          "file": "BigShouldersStencilDisplay-var.woff2",
+          "weight": [
+            100,
+            900
+          ],
+          "style": "normal"
+        }
+      ],
+      "stretch": null,
+      "try": {
+        "weight": [
+          700,
+          900
+        ]
+      },
+      "match": true,
+      "metrics": {
+        "upm": 2000,
+        "ascent": 0.984,
+        "descent": 0.213,
+        "cap": 0.8,
+        "x": 0.6
+      }
+    },
+    {
+      "family": "Tinos",
+      "category": "serif",
+      "generic": "serif",
+      "faces": [
+        {
+          "file": "Tinos-Regular.woff2",
+          "weight": [
+            400,
+            400
+          ],
+          "style": "normal"
+        },
+        {
+          "file": "Tinos-Bold.woff2",
+          "weight": [
+            700,
+            700
+          ],
+          "style": "normal"
+        }
+      ],
+      "stretch": null,
+      "try": {
+        "weight": [
+          400,
+          700
+        ]
+      },
+      "match": true,
+      "metrics": {
+        "upm": 2048,
+        "ascent": 0.8911,
+        "descent": 0.2163,
+        "cap": 0.6548,
+        "x": 0.459
+      }
+    },
+    {
+      "family": "Newsreader",
+      "category": "serif",
+      "generic": "serif",
+      "faces": [
+        {
+          "file": "Newsreader-var.woff2",
+          "weight": [
+            200,
+            800
+          ],
+          "style": "normal"
+        }
+      ],
+      "stretch": null,
+      "try": {
+        "weight": [
+          400,
+          600
+        ]
+      },
+      "match": true,
+      "metrics": {
+        "upm": 2000,
+        "ascent": 0.735,
+        "descent": 0.265,
+        "cap": 0.67,
+        "x": 0.426
+      }
+    },
+    {
+      "family": "EB Garamond",
+      "category": "oldstyle",
+      "generic": "serif",
+      "faces": [
+        {
+          "file": "EBGaramond-var.woff2",
+          "weight": [
+            400,
+            800
+          ],
+          "style": "normal"
+        }
+      ],
+      "stretch": null,
+      "try": {
+        "weight": [
+          400,
+          600
+        ]
+      },
+      "match": true,
+      "metrics": {
+        "upm": 1000,
+        "ascent": 1.007,
+        "descent": 0.298,
+        "cap": 0.65,
+        "x": 0.4
+      }
+    },
+    {
+      "family": "Bodoni Moda",
+      "category": "didone",
+      "generic": "serif",
+      "faces": [
+        {
+          "file": "BodoniModa-var.woff2",
+          "weight": [
+            400,
+            900
+          ],
+          "style": "normal"
+        }
+      ],
+      "stretch": null,
+      "try": {
+        "weight": [
+          400,
+          700
+        ]
+      },
+      "match": true,
+      "metrics": {
+        "upm": 2000,
+        "ascent": 1.125,
+        "descent": 0.4,
+        "cap": 0.75,
+        "x": 0.46
+      }
+    },
+    {
+      "family": "JetBrains Mono",
+      "category": "mono",
+      "generic": "monospace",
+      "faces": [
+        {
+          "file": "JetBrainsMono-var.woff2",
+          "weight": [
+            100,
+            800
+          ],
+          "style": "normal"
+        }
+      ],
+      "stretch": null,
+      "try": {
+        "weight": [
+          400,
+          700
+        ]
+      },
+      "match": true,
+      "metrics": {
+        "upm": 1000,
+        "ascent": 1.02,
+        "descent": 0.3,
+        "cap": 0.73,
+        "x": 0.55
+      }
+    },
+    {
+      "family": "Space Mono",
+      "category": "mono",
+      "generic": "monospace",
+      "faces": [
+        {
+          "file": "SpaceMono-Regular.woff2",
+          "weight": [
+            400,
+            400
+          ],
+          "style": "normal"
+        },
+        {
+          "file": "SpaceMono-Bold.woff2",
+          "weight": [
+            700,
+            700
+          ],
+          "style": "normal"
+        }
+      ],
+      "stretch": null,
+      "try": {
+        "weight": [
+          400,
+          700
+        ]
+      },
+      "match": true,
+      "metrics": {
+        "upm": 1000,
+        "ascent": 1.12,
+        "descent": 0.361,
+        "cap": 0.7,
+        "x": 0.496
+      }
+    },
+    {
+      "family": "Courier Prime",
+      "category": "typewriter",
+      "generic": "monospace",
+      "faces": [
+        {
+          "file": "CourierPrime-Regular.woff2",
+          "weight": [
+            400,
+            400
+          ],
+          "style": "normal"
+        },
+        {
+          "file": "CourierPrime-Bold.woff2",
+          "weight": [
+            700,
+            700
+          ],
+          "style": "normal"
+        }
+      ],
+      "stretch": null,
+      "try": {
+        "weight": [
+          400,
+          700
+        ]
+      },
+      "match": true,
+      "metrics": {
+        "upm": 2048,
+        "ascent": 0.7812,
+        "descent": 0.3418,
+        "cap": 0.5796,
+        "x": 0.4512
+      }
+    },
+    {
+      "family": "Mrs Saint Delafield",
+      "category": "script",
+      "generic": "cursive",
+      "faces": [
+        {
+          "file": "MrsSaintDelafield-Regular.woff2",
+          "weight": [
+            400,
+            400
+          ],
+          "style": "normal"
+        }
+      ],
+      "stretch": null,
+      "try": {
+        "weight": [
+          400
+        ]
+      },
+      "match": false,
+      "metrics": {
+        "upm": 1000,
+        "ascent": 0.906,
+        "descent": 0.619,
+        "cap": 0.708,
+        "x": 0.224
+      }
+    }
+  ]
+}

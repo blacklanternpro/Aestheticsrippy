@@ -1,0 +1,37 @@
+{
+  "id": "handshake-receipt-ledger",
+  "name": "Handshake Tag",
+  "version": "1.0.0",
+  "category": "Editorial & Ephemera",
+  "description": "A thermal-receipt inspired typographic ledger featuring high-contrast serif display headers and structured monospace data grids. It utilizes a die-cut serrated aesthetic to mimic physical point-of-sale ephemera.",
+  "target": {
+    "dimensions": {
+      "format": "Custom",
+      "width_mm": 85,
+      "height_mm": 145,
+      "orientation": "portrait"
+    },
+    "margins_mm": {
+      "top": 12,
+      "right": 12,
+      "bottom": 12,
+      "left": 12
+    }
+  },
+  "typography": {
+    "primaryFont": "Courier New, monospace",
+    "displayFont": "Playfair Display SC, serif",
+    "monospaceFont": "Space Mono, monospace",
+    "modularScale": 1.2,
+    "lineHeightBase": 1.05
+  },
+  "colorTokens": {
+    "background": "#ffffff",
+    "textPrimary": "#000000",
+    "textSecondary": "#333333",
+    "accent": "#000000"
+  },
+  "spatialBudget": {
+    "strictSinglePage": true
+  }
+}

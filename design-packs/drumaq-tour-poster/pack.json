@@ -1,37 +1,16 @@
 {
   "id": "drumaq-tour-poster",
   "name": "Drumaq Tour Poster",
-  "version": "1.0.0",
   "category": "Editorial & Poster | Ephemera | Brutalist",
-  "description": "A high-density typographic tour schedule featuring brutalist spacing and silhouette iconography. The layout utilizes a dense, flowing text block with integrated graphic elements and a gradient-infused footer.",
+  "description": "Ripped from a reference by the harvester. 8 type styles, 13 text frames, 6 art frames.",
+  "format": "rip",
+  "variants": [],
   "target": {
     "dimensions": {
-      "format": "US-Letter",
-      "width_mm": 216,
-      "height_mm": 279,
+      "format": "4:5",
+      "width_mm": 200.0,
+      "height_mm": 250.0,
       "orientation": "portrait"
-    },
-    "margins_mm": {
-      "top": 20,
-      "right": 20,
-      "bottom": 20,
-      "left": 20
     }
-  },
-  "typography": {
-    "primaryFont": "Inter",
-    "displayFont": "Anton",
-    "monospaceFont": "Space Mono",
-    "modularScale": 1.2,
-    "lineHeightBase": 0.95
-  },
-  "colorTokens": {
-    "background": "#e0dcd9",
-    "textPrimary": "#222222",
-    "textSecondary": "#444444",
-    "accent": "#d6a8b5"
-  },
-  "spatialBudget": {
-    "strictSinglePage": true
   }
 }

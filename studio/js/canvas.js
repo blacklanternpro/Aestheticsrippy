@@ -92,7 +92,8 @@ export class Canvas {
     let html;
     try {
       html = window.Rip.renderSheet(rip, view.data, {
-        editable: true, assets: view.assets, assetBase: view.assetBase, hyphenation: view.hyphenation,
+        editable: true, assets: view.assets, assetBase: view.assetBase, packBase: view.packBase,
+        hyphenation: view.hyphenation,
       });
     } catch (e) {
       this.hooks.onReport({ error: e.message });

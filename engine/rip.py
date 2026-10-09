@@ -86,15 +86,35 @@ def find_assets(data: object, asset_dirs: Iterable[Path], out_dir: Path) -> Dict
     return found
 
 
+def _frame_srcs(rip: Dict) -> List[str]:
+    """Fixed images named by frames (art the pack owns, not content)."""
+    out: List[str] = []
+
+    def walk(f: Dict) -> None:
+        if isinstance(f.get("src"), str):
+            out.append(f["src"])
+        for c in f.get("children", []):
+            walk(c)
+        if isinstance(f.get("item"), dict):
+            walk(f["item"])
+
+    for f in rip.get("frames", []):
+        walk(f)
+    return out
+
+
 def _rel(path: Path, out_dir: Path) -> str:
     return Path(os.path.relpath(Path(path).resolve(), Path(out_dir).resolve())).as_posix()
 
 
 def loader_html(rip: Dict, data: Dict, out_dir: Path, asset_dirs: Iterable[Path],
                 variant: Optional[str] = None, styles: Optional[Dict] = None,
-                tokens: Optional[Dict] = None, extra_assets: Optional[Dict[str, str]] = None) -> str:
+                tokens: Optional[Dict] = None, extra_assets: Optional[Dict[str, str]] = None,
+                pack_dirs: Optional[List[Path]] = None) -> str:
     """
     A self-contained page that renders `data` through `rip` with the shared renderer.
+    Frame `src` art is looked up only in `pack_dirs` (when given), so a content
+    file can never stand in for a pack's own art.
     `extra_assets` maps refs used in the data (e.g. "asset:3f9a") to URLs or data URLs,
     which is how photos uploaded in the studio travel to export.
     """
@@ -102,7 +122,9 @@ def loader_html(rip: Dict, data: Dict, out_dir: Path, asset_dirs: Iterable[Path]
         raise RipError(f"unknown variant '{variant}' (have: {', '.join(rip.get('variants', {})) or 'none'})")
     payload = json.dumps({
         "rip": rip, "data": data, "variant": variant, "styles": styles or {}, "tokens": tokens or {},
-        "assets": {**find_assets(data, asset_dirs, out_dir), **(extra_assets or {})},
+        "assets": {**find_assets(data, asset_dirs, out_dir),
+                   **find_assets(_frame_srcs(rip), pack_dirs if pack_dirs is not None else asset_dirs, out_dir),
+                   **(extra_assets or {})},
     }, ensure_ascii=False).replace("</", "<\\/")
     title = rip.get("name", rip.get("id", "Rip")).replace("<", "&lt;")
     return f"""<!DOCTYPE html>
@@ -135,7 +157,8 @@ def build_html(pack_dir: Path, data: Dict, out_path: Path, data_dir: Optional[Pa
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     page = loader_html(rip, data, out_path.parent, [data_dir, pack_dir / "assets", pack_dir],
-                       variant=variant, styles=styles, tokens=tokens, extra_assets=extra_assets)
+                       variant=variant, styles=styles, tokens=tokens, extra_assets=extra_assets,
+                       pack_dirs=[pack_dir / "assets", pack_dir])
     out_path.write_text(page, encoding="utf-8")
     return page
 

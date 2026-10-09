@@ -560,3 +560,27 @@ button, input, select, textarea { font: inherit; color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* --- rip an image -------------------------------------------------------- */
+
+.rip-drop {
+  display: grid; justify-items: center; gap: 6px; padding: 28px 16px; margin-bottom: 16px;
+  border: 1px dashed var(--ink-3); border-radius: var(--radius); text-align: center; cursor: pointer;
+  background: var(--chrome-2);
+}
+.rip-drop:hover, .rip-drop:focus-within, .rip-drop.is-over { border-color: var(--select); }
+.rip-drop.is-over { background: var(--select-soft); }
+.rip-drop .rip-thumb { display: none; }
+.rip-drop.has-image .rip-thumb { display: block; max-height: 220px; max-width: 100%; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+.rip-drop-text { font-size: 14px; }
+.rip-form { width: min(520px, 92vw); }
+.rip-progress { width: min(620px, 92vw); }
+.rip-work { display: grid; grid-template-columns: 160px 1fr; gap: 20px; align-items: start; }
+.rip-work .rip-thumb, .rip-work .preview { width: 160px; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+.rip-steps { margin: 0 0 8px; padding-left: 20px; font-size: 13px; line-height: 1.7; color: var(--ink-2); }
+.rip-steps li.is-now { color: var(--ink); font-weight: 600; }
+.rip-steps li.is-now::after { content: " …"; }
+.rip-steps li.is-error { color: var(--problem); font-weight: 600; list-style: none; margin-left: -20px; }
+.rip-score { margin: 0 0 6px; font-size: 14px; }
+.rip-score strong { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
+@media (max-width: 560px) { .rip-work { grid-template-columns: 1fr; } }

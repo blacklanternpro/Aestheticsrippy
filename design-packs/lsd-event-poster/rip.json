@@ -1,0 +1,475 @@
+{
+  "rip": 1,
+  "id": "lsd-event-poster",
+  "name": "LSD Event Poster",
+  "category": "Editorial & Poster | Industrial | Identity",
+  "description": "Ripped from a reference by the harvester. 4 type styles, 17 text frames, 12 art frames.",
+  "reference": {
+    "image": "assets/reference.jpg"
+  },
+  "page": {
+    "width_mm": 200.0,
+    "height_mm": 300.0,
+    "format": "2:3",
+    "paper": "paper",
+    "ink": "ink"
+  },
+  "tokens": {
+    "paper": "#fd5aa6",
+    "ink": "#3a1310"
+  },
+  "styles": {
+    "heading": {
+      "font": "Archivo Black",
+      "size": 26.0,
+      "weight": 400,
+      "leading": 1.2,
+      "color": "ink"
+    },
+    "title": {
+      "font": "Archivo Black",
+      "size": 45.8,
+      "weight": 400,
+      "leading": 1.14,
+      "color": "ink"
+    },
+    "display": {
+      "font": "Archivo Black",
+      "size": 46.3,
+      "weight": 400,
+      "leading": 1.13,
+      "color": "ink",
+      "case": "upper"
+    },
+    "body": {
+      "font": "Archivo Black",
+      "size": 17.4,
+      "weight": 400,
+      "leading": 1.56,
+      "tracking": 0.005,
+      "color": "ink",
+      "case": "upper"
+    }
+  },
+  "frames": [
+    {
+      "id": "paper",
+      "type": "image",
+      "src": "paper.jpg",
+      "x": 0,
+      "y": 0,
+      "w": 200.0,
+      "h": 300.0,
+      "fit": "fill",
+      "z": 0
+    },
+    {
+      "id": "art01",
+      "x": 9.19,
+      "y": 4.44,
+      "w": 122.37,
+      "h": 79.11,
+      "z": 0,
+      "type": "image",
+      "src": "mark-01.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art02",
+      "x": 135.11,
+      "y": 4.44,
+      "w": 56.3,
+      "h": 78.22,
+      "z": 0,
+      "type": "image",
+      "src": "photo-02.jpg",
+      "fit": "fill"
+    },
+    {
+      "id": "art03",
+      "x": 41.78,
+      "y": 226.07,
+      "w": 11.26,
+      "h": 16.89,
+      "z": 0,
+      "type": "image",
+      "src": "mark-03.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art04",
+      "x": 86.81,
+      "y": 250.96,
+      "w": 5.93,
+      "h": 9.19,
+      "z": 0,
+      "type": "image",
+      "src": "mark-04.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art05",
+      "x": 97.78,
+      "y": 250.96,
+      "w": 5.63,
+      "h": 9.48,
+      "z": 0,
+      "type": "image",
+      "src": "mark-05.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art06",
+      "x": 57.48,
+      "y": 251.26,
+      "w": 6.22,
+      "h": 8.59,
+      "z": 0,
+      "type": "image",
+      "src": "mark-06.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art07",
+      "x": 108.15,
+      "y": 251.26,
+      "w": 6.22,
+      "h": 9.19,
+      "z": 0,
+      "type": "image",
+      "src": "mark-07.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art08",
+      "x": 22.52,
+      "y": 278.81,
+      "w": 6.22,
+      "h": 8.3,
+      "z": 0,
+      "type": "image",
+      "src": "mark-08.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art09",
+      "x": 118.22,
+      "y": 279.41,
+      "w": 22.22,
+      "h": 8.3,
+      "z": 0,
+      "type": "image",
+      "src": "mark-09.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art10",
+      "x": 47.7,
+      "y": 287.41,
+      "w": 5.93,
+      "h": 9.19,
+      "z": 0,
+      "type": "image",
+      "src": "mark-10.png",
+      "fit": "fill"
+    },
+    {
+      "id": "art11",
+      "x": 132.15,
+      "y": 288.0,
+      "w": 5.93,
+      "h": 8.59,
+      "z": 0,
+      "type": "image",
+      "src": "mark-11.png",
+      "fit": "fill"
+    },
+    {
+      "id": "t01",
+      "type": "text",
+      "style": "title",
+      "bind": "t01",
+      "x": 7.6,
+      "y": 100.36,
+      "w": 183.92,
+      "with": {
+        "align": "center",
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t02",
+      "type": "text",
+      "style": "display",
+      "bind": "t02",
+      "x": 8.43,
+      "y": 162.2,
+      "w": 182.54,
+      "with": {
+        "align": "center",
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t03",
+      "type": "text",
+      "style": "heading",
+      "bind": "t03",
+      "x": 95.63,
+      "y": 88.62,
+      "w": 19.13,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t04",
+      "type": "text",
+      "style": "heading",
+      "bind": "t04",
+      "x": 157.26,
+      "y": 88.62,
+      "w": 17.65,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t05",
+      "type": "text",
+      "style": "display",
+      "bind": "t05",
+      "x": 51.49,
+      "y": 225.61,
+      "w": 112.32,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t06",
+      "type": "text",
+      "style": "display",
+      "bind": "t06",
+      "x": 26.31,
+      "y": 262.65,
+      "w": 93.95,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t07",
+      "type": "text",
+      "style": "heading",
+      "bind": "t07",
+      "x": 95.34,
+      "y": 150.25,
+      "w": 18.84,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t08",
+      "type": "text",
+      "style": "display",
+      "bind": "t08",
+      "x": 124.38,
+      "y": 263.54,
+      "w": 57.5,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t09",
+      "type": "text",
+      "style": "heading",
+      "bind": "t09",
+      "x": 156.97,
+      "y": 150.84,
+      "w": 17.65,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t10",
+      "type": "text",
+      "style": "heading",
+      "bind": "t10",
+      "x": 30.74,
+      "y": 150.25,
+      "w": 11.73,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t11",
+      "type": "text",
+      "style": "heading",
+      "bind": "t11",
+      "x": 95.34,
+      "y": 212.77,
+      "w": 19.43,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t12",
+      "type": "text",
+      "style": "heading",
+      "bind": "t12",
+      "x": 31.04,
+      "y": 213.06,
+      "w": 11.13,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t13",
+      "type": "text",
+      "style": "heading",
+      "bind": "t13",
+      "x": 156.97,
+      "y": 213.36,
+      "w": 17.65,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t14",
+      "type": "text",
+      "style": "body",
+      "bind": "t14",
+      "x": 61.68,
+      "y": 250.64,
+      "w": 79.83,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t15",
+      "type": "text",
+      "style": "body",
+      "bind": "t15",
+      "x": 26.72,
+      "y": 277.01,
+      "w": 37.76,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t16",
+      "type": "text",
+      "style": "body",
+      "bind": "t16",
+      "x": 76.2,
+      "y": 277.31,
+      "w": 38.65,
+      "with": {
+        "wrap": "nowrap"
+      },
+      "z": 2
+    },
+    {
+      "id": "t17",
+      "type": "text",
+      "style": "body",
+      "bind": "t17",
+      "x": 136.05,
+      "y": 278.1,
+      "w": 38.05,
+      "with": {
+        "wrap": "nowrap",
+        "leading": 1.496
+      },
+      "z": 2
+    }
+  ],
+  "fields": {
+    "order": [
+      "t01",
+      "t02",
+      "t03",
+      "t04",
+      "t05",
+      "t06",
+      "t07",
+      "t08",
+      "t09",
+      "t10",
+      "t11",
+      "t12",
+      "t13",
+      "t14",
+      "t15",
+      "t16",
+      "t17"
+    ],
+    "labels": {
+      "t01": "Title 1",
+      "t02": "Display 1",
+      "t03": "Heading 1",
+      "t04": "Heading 2",
+      "t05": "Display 2",
+      "t06": "Display 3",
+      "t07": "Heading 3",
+      "t08": "Display 4",
+      "t09": "Heading 4",
+      "t10": "Heading 5",
+      "t11": "Heading 6",
+      "t12": "Heading 7",
+      "t13": "Heading 8",
+      "t14": "Body 1",
+      "t15": "Body 2",
+      "t16": "Body 3",
+      "t17": "Body 4"
+    }
+  },
+  "harvest": {
+    "score": 88.1,
+    "live": 0.515,
+    "notes": [
+      "No contrasting surround; the whole image is the sheet.",
+      "Paper: 2:3, 200 x 300 mm.",
+      "Kept 1 unreadable text area as art.",
+      "The paper is not flat; kept it as a paper image under everything."
+    ],
+    "history": [
+      {
+        "round": 0,
+        "score": 88.1
+      },
+      {
+        "round": 1,
+        "score": 86.5,
+        "moved": 16,
+        "kept": null
+      }
+    ],
+    "seconds": 20.3
+  }
+}

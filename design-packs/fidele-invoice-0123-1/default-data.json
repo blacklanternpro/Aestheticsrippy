@@ -1,1 +1,23 @@
-{}
+{
+  "t01": "Thank you for your ourchase at the Fidéle online shop.\nThis is your order invoice. Please write us with any questions or tips.",
+  "t02": "Invoice",
+  "t03": "0123",
+  "t04": "Date: Month 00, 2020",
+  "t05": "€00,00\n€00,00\n€00,00",
+  "t06": "Fidele",
+  "t07": "Aliquam tincidunt mauris risus Vestibulum auctor dapibus Nunc dignissim risus id metu",
+  "t08": "1\n1\n1",
+  "t09": "00000 City",
+  "t10": "Bill to:\nName Surname",
+  "t11": "00 Street Name,",
+  "t12": "00000 City",
+  "t13": "Subtotal\nVAT\nShipping",
+  "t14": "Total",
+  "t15": "€00,00\n+00%\n€00,00",
+  "t16": "€00,00",
+  "t17": "|:@studio_fidele for studio:\nF:fidele.editions for press:",
+  "t18": "studio@ fidele-editions.com\neditions@",
+  "t19": "Lavoir, 75010 Paris",
+  "t20": "4a Villa\n+33 148 03 0670",
+  "t21": "du"
+}

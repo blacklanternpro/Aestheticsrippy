@@ -44,3 +44,14 @@ export async function exportPdf(doc) {
     overflow: (res.headers.get("X-Rip-Overflow") || "").split(",").filter(Boolean),
   };
 }
+
+/** Start ripping a reference image into a new pack; returns { job, pack }. */
+export async function startRip(image, name) {
+  return json(await fetch("/api/rip", {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ image, name }),
+  }));
+}
+
+export async function ripStatus(job) {
+  return json(await fetch(`/api/rip/${encodeURIComponent(job)}`));
+}

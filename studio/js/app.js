@@ -5,7 +5,7 @@ import { h, clear, debounce, getPath, setPath, parentPath, lastKey, clone } from
 import { Store } from "./store.js";
 import { Canvas, ICONS } from "./canvas.js";
 import { ContentPanel, blankLike } from "./content-panel.js";
-import { Inspector } from "./inspector.js";
+import { Inspector, fontsReady } from "./inspector.js";
 import * as api from "./api.js";
 
 const Rip = window.Rip;
@@ -28,6 +28,7 @@ function buildView() {
     data: doc.data,
     assets: doc.assets || {},
     assetBase: doc.source ? "/content/private/" : pack.assetBase,
+    packBase: pack.assetBase,
     hyphenation: window.RIP_HYPH_EN_GB,
   };
 }
@@ -122,6 +123,7 @@ const inspector = new Inspector($("#inspector"), {
     { merge: `token:${t}` }),
   resetToken: (t) => store.commit(`Reset ${t} colour`, (d) => { if (d.tokens) delete d.tokens[t]; }),
 });
+fontsReady.then(() => inspector.render());
 
 // ---------------------------------------------------------------- store events
 
@@ -263,9 +265,10 @@ function toast(message, kind = "info") {
 function emptyState() {
   return h("div.empty-card",
     h("h2", "Start a document"),
-    h("p", "Pick a pack to start from its reference content, or open one of your files from content/private."),
+    h("p", "Pick a pack to start from its reference content, rip a new one from an image, or open one of your files from content/private."),
     h("div.empty-actions",
       h("button.button.primary", { type: "button", onclick: openNewDialog }, "New from a pack"),
+      h("button.button", { type: "button", onclick: openRipDialog }, "Rip an image"),
       h("button.button", { type: "button", onclick: openFileDialog }, "Open a file")));
 }
 
@@ -285,7 +288,8 @@ async function openDocMenu() {
       { current: store.doc && store.doc.id === d.id, meta: (state.packs.get(d.pack) || {}).name || d.pack })));
     menu.append(h("hr.menu-rule"));
   }
-  menu.append(item("New from a pack…", openNewDialog), item("Open a file…", openFileDialog));
+  menu.append(item("New from a pack…", openNewDialog), item("Rip an image…", openRipDialog),
+    item("Open a file…", openFileDialog));
   if (store.doc) {
     menu.append(h("hr.menu-rule"),
       item(store.doc.source ? "Save to file" : "Save as file…", saveToFile),
@@ -330,8 +334,134 @@ function openNewDialog() {
           toast(`Started ${p.name}. Click any text on the sheet to edit it.`);
         } },
       previewOf(p), h("span.pack-name", p.name), h("span.pack-desc", p.category)))),
-      h("div.dialog-actions", h("button.button", { value: "cancel" }, "Cancel"))));
+      h("div.dialog-actions",
+        h("button.button", { type: "button", onclick: () => { dlg.close(); openRipDialog(); } }, "Rip an image instead…"),
+        h("button.button", { value: "cancel" }, "Cancel"))));
   dlg.showModal();
+}
+
+// ---------------------------------------------------------------- ripping
+
+function readAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = () => reject(r.error);
+    r.readAsDataURL(file);
+  });
+}
+
+function openRipDialog() {
+  const dlg = $("#dialog");
+  clear(dlg);
+  let image = null;
+  const thumb = h("img.rip-thumb", { alt: "" });
+  const name = h("input.field-input", { id: "rip-name", type: "text", placeholder: "Name for the new pack" });
+  const file = h("input", { type: "file", accept: "image/png,image/jpeg,image/webp", hidden: true,
+    onchange: () => file.files[0] && choose(file.files[0]) });
+  const go = h("button.button.primary", { type: "submit", disabled: true }, "Rip it");
+  const drop = h("label.rip-drop", { tabindex: 0 },
+    file, thumb, h("span.rip-drop-text", h("strong", "Choose an image"), " or drop it here"),
+    h("span.muted", "A photo, scan or screenshot of one printed sheet. PNG, JPEG or WebP."));
+  async function choose(f) {
+    if (!/^image\/(png|jpeg|webp)$/.test(f.type)) { toast("Use a PNG, JPEG or WebP image.", "error"); return; }
+    image = await readAsDataUrl(f);
+    thumb.src = image;
+    drop.classList.add("has-image");
+    if (!name.value) name.value = f.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ");
+    go.disabled = false;
+  }
+  drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("is-over"); });
+  drop.addEventListener("dragleave", () => drop.classList.remove("is-over"));
+  drop.addEventListener("drop", (e) => {
+    e.preventDefault(); drop.classList.remove("is-over");
+    if (e.dataTransfer.files[0]) choose(e.dataTransfer.files[0]);
+  });
+  const form = h("form.dialog-body.rip-form", {
+    onsubmit: (e) => {
+      e.preventDefault();
+      if (!image || go.disabled) return;
+      go.disabled = true;
+      startRip(image, name.value.trim() || "Ripped reference").finally(() => { go.disabled = false; });
+    } },
+  h("h2", "Rip an image"),
+  h("p.muted", "The harvester finds the sheet, reads the text, matches the type against the cabinet, keeps the art, " +
+    "then renders the result and corrects it until it stops improving. It takes a minute or so."),
+  drop,
+  h("div.field", h("label.field-label", { for: "rip-name" }, "Name"), name),
+  h("div.dialog-actions",
+    h("button.button", { type: "button", onclick: () => dlg.close() }, "Cancel"), go));
+  dlg.append(form);
+  dlg.showModal();
+
+  async function startRip(img, title) {
+    let job;
+    try {
+      job = await api.startRip(img, title);
+    } catch (e) {
+      toast(`Couldn't start: ${e.message}`, "error");
+      return;
+    }
+    const steps = h("ol.rip-steps");
+    const clock = h("span.muted", "0 s");
+    const body = h("div.dialog-body.rip-progress",
+      h("h2", `Ripping ${title}`),
+      h("div.rip-work", h("img.rip-thumb", { src: img, alt: "" }), h("div", steps, clock)),
+      h("div.dialog-actions", h("button.button", { type: "button", onclick: () => dlg.close() },
+        "Keep working; tell me when it's done")));
+    clear(dlg);
+    dlg.append(body);
+    const t0 = Date.now();
+    for (;;) {
+      await new Promise((r) => setTimeout(r, 1000));
+      let st;
+      try { st = await api.ripStatus(job.job); } catch (e) { toast(`Lost track of the rip: ${e.message}`, "error"); return; }
+      clear(steps);
+      st.steps.forEach((label, i) => steps.append(h("li" + (i === st.steps.length - 1 && st.state === "running" ? ".is-now" : ""), label)));
+      clock.textContent = `${Math.round((Date.now() - t0) / 1000)} s`;
+      if (st.state === "error") {
+        if (body.isConnected) steps.append(h("li.is-error", st.error || "Something went wrong."));
+        else toast(`The rip of ${title} failed: ${st.error || "something went wrong"}.`, "error");
+        return;
+      }
+      if (st.state === "done") {
+        try {
+          const packs = await api.ripPacks();
+          packs.forEach((p) => state.packs.set(p.id, p));
+        } catch (e) { /* fall through: reported below */ }
+        const pack = state.packs.get(st.pack);
+        if (!pack) {
+          if (body.isConnected) steps.append(h("li.is-error", "The pack was written but could not be loaded. Reload the studio."));
+          else toast("A rip finished but its pack could not be loaded. Reload the studio.", "error");
+          return;
+        }
+        const open = async () => {
+          if (dlg.open && ready.isConnected) dlg.close();
+          await store.create({ name: `${pack.name} draft`, pack: pack.id, data: pack.defaultData });
+          toast(`Opened ${pack.name}. Its text is yours to edit; the type styles are in the inspector.`);
+        };
+        // Only take over the dialog if it still shows this rip (not another dialog opened since).
+        const ready = h("div.dialog-body.rip-progress",
+            h("h2", `${pack.name} is ready`),
+            h("div.rip-work", previewOf(pack), h("div",
+              h("p.rip-score", h("strong", `${st.score}`), " / 100 against the reference"),
+              h("p", `${st.live}% of the ink is live type and shapes; the rest is kept as images.`),
+              h("p.muted", `${Object.keys(pack.rip.styles).length} type styles, ` +
+                `${pack.rip.frames.filter((f) => f.type === "text").length} texts, ${st.seconds} s.`),
+              ...(st.notes || []).map((n) => h("p.muted", n)))),
+            h("div.dialog-actions",
+              h("button.button", { type: "button", onclick: () => dlg.close() }, "Close"),
+              h("button.button.primary", { type: "button", onclick: open }, "Open it")));
+        if (dlg.open && body.isConnected) {
+          clear(dlg);
+          dlg.append(ready);
+        } else {
+          toast(`${pack.name} is ripped (${st.score} / 100). Find it under New from a pack.`);
+        }
+        return;
+      }
+    }
+  }
 }
 
 async function openFileDialog() {

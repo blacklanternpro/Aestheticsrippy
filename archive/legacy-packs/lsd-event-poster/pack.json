@@ -1,0 +1,36 @@
+{
+  "id": "lsd-event-poster",
+  "name": "LSD Event Poster",
+  "version": "1.0.0",
+  "category": "Editorial & Poster | Industrial | Identity",
+  "description": "A high-contrast, screen-printed aesthetic poster featuring nested typographic lockups and chromatic registration shadows. The layout utilizes a rigid grid system with bold, wide-grotesque display typography and a vibrant neon-pink field.",
+  "target": {
+    "dimensions": {
+      "format": "A4",
+      "width_mm": 210,
+      "height_mm": 297,
+      "orientation": "portrait"
+    },
+    "margins_mm": {
+      "top": 10,
+      "right": 10,
+      "bottom": 10,
+      "left": 10
+    }
+  },
+  "typography": {
+    "primaryFont": "Archivo Black",
+    "displayFont": "Archivo Black",
+    "monospaceFont": "Space Mono",
+    "modularScale": 1.2,
+    "lineHeightBase": 0.9
+  },
+  "colorTokens": {
+    "background": "#ff66cc",
+    "textPrimary": "#1a1a1a",
+    "accent": "#ff6600"
+  },
+  "spatialBudget": {
+    "strictSinglePage": true
+  }
+}

@@ -88,6 +88,8 @@ export class ContentPanel {
     });
     requestAnimationFrame(grow);
     if (opts.bare) return input;
+    // A top-level text sits under its section heading, which already names it.
+    if (opts.top) { input.setAttribute("aria-label", this.label(path)); return h("div.field", input); }
     return h("div.field", h("label.field-label", { for: id }, this.label(path)), input);
   }
 

@@ -86,3 +86,15 @@ test("shipped packs render with their default data and every variant", () => {
     for (const v of Object.keys(rip.variants || {})) Rip.renderSheet(Rip.applyVariant(rip, v), data, opts);
   }
 });
+
+test("box frames draw fills, outlines and ellipses", () => {
+  const rip = { id: "b", page: { width_mm: 50, height_mm: 50 }, tokens: { accent: "#ff0066" }, styles: {},
+    frames: [
+      { id: "panel", type: "box", x: 1, y: 2, w: 10, h: 5, fill: "accent" },
+      { id: "ring", type: "box", x: 5, y: 5, w: 8, h: 4, stroke: "#000", stroke_weight: 1, radius: "ellipse", rotate: -4 },
+    ] };
+  const html = Rip.renderSheet(rip, {});
+  assert.match(html, /data-frame="panel" class="rip-box" style="[^"]*background: #ff0066/);
+  assert.match(html, /data-frame="ring"[^>]*border: 1pt solid #000[^>]*border-radius: 50%/);
+  assert.match(html, /transform: rotate\(-4deg\)/);
+});

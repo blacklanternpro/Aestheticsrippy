@@ -1,37 +1,16 @@
 {
   "id": "fidele-invoice-template",
   "name": "Fidèle Invoice (harvest C)",
-  "version": "1.0.0",
   "category": "Editorial & Industrial | Ledger",
-  "description": "A clean, Swiss-inspired typographic invoice system utilizing high-contrast blue-on-white hierarchy and strict grid-based tabular data. The layout emphasizes functional clarity through precise alignment and minimalist structural lines.",
+  "description": "Ripped from a reference by the harvester. 6 type styles, 22 text frames, 23 art frames.",
+  "format": "rip",
+  "variants": [],
   "target": {
     "dimensions": {
       "format": "A4",
-      "width_mm": 210,
-      "height_mm": 297,
+      "width_mm": 210.0,
+      "height_mm": 297.0,
       "orientation": "portrait"
-    },
-    "margins_mm": {
-      "top": 15,
-      "right": 15,
-      "bottom": 15,
-      "left": 15
     }
-  },
-  "typography": {
-    "primaryFont": "Inter",
-    "displayFont": "Inter",
-    "monospaceFont": "Space Mono",
-    "modularScale": 1.1,
-    "lineHeightBase": 1.2
-  },
-  "colorTokens": {
-    "background": "#ffffff",
-    "textPrimary": "#000000",
-    "textSecondary": "#0033cc",
-    "accent": "#0033cc"
-  },
-  "spatialBudget": {
-    "strictSinglePage": true
   }
 }

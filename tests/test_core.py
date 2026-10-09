@@ -9,7 +9,6 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from eval.fidelity import score  # noqa: E402
-from engine.harvester import normalize_typographic_structures, PRIMITIVES_MARKER  # noqa: E402
 
 REF = ROOT / "design-packs" / "minimalist-corporate-invoice" / "assets" / "reference.jpg"
 
@@ -38,12 +37,3 @@ def test_shifted_render_scores_lower_than_identical():
     shrunk[h // 4: h // 4 + small.shape[0], w // 4: w // 4 + small.shape[1]] = small
     assert score(REF.read_bytes(), _png(shrunk)).score < 60.0
 
-
-def test_normalizer_is_generic_and_idempotent():
-    html = "<html><head></head><body><main class='page-sheet'><div>3 26 16</div></main></body></html>"
-    out_html, out_css = normalize_typographic_structures(html, ".page-sheet{}")
-    assert "date-triptych" in out_html
-    assert out_css.count(PRIMITIVES_MARKER) == 1
-    again_html, again_css = normalize_typographic_structures(out_html, out_css)
-    assert again_css.count(PRIMITIVES_MARKER) == 1
-    assert "!important" not in again_css
