@@ -299,6 +299,25 @@ def test_noise_alone_does_not_buy_a_second_family():
     assert len({f.family for f in faces.values()}) == 1, {i: f.family for i, f in faces.items()}
 
 
+def test_one_big_display_line_keeps_its_own_face():
+    """A single large headline that clearly fits another face keeps it, among much body text."""
+    from engine.harvest.build import harmonise
+    words = ["Luxury Sofa Set", "Dining Table Set", "King Size Bed Frame", "Wardrobe Cabinet",
+             "Office Desk and Chair", "Account Name Claudia", "Payment Method Card", "New York City Office",
+             "Terms and conditions apply", "Payment is due within days", "Thank you for your order"]
+    blocks, matches = [], {}
+    for i, t in enumerate(words * 4):
+        b, m = _matched(t, 13.0, {"Grotesk": 0.82, "Display": 0.76}, baseline=200 + 25 * i)
+        blocks.append(b)
+        matches[len(matches)] = m
+    b, m = _matched("Invoice.", 98.0, {"Grotesk": 0.859, "Display": 0.927}, baseline=150)
+    blocks.append(b)
+    matches[len(matches)] = m
+    faces = harmonise(matches, blocks)
+    assert faces[len(blocks) - 1].family == "Display"
+    assert {faces[i].family for i in range(len(blocks) - 1)} == {"Grotesk"}
+
+
 def test_a_real_second_family_still_earns_its_place():
     """Long headings that clearly fit another face keep it."""
     from engine.harvest.build import harmonise
@@ -313,6 +332,61 @@ def test_a_real_second_family_still_earns_its_place():
         matches[i] = m
     faces = harmonise(matches, blocks)
     assert [faces[i].family for i in range(4)] == ["Grotesk", "Grotesk", "Serif", "Serif"]
+
+
+# ------------------------------------------------------------ weights on small type
+
+KNOWN5 = {
+    "rip": 1, "id": "known5", "name": "Known 5", "page": {"width_mm": 148, "height_mm": 148, "paper": "paper", "ink": "ink"},
+    "tokens": {"paper": "#ffffff", "ink": "#111111"},
+    "styles": {"label": {"font": "Inter", "weight": 700, "size": 6.5, "leading": 1.3, "color": "ink"},
+               "value": {"font": "Inter", "weight": 400, "size": 6.5, "leading": 1.3, "color": "ink"}},
+    "frames": [
+        {"id": "l1", "type": "text", "style": "label", "bind": "l1", "x": 12, "y": 14},
+        {"id": "v1", "type": "text", "style": "value", "bind": "v1", "x": 12, "y": 19, "w": 50},
+        {"id": "l2", "type": "text", "style": "label", "bind": "l2", "x": 70, "y": 14},
+        {"id": "v2", "type": "text", "style": "value", "bind": "v2", "x": 70, "y": 19, "w": 60},
+        {"id": "l3", "type": "text", "style": "label", "bind": "l3", "x": 12, "y": 50},
+        {"id": "v3", "type": "text", "style": "value", "bind": "v3", "x": 12, "y": 55, "w": 120},
+        {"id": "l4", "type": "text", "style": "label", "bind": "l4", "x": 12, "y": 90},
+        {"id": "v4", "type": "text", "style": "value", "bind": "v4", "x": 12, "y": 95, "w": 120},
+    ],
+}
+DATA5 = {"l1": "Billed To:", "v1": "Hannah Morales\nNew York City",
+         "l2": "Payment Method:", "v2": "Account No: 123-456-7890\nAccount Name: Claudia Alves",
+         "l3": "Terms and Conditions:",
+         "v3": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.\nUt posuere velit eu massa placerat fermentum.",
+         "l4": "Payment is due within 14 days",
+         "v4": "Thank you for choosing our furniture for your home.\nWe hope it serves you for many years."}
+
+
+@pytest.fixture(scope="module")
+def ripped5(tmp_path_factory):
+    from engine.harvest.pipeline import harvest
+    from engine.render import Renderer
+    from engine.rip import loader_html
+
+    work = tmp_path_factory.mktemp("known5")
+    page = work / "known5.html"
+    page.write_text(loader_html(KNOWN5, DATA5, work, [work]), encoding="utf-8")
+    with Renderer() as r:
+        (work / "known5.png").write_bytes(r.render_file(page, pdf=False).png)
+        return harvest(work / "known5.png", "Known 5", out_dir=work / "pack", renderer=r, refine_rounds=0)
+
+
+def test_bold_labels_stay_bold_on_small_type(ripped5):
+    st = ripped5.rip["styles"]
+    got = [(ripped5.data[f["bind"]], st[f["style"]]["weight"]) for f in ripped5.rip["frames"] if f.get("type") == "text"]
+
+    def weight_of(text):
+        hits = [w for t, w in got if t.startswith(text[:14])]
+        assert hits, (text, got)
+        return hits[0]
+    weight = {t: weight_of(t) for t in [DATA5[k].split("\n")[0] for k in ("l1", "l2", "l3", "l4", "v1", "v2", "v3", "v4")]}
+    labels = [DATA5[k] for k in ("l1", "l2", "l3", "l4")]
+    values = [DATA5[k].split("\n")[0] for k in ("v1", "v2", "v3", "v4")]
+    assert all(weight[t] >= 600 for t in labels), {t: weight[t] for t in labels}
+    assert all(weight[t] <= 500 for t in values), {t: weight[t] for t in values}
 
 
 # ------------------------------------------------------------ list headers

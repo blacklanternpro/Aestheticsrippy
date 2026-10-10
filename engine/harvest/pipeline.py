@@ -20,7 +20,7 @@ from .build import Harvest, build_rip
 from .layout import analyse
 from .ocr import read_all, read_patch
 from .sheet import find_sheet
-from .typeface import Bench, match_blocks
+from .typeface import Bench, fill_weights, match_blocks
 
 Progress = Callable[[str], None]
 
@@ -85,6 +85,10 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
         bench = Bench(r._browser)
         try:
             matches = match_blocks(bench, clean, blocks)
+            # The sheet's families decided, every block gets every weight of its own
+            # family scored, so a bold label is not forced regular for want of a score.
+            from .build import _harmonise_family
+            fill_weights(bench, clean, blocks, matches, _harmonise_family(matches, blocks, 0.02))
         finally:
             bench.close()
 

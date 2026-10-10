@@ -426,9 +426,8 @@ def _penalty(t: _Try) -> float:
     return 0.6 * max(0.0, abs(em) - 0.06) + (0.4 * max(0.0, -em - 0.03))
 
 
-def match_blocks(bench: Bench, img: np.ndarray, blocks: Sequence[Block],
-                 per_block: int = 2, finalists: int = 6, shortlist_k: int = 40) -> Dict[int, Match]:
-    insts = instances()
+def _samples(img: np.ndarray, blocks: Sequence[Block], per_block: int = 2) -> Dict[int, List[Sample]]:
+    """The runs each block is judged on: confident, long ones first."""
     inks = true_inks(blocks)
     samples: Dict[int, List[Sample]] = {}
     for bi, b in enumerate(blocks):
@@ -442,6 +441,64 @@ def match_blocks(bench: Bench, img: np.ndarray, blocks: Sequence[Block],
                 break
         if got:
             samples[bi] = got
+    return samples
+
+
+def fill_weights(bench: Bench, img: np.ndarray, blocks: Sequence[Block], matches: Dict[int, "Match"],
+                 chosen: Dict[int, Face], per_block: int = 2) -> int:
+    """
+    Score every weight of each block's chosen family it has not been scored in.
+
+    Matching only tries a block's own likeliest faces and a couple of weights of
+    the sheet's favourite families. When the sheet then settles on a family the
+    block did not lead with, it may have just one weight of it scored, and a
+    bold label can only come out regular. Scored as the matcher scores its own
+    candidates (size nudged, then tracked), so old and new weights compare
+    fairly. Updates `matches` in place; returns how many faces were scored.
+    """
+    insts = instances()
+    samples = _samples(img, blocks, per_block)
+    want: Dict[int, List[Face]] = {}
+    for bi, face in chosen.items():
+        m = matches.get(bi)
+        if m is None or bi not in samples:
+            continue
+        for k in insts:
+            f = _face(k)
+            if f.family == face.family and f.stretch == face.stretch and not f.italic:
+                f = Face(f.family, f.weight, f.stretch, face.italic)
+                if f.key not in m.scores:
+                    want.setdefault(bi, []).append(f)
+    if not want:
+        return 0
+
+    def size_of(s: Sample, face: Face) -> float:
+        inst = insts.get(face.upright.key)
+        return instance_size(s, inst) if inst else s.height / 0.7
+
+    tries = [_Try(s, f, size_of(s, f) * mult) for bi, fs in want.items() for s in samples[bi] for f in fs
+             for mult in (0.96, 1.0, 1.04)]
+    _run(bench, tries, fit=True)
+    best: Dict[Tuple[int, str, int], _Try] = {}
+    owner = {id(s): bi for bi, ss in samples.items() for s in ss}
+    for t in tries:
+        key = (owner[id(t.sample)], t.face.key, id(t.sample))
+        if key not in best or t.score - _penalty(t) > best[key].score - _penalty(best[key]):
+            best[key] = t
+    final = list(best.values())
+    _run(bench, final, fit=False)
+    per_face: Dict[Tuple[int, str], List[float]] = {}
+    for (bi, fkey, _), t in best.items():
+        per_face.setdefault((bi, fkey), []).append(t.score - _penalty(t))
+    for (bi, fkey), vals in per_face.items():
+        matches[bi].scores[fkey] = float(np.mean(vals))
+    return len(per_face)
+
+
+def match_blocks(bench: Bench, img: np.ndarray, blocks: Sequence[Block],
+                 per_block: int = 2, finalists: int = 6, shortlist_k: int = 40) -> Dict[int, Match]:
+    insts = instances()
+    samples = _samples(img, blocks, per_block)
     if not samples:
         return {}
     owner = {id(s): bi for bi, ss in samples.items() for s in ss}

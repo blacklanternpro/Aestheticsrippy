@@ -133,11 +133,38 @@ def _harmonise_family(matches: Dict[int, Match], blocks: Sequence[Block], margin
         chosen_set.append(best_f)
         current = best_v
 
+    # A group with strong evidence of its own (display type: big, or many letters) that
+    # fits another family clearly better brings that family in, though as one group it
+    # cannot lift the whole sheet's mean by the price. Big type is where a face shows most.
+    body = float(np.median([blocks[bi].size for bi in matches]))
+    earned: Dict[str, set] = {}     # families brought in for particular groups only
+    for gi, g in enumerate(groups):
+        if len(chosen_set) >= 3:
+            break
+        size = float(np.median([blocks[bi].size for bi in g]))
+        letters = sum(sum(c.isalpha() for c in blocks[bi].text()) for bi in g)
+        if size < 3 * body and letters < 40:
+            continue
+        gw = sum(weight_of[bi] for bi in g)
+        here = max(group_val[(gi, f)] for f in chosen_set) / gw
+        f_best = max(families, key=lambda f: group_val[(gi, f)])
+        if f_best not in chosen_set and group_val[(gi, f_best)] / gw - here > 0.05:
+            chosen_set.append(f_best)
+            earned[f_best] = {gi}
+
     chosen: Dict[int, Face] = {}
     for g in groups:
         def group_value(f):
             return sum(weight_of[bi] * best_of[f][bi][0] for bi in g if best_of[f][bi][1])
         usable = [f for f in chosen_set if all(best_of[f][bi][1] for bi in g)]
+        gi = groups.index(g)
+        gw = sum(weight_of[bi] for bi in g)
+        general = [f for f in usable if f not in earned]
+        if general:
+            # A family brought in for display type serves other groups only on a clear gain.
+            base = max(group_value(f) for f in general)
+            usable = general + [f for f in usable if f in earned and
+                                (gi in earned[f] or (group_value(f) - base) / gw > 0.05)]
         fam = max(usable, key=group_value) if usable else None
         for bi in g:
             m = matches[bi]
