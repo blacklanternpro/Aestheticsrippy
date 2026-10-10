@@ -19,6 +19,7 @@ chain's pieces becomes a path text, and its letters are taken out of the art.
 
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
@@ -39,6 +40,11 @@ class PathText:
     conf: float
     pitch: Optional[float] = None  # px between letter centres for spaced-out lettering
     upright: bool = False
+    angles: Optional[List[float]] = None   # per-letter rotation, degrees CW, for ransom lettering
+    stops: Optional[List[float]] = None    # per-character distance along `points`, px (pitched only)
+    row: Optional[np.ndarray] = None       # the righted letters as read (gray, dark on white), for face matching
+    face: Optional[object] = None          # typeface.Face matched on `row`
+    size_px: Optional[float] = None        # font size matched on `row`, sheet px
     offset: float = 0.0           # px along `points` to the first letter (its left edge, or
     #                               its centre when pitched)
     length: float = 0.0           # px from the first letter's start to the last letter's end
@@ -265,6 +271,228 @@ def _letters(text: str) -> int:
     return sum(ch.isalnum() for ch in text)
 
 
+def _runs(sel: List[_Piece]) -> List[List[_Piece]]:
+    """
+    A dark chain split into runs of one text each: a jump much longer than the
+    chain's own rhythm, or a long jump with a sharp turn, is a boundary (the
+    arc of one word chaining into the stem of the next). Spaced-out lettering
+    splits harder - at any gap clearly over its rhythm with whole words both
+    sides - since its words are separate texts, while a tight chain's word
+    gaps belong inside its one line.
+    """
+    if len(sel) < 2:
+        return [sel]
+    c = np.array([p.centre for p in sel])
+    d = np.hypot(*np.diff(c, axis=0).T)
+    med = float(np.median(d))
+    size = float(np.median([p.size for p in sel]))
+    spaced = med > 1.3 * size
+    out, start = [], 0
+    for i in range(1, len(sel)):
+        long_jump = d[i - 1] > 2.0 * med
+        if spaced and not long_jump:
+            long_jump = d[i - 1] > 1.45 * med and i - start >= 4 and len(sel) - i >= 4
+        turn = False
+        if 0 < i < len(sel) - 1:
+            a = c[i] - c[i - 1]
+            b = c[i + 1] - c[i]
+            na, nb = np.hypot(*a), np.hypot(*b)
+            if na > 0 and nb > 0:
+                turn = float(np.degrees(np.arccos(np.clip(a @ b / (na * nb), -1, 1)))) > 70
+        if long_jump or (d[i - 1] > 1.4 * med and turn):
+            out.append(sel[start:i])
+            start = i
+    out.append(sel[start:])
+    return [r for r in out if r]
+
+
+def _right(tile: np.ndarray, a: float) -> np.ndarray:
+    """The tile rotated by `a` degrees (cv2's sense, which undoes a CSS-clockwise turn)."""
+    h, w = tile.shape
+    m = cv2.getRotationMatrix2D((w / 2, h / 2), a, 1.0)
+    cos, sin = abs(m[0, 0]), abs(m[0, 1])
+    nw, nh = int(h * sin + w * cos) + 2, int(h * cos + w * sin) + 2
+    m[0, 2] += nw / 2 - w / 2
+    m[1, 2] += nh / 2 - h / 2
+    return cv2.warpAffine(tile, m, (nw, nh), flags=cv2.INTER_CUBIC, borderValue=255)
+
+
+def _char_conf(tile: np.ndarray) -> Optional[Tuple[float, str]]:
+    pad = 8
+    t = cv2.copyMakeBorder(tile, pad, pad, pad, pad, cv2.BORDER_CONSTANT, value=255)
+    try:
+        lines = read_lines(cv2.cvtColor(t, cv2.COLOR_GRAY2BGR), psm=10, raw=True)
+    except Exception:
+        return None
+    ws = [w for l in lines for w in l.words if w.text.strip()]
+    if not ws:
+        return None
+    w = max(ws, key=lambda w: w.conf)
+    return float(w.conf), w.text
+
+
+class _OutOfTime(Exception):
+    """The sheet's time for reading curves ran out mid-sweep."""
+
+
+def _ransom_candidates(sel: Sequence[_Piece], anchors: Sequence[float],
+                       deadline: Optional[float] = None) -> List[List[Tuple[float, float]]]:
+    """
+    Candidate rotations per letter (degrees, CSS-clockwise), best first. In the
+    designs this serves, a letter is turned roughly with the path, or stands
+    roughly upright, give or take hand-placed jitter - so the sweep anchors on
+    the local tangent and on upright, not on every possible angle, which also
+    starves the classic traps (an N turned 90 reads as a perfectly fine Z).
+    """
+    out = []
+    for p, anchor in zip(sel, anchors):
+        cached = getattr(p, "cands", None)
+        if cached is not None and cached[0] == round(anchor):
+            out.append(cached[1])
+            continue
+        tile = 255 - 255 * p.mask.astype(np.uint8)
+        bases = [anchor]
+        for b in (anchor + 180, 0.0):   # the path walked the other way; or upright letters
+            if all(_cdiff(b, o) > 20 for o in bases):
+                bases.append(b)
+        scored = []
+        for off in (0, 15, -15, 30, -30):
+            for base in bases:
+                if deadline is not None and time.monotonic() > deadline:
+                    raise _OutOfTime
+                a = (base + off + 180) % 360 - 180
+                r = _char_conf(_right(tile, a))
+                if r:
+                    scored.append((r[0], float(a)))
+        scored.sort(reverse=True)
+        keep: List[Tuple[float, float]] = []    # (angle, own conf)
+        for conf, a in scored:
+            if conf < max(55.0, scored[0][0] - 25):
+                break
+            if all(_cdiff(a, o) > 20 for o, _ in keep):
+                keep.append((a, conf))
+            if len(keep) >= 2:
+                break
+        keep = keep or [(float(anchor), 0.0)]
+        p.cands = (round(anchor), keep)
+        out.append(keep)
+    return out
+
+
+def _cdiff(a: float, b: float) -> float:
+    d = abs(a - b) % 360
+    return min(d, 360 - d)
+
+
+def _ransom_read(sel: Sequence[_Piece], size: float, anchors: Sequence[float],
+                 deadline: Optional[float] = None) -> Optional[Tuple[float, str, List[float], List[np.ndarray]]]:
+    """
+    Right each letter and read the row, letting the row read choose between
+    each letter's candidate turns (greedy, a few passes). Returns
+    (conf, text, angles, righted tiles) of the best row.
+    """
+    try:
+        cands = _ransom_candidates(sel, anchors, deadline)
+    except _OutOfTime:
+        return None
+    gap = max(2, int(round(0.35 * size)))
+
+    def assemble(choice):
+        tiles = []
+        for i, p in enumerate(sel):
+            t = _right(255 - 255 * p.mask.astype(np.uint8), cands[i][choice[i]][0])
+            on = np.nonzero((t < 128).any(axis=1))[0]
+            if len(on):
+                t = t[on[0]:on[-1] + 1]      # trim rotation padding to the ink
+            tiles.append(t)
+        hmax = max(t.shape[0] for t in tiles)
+        # Letters share a baseline (caps sit on the line); soften the hard masks
+        # a little, as print would, before the reader sees them.
+        row = [cv2.copyMakeBorder(t, hmax - t.shape[0], 0, 0, gap, cv2.BORDER_CONSTANT, value=255)
+               for t in tiles]
+        return tiles, cv2.GaussianBlur(np.hstack(row), (3, 3), 0.7)
+
+    def value(r, choice):
+        if not r:
+            return -1e9, None
+        miss = abs(_letters(r[1]) - len(sel))
+        bonus = (18.0 if miss == 0 else 12.0) if miss <= max(1, int(0.25 * len(sel))) else 0.0
+        # Honest turns: the chosen angle must also be one the letter itself reads
+        # well at, or the row ascent beats a two-word chain into confident nonsense.
+        own = float(np.mean([cands[i][choice[i]][1] for i in range(len(sel))]))
+        return r[0] + bonus + 0.4 * own, r
+
+    choice = [0] * len(sel)
+    tiles, row = assemble(choice)
+    best_v, best_r = value(_read(row), choice)
+    best_row = row
+    budget = 2 * len(sel)
+    for i in range(len(sel)):
+        for alt in range(1, len(cands[i])):
+            if budget <= 0 or (deadline is not None and time.monotonic() > deadline):
+                break
+            trial = list(choice)
+            trial[i] = alt
+            t2, row2 = assemble(trial)
+            v, r = value(_read(row2), trial)
+            budget -= 1
+            if v > best_v:
+                best_v, best_r, choice, tiles, best_row = v, r, trial, t2, row2
+    if best_r is None:
+        return None
+    angles = [_tighten(p, cands[i][choice[i]][0]) for i, p in enumerate(sel)]
+    return best_r[0], best_r[1], angles, tiles, best_row
+
+
+def _tighten(p: _Piece, a: float, span: int = 12) -> float:
+    """
+    Fine-tune a letter's turn: within +-span degrees, the true turn is where the
+    righted letter's ink box is tightest (straight-stroked letters square up).
+    Round letters give a flat curve and barely move; a change needs a clear win.
+    """
+    ys, xs = np.nonzero(p.mask)
+    if len(xs) < 12:
+        return a
+    q = np.stack([xs, ys], 1).astype(np.float64)
+    q -= q.mean(axis=0)
+
+    def area(deg):
+        t = np.radians(deg)          # undo a CSS-clockwise turn of `deg`
+        c, s_ = np.cos(t), np.sin(t)
+        x = q[:, 0] * c + q[:, 1] * s_
+        y = -q[:, 0] * s_ + q[:, 1] * c
+        return float(np.ptp(x) * np.ptp(y))
+
+    base = area(a)
+    best_a, best_v = a, base
+    for d in range(-span, span + 1):
+        v = area(a + d)
+        if v < best_v:
+            best_a, best_v = a + d, v
+    return best_a if best_v < 0.97 * base else a
+
+
+def _varied(sel: Sequence[_Piece], min_diff: float = 0.12) -> bool:
+    """
+    Do these pieces look like different letters? Rows of ticks, dots and other
+    repeating marks chain beautifully but are all one shape; text is varied.
+    Compares the pieces' shapes, each scaled to a small square (and in both
+    orientations, so a tick turned with its path still matches its neighbour).
+    """
+    if len(sel) < 3:
+        return True
+    tiles = []
+    for p in sel:
+        t = cv2.resize(p.mask.astype(np.float32), (16, 16), interpolation=cv2.INTER_AREA)
+        tiles.append(t)
+    diffs = []
+    for i in range(len(tiles)):
+        for j in range(i + 1, min(len(tiles), i + 4)):
+            a, b = tiles[i], tiles[j]
+            diffs.append(min(float(np.abs(a - b).mean()), float(np.abs(a - b.T).mean())))
+    return float(np.median(diffs)) >= min_diff
+
+
 def _geometry(centres: np.ndarray, size: float) -> Tuple[bool, bool, float]:
     """Is this chain of letter centres curved, or spaced out? Returns (curved, spaced, spacing)."""
     spacing = float(np.median(np.hypot(*np.diff(centres, axis=0).T)))
@@ -282,8 +510,8 @@ def _geometry(centres: np.ndarray, size: float) -> Tuple[bool, bool, float]:
 
 
 def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: float = 80,
-         loose: Sequence[Tuple[int, Tuple[float, float, float, float]]] = ()
-         ) -> Tuple[List[PathText], List[Region], List[int]]:
+         loose: Sequence[Tuple[int, Tuple[float, float, float, float]]] = (),
+         time_budget: float = 30.0) -> Tuple[List[PathText], List[Region], List[int]]:
     """
     Curved text in the marks, the regions with it taken out (or marked to be
     painted over), and which of the `loose` level readings (id, box) its chains
@@ -377,11 +605,37 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: f
     absorbed: List[int] = []
     taken = {}      # region index -> mask of dark letters read (cut out of the mark)
     filled = {}     # region index -> mask of hole/tint letters read (painted over)
+    fills_core = {}  # region index -> the letters themselves (always painted)
     # Chains never mix polarities: dark letters (and level readings, which are dark)
     # chain together; holes and tints each chain apart, or a letter's own counter
     # would join the chain between its neighbours.
     dark = [p for p in pieces if p.src[0] in ("mark", "level")]
-    chains = [(dark, ch) for ch in _chains(dark)]
+    sels: List[List[_Piece]] = []
+    paths = [[dark[k] for k in ch] for ch in _chains(dark)]
+    on_path = {id(p) for path in paths for p in path}
+    # A chain's longest path drops branch pieces (a letter on a short spur):
+    # give each one back to the path that passes right by it, before the path
+    # is cut into runs, so a returned letter counts toward its own word.
+    spares = [p for p in dark if id(p) not in on_path]
+    for path in paths:
+        c = np.array([p.centre for p in path])
+        med = float(np.median(np.hypot(*np.diff(c, axis=0).T))) if len(path) > 1 else 0.0
+        path_med = float(np.median([p.size for p in path]))
+        for p in spares:
+            if id(p) in on_path or not 0.45 * path_med <= p.size <= 2.2 * path_med:
+                continue
+            seg = np.hypot(*(c - p.centre).T)
+            j = int(np.argmin(seg))
+            if seg[j] < 1.6 * med:
+                before = j > 0 and np.hypot(*(c[j - 1] - p.centre)) < (
+                    np.hypot(*(c[j + 1] - p.centre)) if j + 1 < len(path) else np.inf)
+                path.insert(j if before else j + 1, p)
+                c = np.array([q.centre for q in path])
+                on_path.add(id(p))
+    for path in paths:
+        for run in _runs(path):
+            if len(run) >= 4:
+                sels.append(run)
     enclosed: dict = {}
     for p in pieces:
         if p.src[0] in ("hole", "tint", "inset"):
@@ -392,15 +646,34 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: f
         med = float(np.median([p.size for p in ps]))
         ps = sorted((p for p in ps if 0.45 * med <= p.size <= 2.2 * med), key=lambda p: p.t)
         if len(ps) >= 4:
-            chains.append((ps, list(range(len(ps)))))
-    for pool, chain in chains:
-        sel = [pool[k] for k in chain]
+            sels.append(ps)
+    # Most promising first: dark lettering and knock-outs (holes, insets) before
+    # tints (colour fragments are the noisiest source), longer chains first. A
+    # sheet gets a fixed time to read curves in, so noise cannot run up the bill.
+    rank = {"mark": 0, "level": 0, "hole": 1, "inset": 1, "tint": 2}
+    queue = sorted(sels, key=lambda sl: (min(rank[p.src[0]] for p in sl), -len(sl)))
+    ransom_budget = [6]   # per-letter sweeps are slow; a sheet gets so many ransom tries
+    deadline = time.monotonic() + time_budget
+    while queue:
+        if time.monotonic() > deadline:
+            break
+        sel = queue.pop(0)
         size = float(np.median([p.size for p in sel]))
         centres = np.array([p.centre for p in sel])
         curved, spaced, spacing = _geometry(centres, size)
         if not (curved or spaced):
             continue    # a straight, tight chain is the line readers' business, not ours
-        got = _read_chain(img, sel, spacing, min_conf)
+        if not _varied(sel):
+            continue    # a row of identical marks (ticks, dots): a pattern, not text
+        got = _read_chain(img, sel, spacing, min_conf, ransom_budget, deadline)
+        if (got is None or got.conf < min_conf) and len(sel) >= 8:
+            # Two texts can share a chain (one word's arc running into the next
+            # word's stem): split at the longest internal gap and try each side.
+            d = np.hypot(*np.diff(centres, axis=0).T)
+            j = int(np.argmax(d))
+            if d[j] > 1.3 * float(np.median(d)) and j + 1 >= 4 and len(sel) - j - 1 >= 4:
+                queue += [sel[:j + 1], sel[j + 1:]]
+            continue
         if got is None or got.conf < min_conf:
             continue
         found.append(got)
@@ -414,7 +687,21 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: f
             acc = store.setdefault(idx, np.zeros(regions[idx].mask.shape, bool))
             rx0, ry0 = regions[idx].box[0], regions[idx].box[1]
             h, w = p.mask.shape
-            acc[p.y - ry0:p.y - ry0 + h, p.x - rx0:p.x - rx0 + w] |= p.mask
+            if store is filled:
+                # Printed knock-outs carry a fringe (misregistration, ink spread): paint
+                # a margin of about a stroke round the letter. It is painted with the
+                # shape's own colour and kept inside the shape below, so it is harmless.
+                g = max(2, int(round(0.28 * p.size)))
+                m = cv2.dilate(np.pad(p.mask, g).astype(np.uint8), np.ones((2 * g + 1, 2 * g + 1), np.uint8)) > 0
+                ys, xs = p.y - ry0 - g, p.x - rx0 - g
+                H2, W2 = acc.shape
+                cy0, cx0 = max(0, ys), max(0, xs)
+                cy1, cx1 = min(H2, ys + m.shape[0]), min(W2, xs + m.shape[1])
+                acc[cy0:cy1, cx0:cx1] |= m[cy0 - ys:cy1 - ys, cx0 - xs:cx1 - xs]
+                fills_core.setdefault(idx, np.zeros(regions[idx].mask.shape, bool))[
+                    p.y - ry0:p.y - ry0 + h, p.x - rx0:p.x - rx0 + w] |= p.mask
+            else:
+                acc[p.y - ry0:p.y - ry0 + h, p.x - rx0:p.x - rx0 + w] |= p.mask
 
     kept: List[Region] = []
     for ri, reg in enumerate(regions):
@@ -422,7 +709,9 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: f
             cut = cv2.dilate(taken[ri].astype(np.uint8), np.ones((3, 3), np.uint8)) > 0
             reg.mask = reg.mask & ~cut
         if ri in filled:
-            pad = cv2.dilate(filled[ri].astype(np.uint8), np.ones((3, 3), np.uint8)) > 0
+            # The margin stays inside the shape (the letter itself is paper, so is kept).
+            shape = cv2.morphologyEx(reg.mask.astype(np.uint8), cv2.MORPH_CLOSE, np.ones((5, 5), np.uint8)) > 0
+            pad = (filled[ri] & (shape | reg.mask)) | fills_core[ri]
             reg.fill = pad if getattr(reg, "fill", None) is None else (reg.fill | pad)
         if reg.kind == "mark" and reg.mask is not None and reg.mask.sum() <= 40 \
                 and getattr(reg, "fill", None) is None:
@@ -431,7 +720,8 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: f
     return found, kept, absorbed
 
 
-def _read_chain(img, sel: Sequence[_Piece], spacing: float, min_conf: float) -> Optional[PathText]:
+def _read_chain(img, sel: Sequence[_Piece], spacing: float, min_conf: float,
+                ransom_budget: Optional[List[int]] = None, deadline: Optional[float] = None) -> Optional[PathText]:
     # Read left to right, or top to bottom: the chain's own order is arbitrary.
     ends = sel[-1].centre - sel[0].centre
     if (abs(ends[0]) >= abs(ends[1]) and ends[0] < 0) or (abs(ends[1]) > abs(ends[0]) and ends[1] < 0):
@@ -455,11 +745,13 @@ def _read_chain(img, sel: Sequence[_Piece], spacing: float, min_conf: float) -> 
     if len(dense) < 4:
         return None
     best = None
+    best_img = None
 
-    def consider(r, mode, flip, bonus=0):
-        nonlocal best
+    def consider(r, mode, flip, bonus=0, img=None):
+        nonlocal best, best_img
         if r and (best is None or r[0] > best[0] + bonus):
             best = (r[0], r[1], mode, flip)
+            best_img = img
 
     # Along: the band either side of the path unrolled straight. The canonical
     # direction decides; the reversed read is only a rescue when it fails, since
@@ -467,11 +759,44 @@ def _read_chain(img, sel: Sequence[_Piece], spacing: float, min_conf: float) -> 
     # Extend past both end letters, then resample so every strip column is 1 px of arc.
     path = _resample(_extend(dense, 1.1 * size))[0]
     strip = _unroll(canvas, path, 0.8 * size)
-    consider(_read(strip), "along", False)
+    consider(_read(strip), "along", False, img=strip)
     if best is None or best[0] < min_conf:
-        consider(_read(cv2.rotate(strip, cv2.ROTATE_180)), "along", True)
-    # Upright: each letter lifted out as it stands, set side by side in chain order.
+        flipped = cv2.rotate(strip, cv2.ROTATE_180)
+        consider(_read(flipped), "along", True, img=flipped)
+    # Upright: each letter lifted out as it stands, set side by side in chain
+    # order - but only when the letters really do stand upright: a sideways row
+    # can scrape past the gates and then render unrotated. Three letters probed
+    # at no turn decide.
+    # One probe serves both remaining modes: three letters read alone, as they
+    # stand and turned to the path (either way round). Letters that read standing
+    # are upright lettering; letters that read only turned may be ransom
+    # lettering; letters that read neither way are not letters, and stop here.
+    anchors = []
+    for p in sel:
+        c = p.centre - [bx0, by0]
+        j = int(np.argmin(np.hypot(*(dense - c).T)))
+        j0, j1 = max(0, j - 3), min(len(dense) - 1, j + 3)
+        d = dense[j1] - dense[j0]
+        anchors.append(float(np.degrees(np.arctan2(d[1], d[0]))) if np.hypot(*d) > 0 else 0.0)
+    stand_conf = turned_conf = 0.0
     if best is None or best[0] < 92:
+        def lettered(r):
+            # A confident "_" or ">" is no letter: only alphanumeric readings count.
+            return r[0] if r and any(ch.isalnum() for ch in r[1]) else 0.0
+
+        sv, tv = [], []
+        for k in sorted({0, len(sel) // 2, len(sel) - 1}):
+            tile = 255 - 255 * sel[k].mask.astype(np.uint8)
+            sv.append(lettered(_char_conf(tile)))
+            tv.append(max(sv[-1], max((lettered(_char_conf(_right(tile, a)))
+                                       for a in (anchors[k], anchors[k] + 180)), default=0.0))
+                      if sv[-1] < 70 else sv[-1])
+        stand_conf, turned_conf = float(np.mean(sv)), float(np.mean(tv))
+        turn_gain = max(t - v for t, v in zip(tv, sv))
+    else:
+        turn_gain = 0.0
+    stands = stand_conf >= 68
+    if stands and (best is None or best[0] < 92):
         gap = max(2, int(round(0.35 * size)))
         tiles = [255 - 255 * p.mask.astype(np.uint8) for p in sel]
         hmax = max(t.shape[0] for t in tiles)
@@ -482,7 +807,36 @@ def _read_chain(img, sel: Sequence[_Piece], spacing: float, min_conf: float) -> 
                                           cv2.BORDER_CONSTANT, value=255))
         # Upright letters look the same read either way, and the reader is happy to
         # read nonsense backwards with confidence: top-down / left-right is the rule.
-        consider(_read(np.hstack(row)), "upright", False, 3)
+        upright_row = np.hstack(row)
+        consider(_read(upright_row), "upright", False, 3, img=upright_row)
+    # Ransom lettering: each letter at an angle of its own. Right each letter by
+    # the turn it reads best at, then read the righted row; the row read is the
+    # arbiter, so one letter righted wrong does not decide anything.
+    angs = righted = None
+    may_ransom = ransom_budget is None or ransom_budget[0] > 0
+    if may_ransom and (best is None or best[0] < 88) and 4 <= len(sel) <= 10:
+        # The probe gates the full per-letter sweep: ticks, dots and texture must
+        # not pay for it. The local path direction anchors each letter's turn.
+        # Ransom lettering has letters that read turned far better than standing
+        # (others may stand: an upright T, a symmetric S). A chain zig-zagging
+        # across two lines of ordinary text passes every other test, but its
+        # letters all read standing, so turning gains nothing and it stops here.
+        letterish = turned_conf >= 62 and turn_gain >= 25
+        if letterish and ransom_budget is not None:
+            ransom_budget[0] -= 1
+        got = _ransom_read(sel, size, anchors, deadline) if letterish else None
+        if got is not None and len(sel) >= 5 and len(set(c for c in got[1] if c.isalnum())) <= 2:
+            got = None     # "IIIII", "lll": a row of strokes, not words
+        if letterish and (got is None or got[0] < min_conf):
+            # The chain may read the other way (text running up a stroke): the
+            # reversed order is a rescue, as elsewhere, never a competitor.
+            rev = _ransom_read(sel[::-1], size, [a + 180 for a in reversed(anchors)], deadline)
+            if rev and (got is None or rev[0] > got[0]):
+                got = rev
+                sel = list(sel)[::-1]
+        if got and (best is None or got[0] > best[0] + 3):
+            best = (got[0], got[1], "ransom", False)
+            angs, righted, best_img = got[2], got[3], got[4]
     if best is None:
         return None
     conf, text, mode, flip = best
@@ -497,7 +851,7 @@ def _read_chain(img, sel: Sequence[_Piece], spacing: float, min_conf: float) -> 
     line = _smooth(pts)
     dense_line, _ = _resample(line)
     nrm = _normals(dense_line)
-    upright = mode == "upright"
+    upright = mode in ("upright", "ransom")
     colour_px = []
     heights = []
     for p in sel:
@@ -509,17 +863,54 @@ def _read_chain(img, sel: Sequence[_Piece], spacing: float, min_conf: float) -> 
             j = int(np.argmin(np.hypot(*(dense_line - p.centre).T)))
             proj = (xs + p.x - dense_line[j, 0]) * nrm[j, 0] + (ys + p.y - dense_line[j, 1]) * nrm[j, 1]
             heights.append(float(np.ptp(proj) + 1))
+    if mode == "ransom" and righted is not None:
+        # Heights from the righted letters: a tilted letter's upright box lies.
+        heights = []
+        for t in righted:
+            rows_on = np.nonzero((t < 128).any(axis=1))[0]
+            heights.append(float(rows_on[-1] - rows_on[0] + 1) if len(rows_on) else 1.0)
     h_med = float(np.median(heights))
     cap = h_med if caps else 0.72 * h_med
     colour = tuple(int(v) for v in np.median(np.vstack(colour_px), axis=0))
     light = any(p.src[0] in ("hole", "tint", "inset") for p in sel)
-    out = PathText(text, line, cap, colour, conf, upright=upright, light=light)
+    out = PathText(text, line, cap, colour, conf, upright=upright, light=light, row=best_img)
     arc = float(np.sum(np.hypot(*np.diff(dense_line, axis=0).T)))
     if spacing > 1.3 * size or upright:
-        # Spaced-out lettering: the renderer steps along the centre line, a slot per
-        # character of the reading (a space takes a slot, as it did on the sheet).
-        out.pitch = arc / max(1, len(text.rstrip()) - 1)
-        out.length = arc
+        # Spaced-out lettering: a slot per character of the reading. The path runs
+        # through the letters' own centres (corners and all, no smoothing) and,
+        # when the reading accounts for every piece, each letter gets its measured
+        # distance along it, so uneven spacing round a corner lands true.
+        raw = np.array([p.centre for p in sel], float)
+        steps = np.hypot(*np.diff(raw, axis=0).T)
+        at = np.r_[0.0, np.cumsum(steps)]
+        out.pitch = float(at[-1] / max(1, len(text.rstrip()) - 1))
+        out.length = float(at[-1])
+        chars = text.rstrip()
+        if sum(not c.isspace() for c in chars) == len(sel):
+            out.points = raw
+            stops, k = [], 0
+            for i, c in enumerate(chars):
+                if c.isspace():
+                    stops.append(None)
+                else:
+                    stops.append(float(at[k]))
+                    k += 1
+            for i, v in enumerate(stops):      # a space sits halfway between its neighbours
+                if v is None:
+                    prev = next((stops[j] for j in range(i - 1, -1, -1) if stops[j] is not None), 0.0)
+                    nxt = next((stops[j] for j in range(i + 1, len(stops)) if stops[j] is not None), prev)
+                    stops[i] = (prev + nxt) / 2
+            out.stops = stops
+            out.pitch = float(np.median(steps)) if len(steps) else out.pitch
+        if mode == "ransom":
+            chars = [c for c in text if not c.isspace()]
+            if angs is not None and len(chars) == len(sel):
+                it = iter(angs)
+                out.angles = [0.0 if c.isspace() else round(float(next(it)), 1) for c in text.rstrip()]
+            else:
+                # No per-letter angles to carry: letters turned with the path is the
+                # closest render (the sweep anchored on the tangent), not upright.
+                out.upright = False
         return out
     # Tight text on the curve: the baseline lies half a height below the centre line.
     lead = 0.9 * size

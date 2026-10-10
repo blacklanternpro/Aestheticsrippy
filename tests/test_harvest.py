@@ -446,6 +446,65 @@ def test_curved_text_is_read_onto_paths(ripped4):
     assert not level, level
 
 
+# ------------------------------------------------------------ ransom lettering
+
+RANSOM_JITTER = {"FORTUNE": [25, -18, 30, -27, 12, -30, 20], "LAST": [-25, 20, -30, 18]}
+
+
+def _ransom_page() -> str:
+    """Letters strung with hand-placed jitter: along an arc, and down a stem."""
+    import math
+    spans = []
+    for i, (ch, j) in enumerate(zip("FORTUNE", RANSOM_JITTER["FORTUNE"])):
+        t = i / 6.0
+        x, y = 60 + 360 * t, 240 - 170 * math.sin(t * math.pi)
+        tang = math.degrees(math.atan2(-170 * math.pi / 6 * math.cos(t * math.pi), 60))
+        spans.append(f'<span style="position:absolute;left:{x}px;top:{y}px;'
+                     f'transform:rotate({tang + j:.0f}deg)">{ch}</span>')
+    for i, (ch, j) in enumerate(zip("LAST", RANSOM_JITTER["LAST"])):
+        spans.append(f'<span style="position:absolute;left:560px;top:{60 + 90 * i}px;'
+                     f'transform:rotate({90 + j}deg)">{ch}</span>')
+    font = (ROOT / "fonts" / "Inter-var.woff2").resolve()
+    return ("<!doctype html><meta charset=\"utf-8\"><style>"
+            f"@font-face {{ font-family:'Inter'; src: url('file://{font}'); }}"
+            "body { background:#fff; margin:0; width:700px; height:700px; position:relative;"
+            " font-family:Inter; font-weight:700; font-size:44px; color:#111; }"
+            "</style>" + "".join(spans))
+
+
+def test_ransom_lettering_reads_with_per_letter_angles(tmp_path):
+    from engine.harvest.pipeline import harvest
+    from engine.render import Renderer
+
+    page = tmp_path / "ransom.html"
+    page.write_text(_ransom_page(), encoding="utf-8")
+    with Renderer() as r:
+        (tmp_path / "ransom.png").write_bytes(r.render_file(page, pdf=False).png)
+        res = harvest(tmp_path / "ransom.png", "Ransom", out_dir=tmp_path / "pack",
+                      renderer=r, refine_rounds=0)
+    paths = {res.data[f["bind"]]: f for f in res.rip["frames"] if f.get("type") == "path"}
+    assert set(paths) >= {"FORTUNE", "LAST"}, paths.keys()
+    for text, f in paths.items():
+        if text not in RANSOM_JITTER:
+            continue
+        assert f.get("pitch"), f
+        if f.get("angles") is None:
+            # Read without per-letter angles: the letters then turn with the path,
+            # which is within the jitter of the truth - but only if they turn.
+            assert not f.get("upright"), f
+            continue
+        assert len(f["angles"]) == len(text)
+        # Each recovered turn lands near the letter's true one (symmetric letters
+        # may settle half a turn away; the row read cannot tell those apart).
+        import math as m
+        for k, ch in enumerate(text):
+            true = (90 if text == "LAST" else m.degrees(m.atan2(
+                -170 * m.pi / 6 * m.cos(k / 6 * m.pi), 60))) + RANSOM_JITTER[text][k]
+            d = abs(f["angles"][k] - true) % 360
+            d = min(d, 360 - d)
+            assert d < 35 or abs(d - 180) < 35, (ch, f["angles"][k], round(true))
+
+
 # ------------------------------------------------------------ list headers
 
 def _cell(text, left, right, baseline, cap=14.0):

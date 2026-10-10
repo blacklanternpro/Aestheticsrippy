@@ -137,6 +137,7 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
             text_lines = [r.line for b in blocks for r in b.runs]
         if curved:
             notes.append(f"Read {len(curved)} {'line' if len(curved) == 1 else 'lines'} of type set along a curve.")
+            match_path_faces(r, curved, {m.face.family for m in matches.values()})
         covered = art_mod.text_mask(sheet.image.shape, text_lines) | (rule_mask > 0)
         for reg in regions:
             x0, y0, x1, y1 = reg.box
@@ -197,6 +198,42 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
     finally:
         if own:
             r.__exit__(None, None, None)
+
+
+def match_path_faces(renderer, curved, sheet_families) -> None:
+    """
+    Curved lettering gets its own face: it is often set apart from the sheet's
+    text (strung letters in a geometric sans over a display face). The row the
+    reader righted and read is matched on the bench like any line; a family the
+    sheet already uses wins when it is nearly as good, so a design that sets
+    its curves in its own text face keeps one family.
+    """
+    from .ocr import read_lines
+    from .typeface import _face
+    bench = Bench(renderer._browser)
+    try:
+        for pt in curved:
+            if pt.row is None:
+                continue
+            pad = 12
+            row = cv2.copyMakeBorder(pt.row, pad, pad, pad, pad, cv2.BORDER_CONSTANT, value=255)
+            bgr = cv2.cvtColor(row, cv2.COLOR_GRAY2BGR)
+            try:
+                blocks = analyse(bgr, read_lines(bgr, psm=7))
+            except Exception:
+                continue
+            if not blocks:
+                continue
+            got = match_blocks(bench, bgr, blocks[:1]).get(0)
+            if got is None:
+                continue
+            best = max(got.scores.values())
+            near = [(v, k) for k, v in got.scores.items()
+                    if k.split("|")[0] in sheet_families and best - v <= 0.03]
+            face = _face(max(near)[1]) if near else got.face
+            pt.face, pt.size_px = face, got.size_px
+    finally:
+        bench.close()
 
 
 def live_share(img, bg, text_lines, rule_mask, regions) -> float:

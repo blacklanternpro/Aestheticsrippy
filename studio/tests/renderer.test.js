@@ -142,6 +142,31 @@ test("pitched path frames place letters at even steps, upright or along the curv
   assert.doesNotMatch(up, /rotate\(/);
 });
 
+test("a pitched path frame can turn each letter by its own angle", () => {
+  const rip = { id: "r", page: { width_mm: 60, height_mm: 60 }, styles: { s: { font: "Inter", size: 18 } },
+    frames: [{ id: "rn", type: "path", style: "s", bind: "t", x: 0, y: 0, w: 60, h: 20,
+      points: [[5, 10], [55, 10]], pitch: 12, upright: true, angles: [14, -80, 0, 95] }] };
+  const html = Rip.renderSheet(rip, { t: "LAST" });
+  const turns = [...html.matchAll(/rotate\(([-\d.]+) ([\d.]+) ([\d.]+)\)/g)].map((m) => +m[1]);
+  assert.deepEqual(turns, [14, -80, 95]);     // 0 needs no transform
+  const glyphs = [...html.matchAll(/>(.)<\/text>/g)].map((m) => m[1]);
+  assert.deepEqual(glyphs, ["L", "A", "S", "T"]);
+});
+
+test("stops place each letter at its own distance along the path, pitch carries on past them", () => {
+  const rip = { id: "st", page: { width_mm: 60, height_mm: 60 }, styles: { s: { font: "Inter", size: 18 } },
+    frames: [{ id: "sp", type: "path", style: "s", bind: "t", x: 0, y: 0, w: 60, h: 10,
+      points: [[0, 5], [60, 5]], pitch: 10, upright: true, stops: [2, 7, 30] }] };
+  // A fourth letter (the text was edited longer) continues at the pitch after the last stop.
+  const html = Rip.renderSheet(rip, { t: "LAST" });
+  const xs = [...html.matchAll(/<text x="([\d.]+)"/g)].map((m) => +m[1]);
+  const px = (mmv) => Math.round(mmv * 96 / 25.4 * 100) / 100;
+  assert.deepEqual(xs, [px(2), px(7), px(30), px(40)]);
+  // A letter a rounding hair past the path's end still lands, at the end.
+  const end = Rip.renderSheet({ ...rip, frames: [{ ...rip.frames[0], stops: [0, 60.004] }] }, { t: "LA" });
+  assert.equal([...end.matchAll(/<text x="([\d.]+)"/g)].length, 2);
+});
+
 test("box frames draw fills, outlines and ellipses", () => {
   const rip = { id: "b", page: { width_mm: 50, height_mm: 50 }, tokens: { accent: "#ff0066" }, styles: {},
     frames: [

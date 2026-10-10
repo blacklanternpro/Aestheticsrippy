@@ -616,26 +616,26 @@ def _path_frames(h: "Harvest", styles: Dict[str, Dict], specs, names, data, labe
         inst = next(m for m in matcher_data()["instances"] if m["family"] == main.family)
     frames, made = [], {}
     for k, pt in enumerate(h.curved):
-        size_px = pt.cap / max(0.3, inst["cap"])
+        # Its own matched face when the bench found one; else the sheet's main face.
+        face = pt.face or main
+        finst = _instance(face) or inst
+        size_px = pt.size_px if pt.face and pt.size_px else pt.cap / max(0.3, finst["cap"])
         size_pt = mm(size_px) * PT_PER_MM
         sname = None
         colour = min(tokens, key=lambda t: _dist_hex(tokens[t], pt.colour)) if tokens else "ink"
-        for n, st in styles.items():
-            if st["font"] == main.family and st["weight"] == main.weight and st.get("stretch") == main.stretch \
+        for n, st in list(styles.items()) + list(made.items()):
+            if st["font"] == face.family and st["weight"] == face.weight and st.get("stretch") == face.stretch \
                     and st["color"] == colour and abs(st["size"] / size_pt - 1) <= 0.06:
-                sname = n
-                break
-        for n, st in made.items():
-            if sname is None and st["color"] == colour \
-                    and abs(st["size"] - size_pt) <= max(0.08 * size_pt, mm(2.2) * PT_PER_MM):
                 sname = n
                 break
         if sname is None:
             sname = "curve" if not made else f"curve-{'bcdefghij'[(len(made) - 1) % 9]}"
-            made[sname] = {"font": main.family, "weight": main.weight, "size": round(size_pt, 1),
+            made[sname] = {"font": face.family, "weight": face.weight, "size": round(size_pt, 1),
                            "leading": 1.0, "color": colour}
-            if main.stretch:
-                made[sname]["stretch"] = main.stretch
+            if face.stretch:
+                made[sname]["stretch"] = face.stretch
+            if face.italic:
+                made[sname]["italic"] = True
         st = made.get(sname) or styles[sname]
         size_px = st["size"] / PT_PER_MM * sheet.px_per_mm
         x0, y0 = float(pt.points[:, 0].min()), float(pt.points[:, 1].min())
@@ -654,9 +654,13 @@ def _path_frames(h: "Harvest", styles: Dict[str, Dict], specs, names, data, labe
             f["pitch"] = round(mm(pt.pitch), 2)
             if pt.upright:
                 f["upright"] = True
+            if pt.angles:
+                f["angles"] = [round(a, 1) for a in pt.angles]
+            if pt.stops:
+                f["stops"] = [round(mm(v), 2) for v in pt.stops]
         else:
             # Tight text along the curve: track it to the measured arc, as set type.
-            adv = sum(inst["adv"].get(c, inst["adv"].get("n", 0.55)) for c in pt.text)
+            adv = sum(finst["adv"].get(c, finst["adv"].get("n", 0.55)) for c in pt.text)
             n = max(2, len(pt.text))
             track = float(np.clip((pt.length / size_px - adv + 0.06) / (n - 1), -0.1, 0.6))
             if abs(track - st.get("tracking", 0.0)) > 0.012:

@@ -323,7 +323,10 @@
       const dx = p[i][0] - p[i - 1][0], dy = p[i][1] - p[i - 1][1];
       const len = Math.hypot(dx, dy);
       if (len === 0) continue;
-      if (left <= len || i === p.length - 1 && left <= len + 1e-6) {
+      // The last letter of a measured path sits right at its end; rounding to
+      // 0.01 mm can put it a hair past, so the end has half a millimetre of grace.
+      if (left <= len || i === p.length - 1 && left <= len + 0.5) {
+        left = Math.min(left, len);
         const t = Math.max(0, left) / len;
         return { x: p[i - 1][0] + dx * t, y: p[i - 1][1] + dy * t, angle: Math.atan2(dy, dx) * 180 / Math.PI };
       }
@@ -359,10 +362,23 @@
       // its point, turned with the curve unless `upright`. Needs no glyph measuring.
       body = [...text].map((ch, i) => {
         if (ch === " ") return "";
-        const at = pointAt(pts, (f.offset || 0) + i * f.pitch, f.closed);
+        // Measured letters sit at their own distances (`stops`); letters past the
+        // measured ones (the text edited longer) carry on at the pitch.
+        let dist;
+        if (f.stops && f.stops.length) {
+          const last = f.stops.length - 1;
+          dist = i <= last ? f.stops[i] : f.stops[last] + (i - last) * f.pitch;
+        } else {
+          dist = (f.offset || 0) + i * f.pitch;
+        }
+        const at = pointAt(pts, dist, f.closed);
         if (!at) return "";
         const x = pxNum(at.x), y = pxNum(at.y);
-        const turn = f.upright ? "" : ` transform="rotate(${Math.round(at.angle * 100) / 100} ${x} ${y})"`;
+        // Each letter's own angle when given (ransom-note lettering); else turn
+        // with the path, or not at all when upright.
+        const own = f.angles && f.angles[i] !== undefined ? f.angles[i] : (f.upright ? 0 : at.angle);
+        const deg = Math.round(own * 100) / 100;
+        const turn = deg ? ` transform="rotate(${deg} ${x} ${y})"` : "";
         return `<text x="${x}" y="${y}" dy="0.36em" text-anchor="middle" fill="currentColor"${turn}>${escapeHtml(ch)}</text>`;
       }).join("");
     } else {
