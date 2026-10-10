@@ -21,7 +21,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 import cv2
 import numpy as np
 
-CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@&"
 # Shape coverage, not taste: a grotesque, a condensed, a wide geometric,
 # a serif and a mono between them bracket most letterforms.
 FACE_WISHES = [("Inter", 600), ("Archivo Narrow", 500), ("Krona One", 400),

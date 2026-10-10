@@ -273,6 +273,33 @@ def ink_map(img: np.ndarray, bg: np.ndarray) -> np.ndarray:
     return np.linalg.norm(_lab_img(img) - _lab_img(bg), axis=2)
 
 
+def debloat(lines, body_px: float = 12.0) -> list:
+    """
+    Word boxes trimmed back to the height their line can vouch for. OCR
+    stretches a box over foreign ink below the glyphs (a stamp's crown
+    rising under a paragraph), and everything inside the bloated box then
+    vanishes: covered as text, rendered as nothing. Only body-scale lines
+    are judged - against the sheet's body size, since the bloated box
+    pollutes its own line's median - and display type is left alone.
+    """
+    out = []
+    for l in lines:
+        hs = [w.box[3] - w.box[1] for w in l.words]
+        med = float(np.median(hs)) if hs else 0.0
+        ref = body_px if 0.6 * body_px <= med <= 1.6 * body_px else med
+        if not hs or max(hs) <= 1.5 * ref:
+            out.append(l)
+            continue
+        import copy
+        l2 = copy.deepcopy(l)
+        for w in l2.words:
+            x0, y0, x1, y1 = w.box
+            if y1 - y0 > 1.5 * ref:
+                w.box = (x0, y0, x1, y0 + 1.25 * ref)
+        out.append(l2)
+    return out
+
+
 def text_mask(shape, lines, grow: float = 0.18) -> np.ndarray:
     m = np.zeros(shape[:2], np.uint8)
     for l in lines:
@@ -333,7 +360,7 @@ def regions(img: np.ndarray, lines, rule_mask: np.ndarray, paper, pans: Optional
     pans = list(pans if pans is not None else panels(img, paper))
     bg = background(img, paper, pans)
     ink = ink_map(img, bg)
-    covered = text_mask(img.shape, lines) | (cv2.dilate(rule_mask, np.ones((5, 5), np.uint8)) > 0)
+    covered = text_mask(img.shape, debloat(lines, body_px)) | (cv2.dilate(rule_mask, np.ones((5, 5), np.uint8)) > 0)
     for p in pans:  # panel edges are antialiased, not art
         x0, y0, x1, y1 = p.box
         edge = np.zeros(img.shape[:2], np.uint8)

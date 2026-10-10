@@ -128,10 +128,10 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
         # path read level one by one, and belong to the path instead.
         loose = [(bi, b.runs[0].box) for bi, b in enumerate(blocks)
                  if len(b.runs) == 1 and sum(c.isalnum() for c in b.text()) <= 3]
+        from .letters import atlas
         if os.environ.get("RIP_NO_CURVED"):
             curved, regions, absorbed = [], regions, []
         else:
-            from .letters import atlas
             curved, regions, absorbed = find_curved(sheet.image, regions, bg, loose=loose,
                                                     glyphs=atlas(r._browser))
         if absorbed:
@@ -139,6 +139,13 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
             matches = {k: matches[i] for k, i in enumerate(keep) if i in matches}
             blocks = [blocks[i] for i in keep]
             text_lines = [r.line for b in blocks for r in b.runs]
+        if not os.environ.get("RIP_NO_CURVED"):
+            from .stamps import find as find_stamps
+            stamped, regions = find_stamps(sheet.image, regions, bg, rules=rule_mask,
+                                           glyphs=atlas(r._browser), lines=text_lines)
+            if stamped:
+                notes.append(f"Read {len(stamped)} rubber-stamp ring{'' if len(stamped) == 1 else 's'}.")
+                curved += stamped
         if curved:
             notes.append(f"Read {len(curved)} {'line' if len(curved) == 1 else 'lines'} of type set along a curve.")
             match_path_faces(r, curved, {m.face.family for m in matches.values()})

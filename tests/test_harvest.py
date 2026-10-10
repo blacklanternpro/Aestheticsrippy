@@ -524,6 +524,52 @@ def test_wordness_hears_words_not_digit_dodges():
     assert not _lexical("D4ZOE") and not _lexical("ADENO")
 
 
+def _stamp_page() -> str:
+    """A rubber stamp: ring text round a lined globe, crossing a rule."""
+    import math
+    cx, cy, rm, rt = 350, 380, 90, 128
+    spans = []
+    word = "RIPPED@HAND.FUN"
+    n = len(word)
+    for i, ch in enumerate(word):
+        th = -120 + 270 * i / n                  # 270-degree arc leaves the ring's own gap
+        x = cx + rt * math.cos(math.radians(th))
+        y = cy + rt * math.sin(math.radians(th))
+        spans.append(f'<span style="position:absolute;left:{x - 20:.0f}px;top:{y - 26:.0f}px;'
+                     f'width:40px;text-align:center;line-height:52px;'
+                     f'transform:rotate({th + 90:.0f}deg)">{ch}</span>')
+    font = (ROOT / "fonts" / "Inter-var.woff2").resolve()
+    rings = "".join(f'<div style="position:absolute;left:{cx - rx}px;top:{cy - rm}px;width:{2 * rx}px;'
+                    f'height:{2 * rm}px;border:3px solid #222;border-radius:50%"></div>'
+                    for rx in (rm, int(0.62 * rm), int(0.3 * rm)))
+    bands = "".join(f'<div style="position:absolute;left:{cx - rm}px;top:{cy - ry}px;width:{2 * rm}px;'
+                    f'height:{2 * ry}px;border:3px solid #222;border-radius:50%"></div>'
+                    for ry in (int(0.55 * rm),))
+    rule = f'<div style="position:absolute;left:40px;top:{cy - 40}px;width:620px;height:4px;background:#222"></div>'
+    return ("<!doctype html><meta charset=\"utf-8\"><style>"
+            f"@font-face {{ font-family:'Inter'; src: url('file://{font}'); }}"
+            "body { background:#fff; margin:0; width:700px; height:700px; position:relative;"
+            " font-family:Inter; font-weight:700; font-size:40px; color:#1a1a1a; }"
+            "</style>" + rings + bands + rule + "".join(spans))
+
+
+def test_stamp_ring_reads_through_its_own_art(tmp_path):
+    # Ring text woven through a stamp's line art and a crossing rule: found by
+    # the motif, unrolled about the fitted circle, read as an ordinary row.
+    from engine.harvest.pipeline import harvest
+    from engine.render import Renderer
+
+    page = tmp_path / "stamp.html"
+    page.write_text(_stamp_page(), encoding="utf-8")
+    with Renderer() as r:
+        (tmp_path / "stamp.png").write_bytes(r.render_file(page, pdf=False).png)
+        res = harvest(tmp_path / "stamp.png", "Stamp", out_dir=tmp_path / "pack",
+                      renderer=r, refine_rounds=0)
+    paths = [res.data[f["bind"]] for f in res.rip["frames"] if f.get("type") == "path"]
+    joined = " ".join(paths).upper()
+    assert "RIPPED" in joined and "HAND" in joined, paths
+
+
 def test_ransom_lettering_reads_with_per_letter_angles(tmp_path):
     from engine.harvest.pipeline import harvest
     from engine.render import Renderer
