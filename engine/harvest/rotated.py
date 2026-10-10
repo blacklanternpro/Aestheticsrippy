@@ -97,6 +97,104 @@ def _skew(mask: np.ndarray, min_angle: float = 6) -> List[float]:
     return out
 
 
+def _piece_angles(mask: np.ndarray, min_angle: float = 6) -> List[float]:
+    """
+    Angles the mark's long pieces (words whose letters run together) agree on.
+    Projection sharpness is ruled by the biggest family of lines, so a second,
+    smaller family (one arm of a V) can hide under its floor; the pieces still
+    point its way.
+    """
+    n, lab, st, _ = cv2.connectedComponentsWithStats(mask.astype(np.uint8), 8)
+    pieces = []
+    for i in range(1, n):
+        if st[i, cv2.CC_STAT_AREA] < 20:
+            continue
+        ys, xs = np.nonzero(lab == i)
+        q = np.stack([xs, ys], 1).astype(np.float64)
+        q -= q.mean(axis=0)
+        _, vecs = np.linalg.eigh(np.cov(q.T))
+        major, minor = vecs[:, 1], vecs[:, 0]
+        length, width = float(np.ptp(q @ major)), float(np.ptp(q @ minor))
+        a = (float(np.degrees(np.arctan2(major[1], major[0]))) + 90) % 180 - 90
+        pieces.append((a, length, width))
+    if not pieces:
+        return []
+    h = float(np.median([w for _, _, w in pieces]))
+    long = [(a, l) for a, l, w in pieces if l > 3 * w and l > 2.5 * h]
+    total = sum(l for _, l in long)
+    out: List[float] = []
+    for a, _ in sorted(long, key=lambda t: -t[1]):
+        near = [(b, l) for b, l in long if _adiff(a, b) <= 4]
+        share = sum(l for _, l in near)
+        if len(near) < 2 or share < 0.15 * total or abs(a) < min_angle:
+            continue
+        mean = float(np.average([b for b, _ in near], weights=[l for _, l in near]))
+        if all(_adiff(mean, o) > 10 for o in out):
+            out.append(float(round(mean)))
+    return out
+
+
+def _neighbour_angles(ink: np.ndarray, min_angle: float = 6) -> List[float]:
+    """
+    Angles from letters' nearest neighbours (a docstrum): within a word the next
+    letter lies along the baseline, closer than the next line, so the directions
+    to near neighbours pile up at each family's angle however small the family.
+    Only pairs of like-sized pieces closer than a letter's height vote, which
+    keeps line-to-line pairs (the perpendicular) out.
+    """
+    n, lab, st, cen = cv2.connectedComponentsWithStats(ink.astype(np.uint8), 8)
+    ok = [i for i in range(1, n) if st[i, cv2.CC_STAT_AREA] >= 6]
+    if len(ok) < 6:
+        return []
+    if len(ok) > 2500:   # a texture, not lettering: sample it rather than pair every speck
+        ok = list(np.random.default_rng(0).choice(ok, 2500, replace=False))
+    size = np.array([max(st[i, 2], st[i, 3]) for i in ok], float)
+    h = float(np.median(size))
+    pts = cen[ok]
+    votes = []
+    for j in range(len(ok)):
+        d = np.hypot(*(pts - pts[j]).T)
+        d[j] = np.inf
+        like = (size > 0.5 * size[j]) & (size < 2.0 * size[j])
+        cand = np.where(like & (d < 1.1 * h))[0]
+        for k in cand[np.argsort(d[cand])][:2]:
+            dx, dy = pts[k] - pts[j]
+            votes.append((float(np.degrees(np.arctan2(dy, dx))) + 90) % 180 - 90)
+    if len(votes) < 6:
+        return []
+    hist = np.zeros(180)
+    for v in votes:
+        hist[int(round(v)) % 180] += 1
+    smooth = np.convolve(np.r_[hist[-3:], hist, hist[:3]], np.ones(5) / 5, mode="same")[3:-3]
+    out: List[float] = []
+    floor = max(3.0, 0.12 * len(votes) / 5)
+    for d in np.argsort(-smooth):
+        a = (d + 90) % 180 - 90
+        if smooth[d] < floor:
+            break
+        if abs(a) < min_angle or smooth[d] < smooth[(d - 1) % 180] or smooth[d] < smooth[(d + 1) % 180]:
+            continue
+        if all(_adiff(a, o) > 10 for o in out):
+            out.append(float(a))
+        if len(out) >= 3:
+            break
+    return out
+
+
+def _angles(mask: np.ndarray, ink: Optional[np.ndarray] = None) -> List[float]:
+    """
+    The mark's line angles: projection peaks, plus any family the pieces agree
+    on. Pieces come from the ink itself when given (the mark's mask is grown and
+    fuses stacked lines into one blob).
+    """
+    out = _skew(mask)
+    pieces = mask if ink is None else ink & mask
+    for a in _piece_angles(pieces) + _neighbour_angles(pieces):
+        if all(_adiff(a, o) > 10 for o in out):
+            out.append(a)
+    return out
+
+
 def _adiff(a: float, b: float) -> float:
     """Distance between two line directions, degrees (directions repeat every 180)."""
     d = abs(a - b) % 180
@@ -312,7 +410,10 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: f
             kept.append(reg)
             continue
         # The mark's own angles, found before any level ink is lent to it.
-        angles = _skew(reg.mask)
+        x0, y0, x1, y1 = reg.box
+        dist = ink_map(img[y0:y1, x0:x1], bg[y0:y1, x0:x1])
+        inside = dist[reg.mask]
+        angles = _angles(reg.mask, dist > 0.5 * float(np.median(inside)) if inside.size else None)
         lent: List[Tuple[int, np.ndarray]] = []
         orig_box, orig_mask = reg.box, reg.mask
         if loose and angles:
@@ -380,6 +481,34 @@ def _leftover(mask: np.ndarray, remaining: np.ndarray) -> np.ndarray:
         piece = lab == i
         keep[i] = (piece & near_read).sum() < 0.5 * area
     return keep[lab]
+
+
+def _snap_ends(band: np.ndarray, x0: float, x1: float, h: float) -> Tuple[float, float]:
+    """
+    A line's ends on its own ink: the reader's word boxes run a little loose.
+    Columns join across gaps narrower than a word space, so a neighbouring
+    group on the same baseline is not swallowed.
+    """
+    cols = np.nonzero(band.sum(axis=0) >= 1)[0]
+    if not len(cols):
+        return x0, x1
+    gap = max(2.0, 0.45 * h)
+    segs, start, prev = [], cols[0], cols[0]
+    for c in list(cols[1:]) + [None]:
+        if c is None or c - prev > gap:
+            segs.append((start, prev + 1))
+            if c is not None:
+                start = c
+        if c is not None:
+            prev = c
+    mine = [(a, b) for a, b in segs if b > x0 and a < x1]
+    if not mine:
+        return x0, x1
+    a, b = float(min(s[0] for s in mine)), float(max(s[1] for s in mine))
+    # Only tighten or nudge: a snap that moves an end by more than a letter is a wrong join.
+    if abs(a - x0) > h or abs(b - x1) > h:
+        return x0, x1
+    return a, b
 
 
 def _read_at(img, bg, reg, mask, deg, min_conf):
@@ -450,13 +579,28 @@ def _read_at(img, bg, reg, mask, deg, min_conf):
                 if flip:
                     gx0, gx1, gy0, gy1 = cw - gx1, cw - gx0, ch_ - gy1, ch_ - gy0
                 lx0, lx1, ly0, ly1 = left + gx0, left + gx1, top + gy0, top + gy1
+                lx0, lx1 = _snap_ends(lmask[by0:by1], lx0, lx1, word_h)
                 # The reader's word boxes say which ink is this line, but their heights
                 # wander (some run down to the crop's edge): measure height from the ink.
                 sub = lmask[by0:by1, max(0, int(lx0)):int(np.ceil(lx1))]
-                rows = np.nonzero(sub.sum(axis=1) >= 2)[0] if sub.size else []
+                # Rows count when they hold a real share of the line's ink: levelling smears
+                # a fringe row onto the top and bottom, which would make the type too big.
+                rs = sub.sum(axis=1) if sub.size else np.zeros(0)
+                rows = np.nonzero(rs >= max(2, 0.2 * rs.max()))[0] if rs.size else []
                 if len(rows):
                     ly0, ly1 = by0 + rows[0], by0 + rows[-1] + 1
                 gh = ly1 - ly0
+                if caps and len(rows):
+                    # Caps: the median column top and bottom sit on the cap line and baseline;
+                    # the outer rows include round letters' overshoot, a few percent too tall.
+                    cols = np.nonzero(sub.any(axis=0))[0]
+                    if len(cols) >= 8:
+                        tops = np.argmax(sub[:, cols], axis=0)
+                        bots = sub.shape[0] - 1 - np.argmax(sub[::-1, cols], axis=0)
+                        mt, mb = float(np.median(tops)), float(np.median(bots))
+                        gh = max(2.0, mb - mt + 1)
+                        # Place by the same band: an outer row may be a neighbour's stray ink.
+                        ly0, ly1 = by0 + mt, by0 + mb + 1
                 cap = gh if caps else gh * 0.72
                 per_char = (lx1 - lx0) / max(1, len(gtext)) / max(1.0, cap)
                 if not 0.45 <= per_char <= 1.5:

@@ -215,6 +215,10 @@ def test_list_header_rides_on_the_repeat(ripped2):
     titles = [ripped2.data[c["bind"].split(".")[0]][c["bind"].split(".")[1]] for c in cells]
     assert [t.upper() for t in titles] == ["ITEM", "PRICE"]
     assert cells[-1]["with"].get("align") == "right"
+    # The titles were set spaced (0.12 em); the spacing survives whatever face they land in.
+    st = ripped2.rip["styles"]
+    track = [c["with"].get("tracking", st[c["style"]].get("tracking", 0)) for c in cells]
+    assert all(t > 0.06 for t in track), track
     loose = [ripped2.data[f["bind"]] for f in ripped2.rip["frames"]
              if f.get("type") == "text" and isinstance(ripped2.data.get(f["bind"]), str)]
     assert not any(t.upper() in ("ITEM", "PRICE") for t in loose), loose
@@ -237,6 +241,78 @@ def test_forced_width_lines_get_their_own_tracking(ripped2):
     st = ripped2.rip["styles"]
     track = lambda f: (f.get("with") or {}).get("tracking", st[f["style"]].get("tracking", 0))  # noqa: E731
     assert track(ivan) - track(tom) > 0.15
+
+
+# ------------------------------------------------------------ faces
+
+def _matched(text, size, scores, baseline=100.0):
+    """A block of `text` at cap-height-based `size` px with matcher scores {family: score}."""
+    from engine.harvest.typeface import Face, Match
+    blk = _cell(text, 50, 50 + 7 * len(text), baseline, cap=size * 0.71)
+    keys = {f"{fam}|400|": v for fam, v in scores.items()}
+    best = max(keys, key=keys.get)
+    m = Match(Face(best.split("|")[0], 400), size, 0.0, keys[best], keys)
+    return blk, m
+
+
+def test_figures_follow_the_family_the_words_prove():
+    """
+    Body text proves its face on long lines; prices a pixel taller (a separate size
+    group) score noisily and lean to another face. They carry no evidence and must
+    not drag a second family onto the sheet.
+    """
+    from engine.harvest.build import harmonise
+    sheet = [("Luxury Sofa Set with matching cushions", 13.0, {"Grotesk": 0.84, "Narrow": 0.77}),
+             ("King Size Bed Frame in solid oak wood", 13.0, {"Grotesk": 0.83, "Narrow": 0.78}),
+             ("Terms and conditions apply to every order", 13.5, {"Grotesk": 0.86, "Narrow": 0.76}),
+             ("$1,300", 15.5, {"Grotesk": 0.72, "Narrow": 0.79}),
+             ("$950", 15.5, {"Grotesk": 0.73, "Narrow": 0.80}),
+             ("$650", 15.5, {"Grotesk": 0.74, "Narrow": 0.79}),
+             ("$5,720", 15.5, {"Grotesk": 0.69, "Narrow": 0.75})]
+    blocks, matches = [], {}
+    for i, (t, s, sc) in enumerate(sheet):
+        b, m = _matched(t, s, sc, baseline=100 + 30 * i)
+        blocks.append(b)
+        matches[i] = m
+    faces = harmonise(matches, blocks)
+    assert {f.family for f in faces.values()} == {"Grotesk"}, {i: f.family for i, f in faces.items()}
+
+
+def test_noise_alone_does_not_buy_a_second_family():
+    """
+    Two near-identical faces whose scores trade places block by block: taking the
+    better of the two per block gains on noise alone. One size of text is one face.
+    """
+    from engine.harvest.build import harmonise
+    words = ["Luxury Sofa Set", "Dining Table Set", "King Size Bed Frame", "Wardrobe Cabinet",
+             "Office Desk and Chair", "Account Name Claudia", "Payment Method Card", "New York City Office"]
+    blocks, matches = [], {}
+    # Two size groups (measurement noise on small type splits one size): each leans a hair
+    # to a different face, with the scores trading places block by block on top.
+    for i, t in enumerate(words + words):
+        size, lean = (13.0, 0.01) if i < len(words) else (17.0, -0.01)
+        d = 0.04 if i % 2 else -0.04
+        b, m = _matched(t, size, {"Grotesk": 0.80 + lean + d, "Narrow": 0.80 - lean - d}, baseline=100 + 30 * i)
+        blocks.append(b)
+        matches[i] = m
+    faces = harmonise(matches, blocks)
+    assert len({f.family for f in faces.values()}) == 1, {i: f.family for i, f in faces.items()}
+
+
+def test_a_real_second_family_still_earns_its_place():
+    """Long headings that clearly fit another face keep it."""
+    from engine.harvest.build import harmonise
+    sheet = [("Luxury Sofa Set with matching cushions", 13.0, {"Grotesk": 0.84, "Serif": 0.60}),
+             ("King Size Bed Frame in solid oak wood", 13.0, {"Grotesk": 0.83, "Serif": 0.61}),
+             ("The Spring Collection Catalogue", 40.0, {"Grotesk": 0.62, "Serif": 0.90}),
+             ("Handmade Furniture Since Nineteen Ten", 40.0, {"Grotesk": 0.63, "Serif": 0.89})]
+    blocks, matches = [], {}
+    for i, (t, s, sc) in enumerate(sheet):
+        b, m = _matched(t, s, sc, baseline=100 + 60 * i)
+        blocks.append(b)
+        matches[i] = m
+    faces = harmonise(matches, blocks)
+    assert [faces[i].family for i in range(4)] == ["Grotesk", "Grotesk", "Serif", "Serif"]
 
 
 # ------------------------------------------------------------ list headers
@@ -275,6 +351,36 @@ def test_list_header_in_its_own_style_joins_the_list():
     assert [c.text if c else None for c in t.header] == ["ITEM", "PRICE"]
     assert t.header_styles == ["head", "head"]
     assert {0, 1} <= set(t.blocks)
+
+
+def test_a_header_in_the_rows_own_style_is_found_by_its_figures():
+    from engine.harvest.tables import find_tables
+    blocks, style = _list_sheet([("ITEM", 100, 150, 170, "row"), ("PRICE", 362, 420, 170, "row")])
+    tables = find_tables(blocks, style)
+    assert len(tables) == 1
+    t = tables[0]
+    assert len(t.rows) == 4, [r[0].text for r in t.rows]
+    assert [c.text for c in t.header] == ["ITEM", "PRICE"]
+
+
+def test_summary_rows_end_the_list_instead_of_shrinking_it():
+    """Item / qty / price rows, then subtotal rows using only the outer columns."""
+    from engine.harvest.tables import find_tables
+    blocks, style = [], {}
+
+    def add(text, l, r, base):
+        style[len(blocks)] = "row"
+        blocks.append(_cell(text, l, r, base))
+    for i, item in enumerate(["OAK TABLE", "LINEN CHAIR", "WALNUT SHELF", "BRASS LAMP"]):
+        add(item, 100, 100 + 12 * len(item), 200 + 30 * i)
+        add("1", 300, 310, 200 + 30 * i)
+        add("$950", 372, 420, 200 + 30 * i)
+    for i, label in enumerate(["SUBTOTAL", "TAX", "TOTAL"]):
+        add(label, 100, 100 + 12 * len(label), 320 + 30 * i)
+        add("$950", 372, 420, 320 + 30 * i)
+    tables = sorted(find_tables(blocks, style), key=lambda t: t.rows[0][0].baseline)
+    assert len(tables[0].styles) == 3, [len(t.styles) for t in tables]
+    assert len(tables[0].rows) == 4
 
 
 def test_a_title_across_the_columns_is_not_a_header():
@@ -349,6 +455,13 @@ def test_v_of_angled_type_reads_both_arms(ripped3):
     for text, ang in (("SALT CELLAR", 40), ("COOTIE CATCHER", 40), ("ELEMENTARY", -40), ("FORTUNE TELLER", -40)):
         assert text in rot, rot
         assert abs(rot[text] - ang) < 4, (text, rot[text])
+    # Set at 15 pt with no tracking (the page may snap to a larger paper size: scale with it).
+    scale = ripped3.rip["page"]["width_mm"] / KNOWN3["page"]["width_mm"]
+    for f in ripped3.rip["frames"]:
+        if f.get("rotate"):
+            size = ripped3.rip["styles"][f["style"]]["size"]
+            assert abs(size / (15 * scale) - 1) < 0.03, size
+            assert abs(f["with"].get("tracking", 0)) < 0.03, f["with"]
     # Nothing of the arms is left as level text or as art.
     level = [ripped3.data[f["bind"]] for f in ripped3.rip["frames"] if f.get("type") == "text" and not f.get("rotate")]
     assert not level, level

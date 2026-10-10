@@ -28,6 +28,20 @@ class Table:
     header_styles: Optional[List[Optional[str]]] = None
 
 
+def _titles_row(cells: Sequence[Sequence[Run]]) -> bool:
+    """
+    Is a list's first row its column titles? It holds no figures while at least
+    one column below it is all figures ("Price" over "$1,200"), and enough rows
+    remain to be a list without it.
+    """
+    if len(cells) < 4:
+        return False
+    digit = lambda r: any(ch.isdigit() for ch in r.text)  # noqa: E731
+    if any(digit(c) for c in cells[0]):
+        return False
+    return any(all(digit(row[c]) for row in cells[1:]) for c in range(len(cells[0])))
+
+
 def _header(rows, above: int, cells, aligns, step: float, style_of, blocks, taken) -> Optional[Tuple]:
     """
     The row just above a list, if it titles the list's columns: every piece of it
@@ -104,6 +118,11 @@ def find_tables(blocks: Sequence[Block], style_of: Dict[int, str], same=None) ->
     runs = [(bi, r) for bi, b in enumerate(blocks) if bi in style_of for r in b.runs]
     rows = _rows(runs)
 
+    def tiny(r: Run) -> bool:
+        # A lone figure ("1") is the least reliable thing on the sheet to size or match:
+        # its alignment places it in a column, its style cannot veto that.
+        return sum(ch.isalnum() for ch in r.text) <= 2
+
     def aligned(a: Run, b: Run, tol: float) -> bool:
         return abs(a.left - b.left) <= tol or abs(a.right - b.right) <= tol or \
             abs((a.left + a.right) / 2 - (b.left + b.right) / 2) <= tol
@@ -122,7 +141,8 @@ def find_tables(blocks: Sequence[Block], style_of: Dict[int, str], same=None) ->
                 bi0, r0 = ch[-1]
                 tol = 0.6 * r0.size
                 hit = [(bi, r) for bi, r in rows[j] if (j, id(r)) not in taken and aligned(r0, r, tol)
-                       and same(style_of[bi0], style_of[bi])] if step <= 4.5 * r0.size else []
+                       and (same(style_of[bi0], style_of[bi]) or tiny(r) or tiny(r0))] \
+                    if step <= 4.5 * r0.size else []
                 if len(hit) == 1:
                     nxt.append(ch + hit)
                 else:
@@ -136,6 +156,10 @@ def find_tables(blocks: Sequence[Block], style_of: Dict[int, str], same=None) ->
                     break
                 j += 1
                 continue
+            if len(nxt) < len(chains) and len(group) >= 3:
+                # An established list ends at a row that drops a column (the subtotal
+                # rows under an invoice's items) rather than shrinking to fit it.
+                break
             if len(group) >= 2:
                 first = rows[group[1]][0][1].baseline - rows[group[0]][0][1].baseline
                 if abs(step - first) > 0.18 * first:
@@ -169,12 +193,24 @@ def find_tables(blocks: Sequence[Block], style_of: Dict[int, str], same=None) ->
         sig = [Counter(style_of[bi] for bi, _ in ch).most_common(1)[0][0] for ch in chains]
         involved = {bi for ch in chains for bi, _ in ch}
         in_rows = {id(r) for ch in chains for _, r in ch}
+        # Two blocks of words side by side (an address beside payment details) share a
+        # rhythm too. A short run is only a list if a column of it is figures.
+        figures = any(all(any(ch.isdigit() for ch in r.text) for _, r in chain) for chain in chains)
+        if n < 4 and not figures:
+            i += 1
+            continue
         if all(all(id(r) in in_rows for r in blocks[bi].runs) for bi in involved):
             steps = np.diff([rows[g][0][1].baseline for g in group])
             step = float(np.median(steps))
             t = Table(cells, sig, aligns, sorted(involved), step)
+            if _titles_row(cells):
+                # Column titles in the rows' own style chain in as the first row.
+                t.rows = cells[1:]
+                t.header = list(cells[0])
+                t.header_styles = [style_of[ch[0][0]] for ch in chains]
+                t.step = float(np.median(np.diff([r[0].baseline for r in t.rows])))
             # Column titles in a style of their own never join the chains: look above.
-            head = _header(rows, group[0] - 1, cells, aligns, step, style_of, blocks, taken)
+            head = None if t.header else _header(rows, group[0] - 1, cells, aligns, step, style_of, blocks, taken)
             if head:
                 t.header, t.header_styles, used = head
                 t.blocks = sorted(involved | used)

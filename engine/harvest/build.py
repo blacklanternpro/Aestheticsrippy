@@ -92,13 +92,32 @@ def _harmonise_family(matches: Dict[int, Match], blocks: Sequence[Block], margin
     families = {k.split("|")[0] for m in matches.values() for k in m.scores}
     best_of = {f: {bi: fam_best(m, f) for bi, m in matches.items()} for f in families}
 
+    # Text of one size and colour is one family: decide per group of like blocks, not per
+    # block, so measurement noise cannot set two neighbouring prices in different faces.
+    groups: List[List[int]] = []
+    for bi in sorted(matches, key=lambda b: blocks[b].size):
+        b = blocks[bi]
+        for g in groups:
+            ref = blocks[g[0]]
+            if abs(b.size - ref.size) <= max(0.15 * ref.size, 2.5) and _close_colour(b, ref):
+                g.append(bi)
+                break
+        else:
+            groups.append([bi])
+
+    def block_value(bi: int, f: str) -> float:
+        # A block a family cannot render at all keeps its own best, discounted.
+        s, key = best_of[f][bi]
+        return s if key else max(matches[bi].scores.values()) - 0.15
+
+    group_val = {(gi, f): sum(weight_of[bi] * block_value(bi, f) for bi in g)
+                 for gi, g in enumerate(groups) for f in families}
+
     def value(fset) -> float:
-        v = 0.0
-        for bi, m in matches.items():
-            scores = [best_of[f][bi][0] for f in fset if best_of[f][bi][1]]
-            # A block the set cannot render at all keeps its own best, discounted.
-            v += weight_of[bi] * (max(scores) if scores else max(m.scores.values()) - 0.15)
-        return v / total_w
+        # Each group takes the family in the set that fits it best, as it will be
+        # rendered. Letting each block take its own best instead would reward a set
+        # of near-identical faces for the noise in their scores alone.
+        return sum(max(group_val[(gi, f)] for f in fset) for gi in range(len(groups))) / total_w
 
     chosen_set: List[str] = []
     current = -1e9
@@ -114,18 +133,6 @@ def _harmonise_family(matches: Dict[int, Match], blocks: Sequence[Block], margin
         chosen_set.append(best_f)
         current = best_v
 
-    # Text of one size and colour is one family: decide per group of like blocks, not per
-    # block, so measurement noise cannot set two neighbouring prices in different faces.
-    groups: List[List[int]] = []
-    for bi in sorted(matches, key=lambda b: blocks[b].size):
-        b = blocks[bi]
-        for g in groups:
-            ref = blocks[g[0]]
-            if abs(b.size - ref.size) <= max(0.15 * ref.size, 2.5) and _close_colour(b, ref):
-                g.append(bi)
-                break
-        else:
-            groups.append([bi])
     chosen: Dict[int, Face] = {}
     for g in groups:
         def group_value(f):
@@ -460,6 +467,38 @@ def _table_header(frame: Dict, t, key: str, cols, row_base: float, styles: Dict[
             labels[f"{hkey}.c{c + 1}"] = f"Column {c + 1} title"
 
 
+def _instance(face: Face) -> Optional[Dict]:
+    """The type cabinet's measurements for a face (its nearest weight when that one is missing)."""
+    from ..typecase import matcher_data
+    insts = [m for m in matcher_data()["instances"] if m["family"] == face.family
+             and (m.get("stretch") or None) == face.stretch]
+    if not insts:
+        insts = [m for m in matcher_data()["instances"] if m["family"] == face.family]
+    return min(insts, key=lambda m: abs(int(m["weight"]) - face.weight)) if insts else None
+
+
+def _solve_tracking(face: Face, size_px: float, runs: Sequence, fallback: float) -> float:
+    """
+    Tracking (em) that sets each run at its measured ink width in `face`: the
+    width left over after the letters' own advances, shared between the gaps.
+    The median over runs long enough to say; `fallback` when none are.
+    """
+    inst = _instance(face)
+    if inst is None or size_px <= 0:
+        return fallback
+    vals = []
+    for r in runs:
+        text = r.text
+        n = len(text)
+        if n < 4 or r.ink is None:
+            continue
+        adv = sum(inst["adv"].get(c, inst["adv"].get("n", 0.55)) for c in text)
+        vals.append(((r.right - r.left) / size_px - adv + 0.06) / (n - 1))
+    if not vals:
+        return fallback
+    return float(np.clip(np.median(vals), -0.1, 0.6))
+
+
 def _rotated_frames(h: "Harvest", styles: Dict[str, Dict], specs, names, data, labels, tokens) -> List[Dict]:
     """
     Rotated lines take the sheet's main face, sized from their cap height and
@@ -484,18 +523,25 @@ def _rotated_frames(h: "Harvest", styles: Dict[str, Dict], specs, names, data, l
         size_px = rt.cap / max(0.3, inst["cap"])
         size_pt = mm(size_px) * PT_PER_MM
         sname = None
+        colour = min(tokens, key=lambda t: _dist_hex(tokens[t], rt.colour)) if tokens else "ink"
+        # Angled lines a hair off a level style in the same face are that style turned
+        # (the design has one size of type, measured twice): join it rather than add a near twin.
+        for n, st in styles.items():
+            if st["font"] == main.family and st["weight"] == main.weight and st.get("stretch") == main.stretch \
+                    and st["color"] == colour and abs(st["size"] / size_pt - 1) <= 0.06:
+                sname = n
+                break
         for n, st in made.items():
-            if abs(st["size"] - size_pt) <= max(0.08 * size_pt, mm(2.2) * PT_PER_MM):
+            if sname is None and abs(st["size"] - size_pt) <= max(0.08 * size_pt, mm(2.2) * PT_PER_MM):
                 sname = n
                 break
         if sname is None:
             sname = "angled" if not made else f"angled-{'bcdefghij'[(len(made) - 1) % 9]}"
-            colour = min(tokens, key=lambda t: _dist_hex(tokens[t], rt.colour)) if tokens else "ink"
             made[sname] = {"font": main.family, "weight": main.weight, "size": round(size_pt, 1),
                            "leading": 1.0, "color": colour}
             if main.stretch:
                 made[sname]["stretch"] = main.stretch
-        st = made[sname]
+        st = made.get(sname) or styles[sname]
         size_px = st["size"] / PT_PER_MM * sheet.px_per_mm
         adv = sum(inst["adv"].get(c, inst["adv"].get("n", 0.55)) for c in rt.text)
         n = max(2, len(rt.text))
@@ -516,6 +562,8 @@ def _rotated_frames(h: "Harvest", styles: Dict[str, Dict], specs, names, data, l
         f = {"id": key, "type": "text", "style": sname, "bind": key,
              "x": round(mm(cx - width / 2), 2), "y": round(mm(cy - height / 2), 2), "w": round(mm(width), 2),
              "rotate": round(rt.angle, 2), "with": {"align": "center", "wrap": "nowrap", "tracking": round(track, 3)}}
+        if st.get("leading", 1.0) != 1.0:
+            f["with"]["leading"] = 1.0    # placed on a 1.0 line box above
         frames.append(f)
     styles.update(made)
     return frames
@@ -575,7 +623,16 @@ def build_rip(h: Harvest, pack_id: str, name: str, asset_names: Dict[int, str],
         leading = (b.step / size_px) if b.step else None
         letters = [c for c in b.text() if c.isalpha()]
         upper = bool(letters) and all(c.isupper() for c in letters) and len(letters) >= 2
-        track = m.tracking_em if face.family == m.face.family else 0.0
+        # The match's tracking was solved for its own face; a block moved to another face
+        # is re-tracked to its measured width, or spaced titles would set solid.
+        # Only single lines: a justified paragraph's lines are stretched to the measure, and
+        # solving from their widths would letter-space the whole paragraph.
+        if face.family == m.face.family:
+            track = m.tracking_em
+        elif len(b.runs) == 1:
+            track = _solve_tracking(face, size_px, b.runs, 0.0)
+        else:
+            track = 0.0
         block_track[bi] = track
         sx = m.scale_x if face.family == m.face.family else 1.0
         # Sizes come from heights measured in whole pixels: a pixel of x-height is ~2 px of size.
@@ -621,10 +678,14 @@ def build_rip(h: Harvest, pack_id: str, name: str, asset_names: Dict[int, str],
     # Repeated rows become lists first; the blocks they use up are not framed again.
     from .tables import find_tables
     def same_style(x: str, y: str) -> bool:
+        # Cells of one column: same colour, size and weight. Not necessarily the same
+        # family: on small type the matcher can split one face between near-identical
+        # families cell by cell, and a list must not fall apart over that noise.
         if x == y:
             return True
         a, b = styles[x], styles[y]
-        return a["font"] == b["font"] and a["color"] == b["color"] and abs(a["size"] / b["size"] - 1) <= 0.15
+        return a["color"] == b["color"] and abs(a["size"] / b["size"] - 1) <= 0.15 \
+            and abs(a["weight"] - b["weight"]) <= 200 and a.get("case") == b.get("case")
 
     tables = find_tables(h.blocks, {bi: names[style_of[bi]] for bi, _ in blocks}, same_style)
     in_table = {bi for t in tables for bi in t.blocks}

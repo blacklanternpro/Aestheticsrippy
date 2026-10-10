@@ -2,22 +2,22 @@
   "recorded": "2026-10-10",
   "packs": {
     "creative-studio-office-card": {
-      "score": 96.6,
+      "score": 97.2,
       "live": 0.194,
       "type": 0.876,
       "styles": 4,
       "text_frames": 8,
       "frames": 48,
-      "seconds": 38.2
+      "seconds": 38.5
     },
     "drumaq-tour-poster": {
-      "score": 79.2,
+      "score": 79.3,
       "live": 0.283,
-      "type": 0.691,
+      "type": 0.682,
       "styles": 5,
       "text_frames": 15,
       "frames": 21,
-      "seconds": 36.4
+      "seconds": 40.5
     },
     "dupont-letter": {
       "score": 91.4,
@@ -26,133 +26,133 @@
       "styles": 6,
       "text_frames": 24,
       "frames": 32,
-      "seconds": 42.0
+      "seconds": 47.6
     },
     "fidele-invoice-0123": {
-      "score": 94.3,
+      "score": 94.4,
       "live": 0.928,
       "type": 0.791,
       "styles": 6,
       "text_frames": 23,
       "frames": 39,
-      "seconds": 29.0
+      "seconds": 34.7
     },
     "fidele-invoice-0123-1": {
-      "score": 95.1,
+      "score": 95.0,
       "live": 0.932,
       "type": 0.784,
       "styles": 4,
-      "text_frames": 23,
-      "frames": 42,
-      "seconds": 29.5
+      "text_frames": 17,
+      "frames": 37,
+      "seconds": 33.6
     },
     "fidele-invoice-template": {
-      "score": 94.8,
+      "score": 94.5,
       "live": 0.931,
       "type": 0.789,
       "styles": 5,
-      "text_frames": 23,
-      "frames": 42,
-      "seconds": 31.0
+      "text_frames": 17,
+      "frames": 37,
+      "seconds": 34.3
     },
     "fidele-order-invoice": {
-      "score": 94.8,
+      "score": 94.5,
       "live": 0.931,
       "type": 0.789,
       "styles": 5,
-      "text_frames": 23,
-      "frames": 42,
-      "seconds": 30.9
+      "text_frames": 17,
+      "frames": 37,
+      "seconds": 33.4
     },
     "forecaster-prototype-card": {
-      "score": 95.3,
+      "score": 94.7,
       "live": 0.971,
       "type": 0.802,
-      "styles": 4,
+      "styles": 2,
       "text_frames": 19,
       "frames": 22,
-      "seconds": 25.2
+      "seconds": 26.8
     },
     "handshake-receipt-card": {
-      "score": 92.1,
+      "score": 92.9,
       "live": 0.449,
-      "type": 0.684,
+      "type": 0.685,
       "styles": 8,
-      "text_frames": 22,
-      "frames": 49,
-      "seconds": 33.2
+      "text_frames": 27,
+      "frames": 53,
+      "seconds": 40.8
     },
     "handshake-receipt-ledger": {
-      "score": 89.3,
+      "score": 89.1,
       "live": 0.485,
       "type": 0.721,
       "styles": 10,
       "text_frames": 18,
       "frames": 51,
-      "seconds": 35.4
+      "seconds": 38.3
     },
     "lsd-event-poster": {
-      "score": 87.0,
+      "score": 88.4,
       "live": 0.515,
-      "type": 0.765,
-      "styles": 6,
+      "type": 0.768,
+      "styles": 7,
       "text_frames": 17,
       "frames": 28,
-      "seconds": 26.9
+      "seconds": 28.8
     },
     "lsd-magick-city-poster": {
-      "score": 87.0,
+      "score": 88.9,
       "live": 0.518,
-      "type": 0.784,
+      "type": 0.783,
       "styles": 5,
       "text_frames": 17,
       "frames": 35,
-      "seconds": 48.0
+      "seconds": 56.2
     },
     "minimalist-corporate-invoice": {
-      "score": 94.2,
+      "score": 93.1,
       "live": 0.976,
-      "type": 0.756,
-      "styles": 6,
-      "text_frames": 40,
-      "frames": 61,
-      "seconds": 32.4
+      "type": 0.749,
+      "styles": 5,
+      "text_frames": 20,
+      "frames": 42,
+      "seconds": 37.2
     },
     "pangpang-receipt-poster": {
-      "score": 93.9,
+      "score": 93.5,
       "live": 0.225,
       "type": 0.621,
       "styles": 9,
       "text_frames": 28,
       "frames": 46,
-      "seconds": 57.0
+      "seconds": 63.7
     },
     "pangpang-receipt-repro": {
-      "score": 94.8,
+      "score": 94.4,
       "live": 0.224,
-      "type": 0.652,
-      "styles": 10,
+      "type": 0.648,
+      "styles": 11,
       "text_frames": 33,
       "frames": 45,
-      "seconds": 60.1
+      "seconds": 71.5
     },
     "public-records-event-ledger": {
-      "score": 82.3,
+      "score": 82.8,
       "live": 0.358,
       "type": 0.595,
       "styles": 10,
       "text_frames": 18,
       "frames": 49,
-      "seconds": 33.2
+      "seconds": 38.1
     },
     "saraiva-resume": {
-      "score": 81.8,
+      "score": 81.9,
       "live": 0.423,
-      "type": 0.759,
+      "type": 0.761,
       "styles": 13,
       "text_frames": 17,
       "frames": 61,
-      "seconds": 79.7
+      "seconds": 95.8
     }
   }
 }
