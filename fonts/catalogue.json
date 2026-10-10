@@ -1,0 +1,9047 @@
+{
+ "categories": {
+  "neo-grotesque": "Neo-grotesque",
+  "grotesque": "Grotesque",
+  "geometric": "Geometric",
+  "humanist": "Humanist",
+  "condensed": "Condensed",
+  "wide": "Wide",
+  "serif": "Serif",
+  "oldstyle": "Old-style",
+  "didone": "Didone",
+  "slab": "Slab",
+  "mono": "Mono",
+  "typewriter": "Typewriter",
+  "pixel": "Pixel",
+  "stencil": "Stencil",
+  "display": "Display",
+  "bubble": "Bubble",
+  "blackletter": "Blackletter",
+  "script": "Script",
+  "hand": "Hand"
+ },
+ "families": [
+  {
+   "family": "Inter",
+   "category": "neo-grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Inter-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "Inter-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 0.9688,
+    "descent": 0.2412,
+    "cap": 0.7275,
+    "x": 0.5459
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Inter Tight",
+   "category": "neo-grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "InterTight-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "InterTight-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 0.9688,
+    "descent": 0.2412,
+    "cap": 0.7275,
+    "x": 0.5459
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Arimo",
+   "category": "neo-grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Arimo-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      700
+     ]
+    },
+    {
+     "file": "Arimo-var.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 0.9053,
+    "descent": 0.2119,
+    "cap": 0.688,
+    "x": 0.5283
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Public Sans",
+   "category": "neo-grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "PublicSans-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "PublicSans-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 2000,
+    "ascent": 0.95,
+    "descent": 0.225,
+    "cap": 0.723,
+    "x": 0.517
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "IBM Plex Sans",
+   "category": "neo-grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "IBMPlexSans-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      700
+     ]
+    },
+    {
+     "file": "IBMPlexSans-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    700
+   ],
+   "stretch": [
+    75.0,
+    100.0
+   ],
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.025,
+    "descent": 0.275,
+    "cap": 0.698,
+    "x": 0.5121
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": 75
+    },
+    {
+     "weight": 300,
+     "stretch": 100
+    },
+    {
+     "weight": 400,
+     "stretch": 75
+    },
+    {
+     "weight": 400,
+     "stretch": 100
+    },
+    {
+     "weight": 500,
+     "stretch": 75
+    },
+    {
+     "weight": 500,
+     "stretch": 100
+    },
+    {
+     "weight": 700,
+     "stretch": 75
+    },
+    {
+     "weight": 700,
+     "stretch": 100
+    }
+   ]
+  },
+  {
+   "family": "Geist",
+   "category": "neo-grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Geist-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "Geist-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.005,
+    "descent": 0.295,
+    "cap": 0.71,
+    "x": 0.53
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Roboto Flex",
+   "category": "neo-grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "RobotoFlex-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      1000
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    1000
+   ],
+   "stretch": [
+    25.0,
+    151.0
+   ],
+   "italic": false,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 0.9277,
+    "descent": 0.2441,
+    "cap": 0.7109,
+    "x": 0.5137
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": 62.5
+    },
+    {
+     "weight": 300,
+     "stretch": 75
+    },
+    {
+     "weight": 300,
+     "stretch": 100.0
+    },
+    {
+     "weight": 300,
+     "stretch": 125
+    },
+    {
+     "weight": 300,
+     "stretch": 150
+    },
+    {
+     "weight": 400,
+     "stretch": 62.5
+    },
+    {
+     "weight": 400,
+     "stretch": 75
+    },
+    {
+     "weight": 400,
+     "stretch": 100.0
+    },
+    {
+     "weight": 400,
+     "stretch": 125
+    },
+    {
+     "weight": 400,
+     "stretch": 150
+    },
+    {
+     "weight": 500,
+     "stretch": 62.5
+    },
+    {
+     "weight": 500,
+     "stretch": 75
+    },
+    {
+     "weight": 500,
+     "stretch": 100.0
+    },
+    {
+     "weight": 500,
+     "stretch": 125
+    },
+    {
+     "weight": 500,
+     "stretch": 150
+    },
+    {
+     "weight": 700,
+     "stretch": 62.5
+    },
+    {
+     "weight": 700,
+     "stretch": 75
+    },
+    {
+     "weight": 700,
+     "stretch": 100.0
+    },
+    {
+     "weight": 700,
+     "stretch": 125
+    },
+    {
+     "weight": 700,
+     "stretch": 150
+    },
+    {
+     "weight": 900,
+     "stretch": 62.5
+    },
+    {
+     "weight": 900,
+     "stretch": 75
+    },
+    {
+     "weight": 900,
+     "stretch": 100.0
+    },
+    {
+     "weight": 900,
+     "stretch": 125
+    },
+    {
+     "weight": 900,
+     "stretch": 150
+    }
+   ]
+  },
+  {
+   "family": "Work Sans",
+   "category": "grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "WorkSans-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "WorkSans-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.93,
+    "descent": 0.243,
+    "cap": 0.66,
+    "x": 0.5
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Manrope",
+   "category": "grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Manrope-var.woff2",
+     "style": "normal",
+     "weight": [
+      200,
+      800
+     ]
+    }
+   ],
+   "weights": [
+    200,
+    800
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2000,
+    "ascent": 1.066,
+    "descent": 0.3,
+    "cap": 0.72,
+    "x": 0.54
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Schibsted Grotesk",
+   "category": "grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "SchibstedGrotesk-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      900
+     ]
+    },
+    {
+     "file": "SchibstedGrotesk-var.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 0.9766,
+    "descent": 0.2578,
+    "cap": 0.7031,
+    "x": 0.5273
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Hanken Grotesk",
+   "category": "grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "HankenGrotesk-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "HankenGrotesk-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.0,
+    "descent": 0.303,
+    "cap": 0.697,
+    "x": 0.493
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Instrument Sans",
+   "category": "grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "InstrumentSans-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      700
+     ]
+    },
+    {
+     "file": "InstrumentSans-var.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    700
+   ],
+   "stretch": [
+    75.0,
+    100.0
+   ],
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.97,
+    "descent": 0.25,
+    "cap": 0.72,
+    "x": 0.51
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": 75
+    },
+    {
+     "weight": 400,
+     "stretch": 100
+    },
+    {
+     "weight": 500,
+     "stretch": 75
+    },
+    {
+     "weight": 500,
+     "stretch": 100
+    },
+    {
+     "weight": 700,
+     "stretch": 75
+    },
+    {
+     "weight": 700,
+     "stretch": 100
+    }
+   ]
+  },
+  {
+   "family": "Familjen Grotesk",
+   "category": "grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "FamiljenGrotesk-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      700
+     ]
+    },
+    {
+     "file": "FamiljenGrotesk-var.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1200,
+    "ascent": 1.025,
+    "descent": 0.225,
+    "cap": 0.65,
+    "x": 0.5
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Bricolage Grotesque",
+   "category": "grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "BricolageGrotesque-var.woff2",
+     "style": "normal",
+     "weight": [
+      200,
+      800
+     ]
+    }
+   ],
+   "weights": [
+    200,
+    800
+   ],
+   "stretch": [
+    75.0,
+    100.0
+   ],
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.93,
+    "descent": 0.27,
+    "cap": 0.66,
+    "x": 0.528
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": 75
+    },
+    {
+     "weight": 300,
+     "stretch": 100
+    },
+    {
+     "weight": 400,
+     "stretch": 75
+    },
+    {
+     "weight": 400,
+     "stretch": 100
+    },
+    {
+     "weight": 500,
+     "stretch": 75
+    },
+    {
+     "weight": 500,
+     "stretch": 100
+    },
+    {
+     "weight": 700,
+     "stretch": 75
+    },
+    {
+     "weight": 700,
+     "stretch": 100
+    }
+   ]
+  },
+  {
+   "family": "Host Grotesk",
+   "category": "grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "HostGrotesk-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      300,
+      800
+     ]
+    },
+    {
+     "file": "HostGrotesk-var.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      800
+     ]
+    }
+   ],
+   "weights": [
+    300,
+    800
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.015,
+    "descent": 0.315,
+    "cap": 0.7,
+    "x": 0.496
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Onest",
+   "category": "grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Onest-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.97,
+    "descent": 0.305,
+    "cap": 0.707,
+    "x": 0.527
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Red Hat Display",
+   "category": "grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "RedHatDisplay-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      300,
+      900
+     ]
+    },
+    {
+     "file": "RedHatDisplay-var.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    300,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.018,
+    "descent": 0.305,
+    "cap": 0.7,
+    "x": 0.492
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Space Grotesk",
+   "category": "grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "SpaceGrotesk-var.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    300,
+    700
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.984,
+    "descent": 0.292,
+    "cap": 0.7,
+    "x": 0.486
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Archivo",
+   "category": "grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Archivo-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "Archivo-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": [
+    62.0,
+    125.0
+   ],
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.878,
+    "descent": 0.21,
+    "cap": 0.6863,
+    "x": 0.5263
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": 62.5
+    },
+    {
+     "weight": 300,
+     "stretch": 75
+    },
+    {
+     "weight": 300,
+     "stretch": 100.0
+    },
+    {
+     "weight": 300,
+     "stretch": 112.5
+    },
+    {
+     "weight": 300,
+     "stretch": 125
+    },
+    {
+     "weight": 400,
+     "stretch": 62.5
+    },
+    {
+     "weight": 400,
+     "stretch": 75
+    },
+    {
+     "weight": 400,
+     "stretch": 100.0
+    },
+    {
+     "weight": 400,
+     "stretch": 112.5
+    },
+    {
+     "weight": 400,
+     "stretch": 125
+    },
+    {
+     "weight": 500,
+     "stretch": 62.5
+    },
+    {
+     "weight": 500,
+     "stretch": 75
+    },
+    {
+     "weight": 500,
+     "stretch": 100.0
+    },
+    {
+     "weight": 500,
+     "stretch": 112.5
+    },
+    {
+     "weight": 500,
+     "stretch": 125
+    },
+    {
+     "weight": 700,
+     "stretch": 62.5
+    },
+    {
+     "weight": 700,
+     "stretch": 75
+    },
+    {
+     "weight": 700,
+     "stretch": 100.0
+    },
+    {
+     "weight": 700,
+     "stretch": 112.5
+    },
+    {
+     "weight": 700,
+     "stretch": 125
+    },
+    {
+     "weight": 900,
+     "stretch": 62.5
+    },
+    {
+     "weight": 900,
+     "stretch": 75
+    },
+    {
+     "weight": 900,
+     "stretch": 100.0
+    },
+    {
+     "weight": 900,
+     "stretch": 112.5
+    },
+    {
+     "weight": 900,
+     "stretch": 125
+    }
+   ]
+  },
+  {
+   "family": "Archivo Black",
+   "category": "grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "ArchivoBlack-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.878,
+    "descent": 0.21,
+    "cap": 0.688,
+    "x": 0.528
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Chivo",
+   "category": "grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Chivo-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "Chivo-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.94,
+    "descent": 0.25,
+    "cap": 0.686,
+    "x": 0.511
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Mona Sans",
+   "category": "grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "MonaSans-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      200,
+      900
+     ]
+    },
+    {
+     "file": "MonaSans-var.woff2",
+     "style": "normal",
+     "weight": [
+      200,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    200,
+    900
+   ],
+   "stretch": [
+    75.0,
+    125.0
+   ],
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.09,
+    "descent": 0.32,
+    "cap": 0.729,
+    "x": 0.5196
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": 75
+    },
+    {
+     "weight": 300,
+     "stretch": 87.5
+    },
+    {
+     "weight": 300,
+     "stretch": 100.0
+    },
+    {
+     "weight": 300,
+     "stretch": 112.5
+    },
+    {
+     "weight": 300,
+     "stretch": 125
+    },
+    {
+     "weight": 400,
+     "stretch": 75
+    },
+    {
+     "weight": 400,
+     "stretch": 87.5
+    },
+    {
+     "weight": 400,
+     "stretch": 100.0
+    },
+    {
+     "weight": 400,
+     "stretch": 112.5
+    },
+    {
+     "weight": 400,
+     "stretch": 125
+    },
+    {
+     "weight": 500,
+     "stretch": 75
+    },
+    {
+     "weight": 500,
+     "stretch": 87.5
+    },
+    {
+     "weight": 500,
+     "stretch": 100.0
+    },
+    {
+     "weight": 500,
+     "stretch": 112.5
+    },
+    {
+     "weight": 500,
+     "stretch": 125
+    },
+    {
+     "weight": 700,
+     "stretch": 75
+    },
+    {
+     "weight": 700,
+     "stretch": 87.5
+    },
+    {
+     "weight": 700,
+     "stretch": 100.0
+    },
+    {
+     "weight": 700,
+     "stretch": 112.5
+    },
+    {
+     "weight": 700,
+     "stretch": 125
+    },
+    {
+     "weight": 900,
+     "stretch": 75
+    },
+    {
+     "weight": 900,
+     "stretch": 87.5
+    },
+    {
+     "weight": 900,
+     "stretch": 100.0
+    },
+    {
+     "weight": 900,
+     "stretch": 112.5
+    },
+    {
+     "weight": 900,
+     "stretch": 125
+    }
+   ]
+  },
+  {
+   "family": "Hubot Sans",
+   "category": "grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "HubotSans-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      200,
+      900
+     ]
+    },
+    {
+     "file": "HubotSans-var.woff2",
+     "style": "normal",
+     "weight": [
+      200,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    200,
+    900
+   ],
+   "stretch": [
+    75.0,
+    125.0
+   ],
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.09,
+    "descent": 0.32,
+    "cap": 0.729,
+    "x": 0.5195
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": 75
+    },
+    {
+     "weight": 300,
+     "stretch": 87.5
+    },
+    {
+     "weight": 300,
+     "stretch": 100.0
+    },
+    {
+     "weight": 300,
+     "stretch": 112.5
+    },
+    {
+     "weight": 300,
+     "stretch": 125
+    },
+    {
+     "weight": 400,
+     "stretch": 75
+    },
+    {
+     "weight": 400,
+     "stretch": 87.5
+    },
+    {
+     "weight": 400,
+     "stretch": 100.0
+    },
+    {
+     "weight": 400,
+     "stretch": 112.5
+    },
+    {
+     "weight": 400,
+     "stretch": 125
+    },
+    {
+     "weight": 500,
+     "stretch": 75
+    },
+    {
+     "weight": 500,
+     "stretch": 87.5
+    },
+    {
+     "weight": 500,
+     "stretch": 100.0
+    },
+    {
+     "weight": 500,
+     "stretch": 112.5
+    },
+    {
+     "weight": 500,
+     "stretch": 125
+    },
+    {
+     "weight": 700,
+     "stretch": 75
+    },
+    {
+     "weight": 700,
+     "stretch": 87.5
+    },
+    {
+     "weight": 700,
+     "stretch": 100.0
+    },
+    {
+     "weight": 700,
+     "stretch": 112.5
+    },
+    {
+     "weight": 700,
+     "stretch": 125
+    },
+    {
+     "weight": 900,
+     "stretch": 75
+    },
+    {
+     "weight": 900,
+     "stretch": 87.5
+    },
+    {
+     "weight": 900,
+     "stretch": 100.0
+    },
+    {
+     "weight": 900,
+     "stretch": 112.5
+    },
+    {
+     "weight": 900,
+     "stretch": 125
+    }
+   ]
+  },
+  {
+   "family": "Epilogue",
+   "category": "grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Epilogue-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "Epilogue-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 2000,
+    "ascent": 0.79,
+    "descent": 0.235,
+    "cap": 0.7375,
+    "x": 0.531
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Barlow",
+   "category": "grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Barlow-100.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      100
+     ]
+    },
+    {
+     "file": "Barlow-200.woff2",
+     "style": "normal",
+     "weight": [
+      200,
+      200
+     ]
+    },
+    {
+     "file": "Barlow-300.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      300
+     ]
+    },
+    {
+     "file": "Barlow-400-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "Barlow-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "Barlow-500.woff2",
+     "style": "normal",
+     "weight": [
+      500,
+      500
+     ]
+    },
+    {
+     "file": "Barlow-600.woff2",
+     "style": "normal",
+     "weight": [
+      600,
+      600
+     ]
+    },
+    {
+     "file": "Barlow-700-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      700,
+      700
+     ]
+    },
+    {
+     "file": "Barlow-700.woff2",
+     "style": "normal",
+     "weight": [
+      700,
+      700
+     ]
+    },
+    {
+     "file": "Barlow-800.woff2",
+     "style": "normal",
+     "weight": [
+      800,
+      800
+     ]
+    },
+    {
+     "file": "Barlow-900.woff2",
+     "style": "normal",
+     "weight": [
+      900,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.0,
+    "descent": 0.2,
+    "cap": 0.7,
+    "x": 0.501
+   },
+   "try": [
+    {
+     "weight": 100,
+     "stretch": null
+    },
+    {
+     "weight": 200,
+     "stretch": null
+    },
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 600,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 800,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Encode Sans",
+   "category": "grotesque",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "EncodeSans-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": [
+    75.0,
+    125.0
+   ],
+   "italic": false,
+   "metrics": {
+    "upm": 2000,
+    "ascent": 1.03,
+    "descent": 0.22,
+    "cap": 0.74,
+    "x": 0.5414
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": 75
+    },
+    {
+     "weight": 300,
+     "stretch": 87.5
+    },
+    {
+     "weight": 300,
+     "stretch": 100.0
+    },
+    {
+     "weight": 300,
+     "stretch": 112.5
+    },
+    {
+     "weight": 300,
+     "stretch": 125
+    },
+    {
+     "weight": 400,
+     "stretch": 75
+    },
+    {
+     "weight": 400,
+     "stretch": 87.5
+    },
+    {
+     "weight": 400,
+     "stretch": 100.0
+    },
+    {
+     "weight": 400,
+     "stretch": 112.5
+    },
+    {
+     "weight": 400,
+     "stretch": 125
+    },
+    {
+     "weight": 500,
+     "stretch": 75
+    },
+    {
+     "weight": 500,
+     "stretch": 87.5
+    },
+    {
+     "weight": 500,
+     "stretch": 100.0
+    },
+    {
+     "weight": 500,
+     "stretch": 112.5
+    },
+    {
+     "weight": 500,
+     "stretch": 125
+    },
+    {
+     "weight": 700,
+     "stretch": 75
+    },
+    {
+     "weight": 700,
+     "stretch": 87.5
+    },
+    {
+     "weight": 700,
+     "stretch": 100.0
+    },
+    {
+     "weight": 700,
+     "stretch": 112.5
+    },
+    {
+     "weight": 700,
+     "stretch": 125
+    },
+    {
+     "weight": 900,
+     "stretch": 75
+    },
+    {
+     "weight": 900,
+     "stretch": 87.5
+    },
+    {
+     "weight": 900,
+     "stretch": 100.0
+    },
+    {
+     "weight": 900,
+     "stretch": 112.5
+    },
+    {
+     "weight": 900,
+     "stretch": 125
+    }
+   ]
+  },
+  {
+   "family": "Jost",
+   "category": "geometric",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Jost-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "Jost-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.07,
+    "descent": 0.375,
+    "cap": 0.7,
+    "x": 0.46
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Figtree",
+   "category": "geometric",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Figtree-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      300,
+      900
+     ]
+    },
+    {
+     "file": "Figtree-var.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    300,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.95,
+    "descent": 0.25,
+    "cap": 0.7,
+    "x": 0.5
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "DM Sans",
+   "category": "geometric",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "DMSans-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      1000
+     ]
+    },
+    {
+     "file": "DMSans-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      1000
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    1000
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.992,
+    "descent": 0.31,
+    "cap": 0.7,
+    "x": 0.5035
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Albert Sans",
+   "category": "geometric",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "AlbertSans-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "AlbertSans-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.95,
+    "descent": 0.25,
+    "cap": 0.7,
+    "x": 0.5
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Sora",
+   "category": "geometric",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Sora-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      800
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    800
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.97,
+    "descent": 0.29,
+    "cap": 0.73,
+    "x": 0.5293
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Poppins",
+   "category": "geometric",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Poppins-100.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      100
+     ]
+    },
+    {
+     "file": "Poppins-200.woff2",
+     "style": "normal",
+     "weight": [
+      200,
+      200
+     ]
+    },
+    {
+     "file": "Poppins-300.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      300
+     ]
+    },
+    {
+     "file": "Poppins-400-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "Poppins-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "Poppins-500.woff2",
+     "style": "normal",
+     "weight": [
+      500,
+      500
+     ]
+    },
+    {
+     "file": "Poppins-600.woff2",
+     "style": "normal",
+     "weight": [
+      600,
+      600
+     ]
+    },
+    {
+     "file": "Poppins-700-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      700,
+      700
+     ]
+    },
+    {
+     "file": "Poppins-700.woff2",
+     "style": "normal",
+     "weight": [
+      700,
+      700
+     ]
+    },
+    {
+     "file": "Poppins-800.woff2",
+     "style": "normal",
+     "weight": [
+      800,
+      800
+     ]
+    },
+    {
+     "file": "Poppins-900.woff2",
+     "style": "normal",
+     "weight": [
+      900,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.05,
+    "descent": 0.35,
+    "cap": 0.704,
+    "x": 0.54
+   },
+   "try": [
+    {
+     "weight": 100,
+     "stretch": null
+    },
+    {
+     "weight": 200,
+     "stretch": null
+    },
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 600,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 800,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Montserrat",
+   "category": "geometric",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Montserrat-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "Montserrat-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.968,
+    "descent": 0.251,
+    "cap": 0.7,
+    "x": 0.522
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Outfit",
+   "category": "geometric",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Outfit-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.0,
+    "descent": 0.26,
+    "cap": 0.688,
+    "x": 0.47
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Urbanist",
+   "category": "geometric",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Urbanist-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "Urbanist-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 2000,
+    "ascent": 0.95,
+    "descent": 0.25,
+    "cap": 0.7,
+    "x": 0.5
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "League Spartan",
+   "category": "geometric",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "LeagueSpartan-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2000,
+    "ascent": 0.7,
+    "descent": 0.22,
+    "cap": 0.66,
+    "x": 0.4105
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Raleway",
+   "category": "geometric",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Raleway-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "Raleway-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.94,
+    "descent": 0.234,
+    "cap": 0.71,
+    "x": 0.5203
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Josefin Sans",
+   "category": "geometric",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "JosefinSans-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      700
+     ]
+    },
+    {
+     "file": "JosefinSans-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.75,
+    "descent": 0.25,
+    "cap": 0.71,
+    "x": 0.391
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Questrial",
+   "category": "geometric",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Questrial-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.82,
+    "descent": 0.21,
+    "cap": 0.662,
+    "x": 0.5
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Rubik",
+   "category": "geometric",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Rubik-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      300,
+      900
+     ]
+    },
+    {
+     "file": "Rubik-var.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    300,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.935,
+    "descent": 0.25,
+    "cap": 0.7,
+    "x": 0.52
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Tenor Sans",
+   "category": "humanist",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "TenorSans-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.92,
+    "descent": 0.25,
+    "cap": 0.7,
+    "x": 0.5
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Oswald",
+   "category": "condensed",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Oswald-var.woff2",
+     "style": "normal",
+     "weight": [
+      200,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    200,
+    700
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.193,
+    "descent": 0.289,
+    "cap": 0.81,
+    "x": 0.578
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Anton",
+   "category": "condensed",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Anton-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 1.1763,
+    "descent": 0.3291,
+    "cap": 0.8594,
+    "x": 0.7324
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Bebas Neue",
+   "category": "condensed",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "BebasNeue-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.9,
+    "descent": 0.3,
+    "cap": 0.7,
+    "x": 0.7
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "League Gothic",
+   "category": "condensed",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "LeagueGothic-var.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": [
+    75.0,
+    100.0
+   ],
+   "italic": false,
+   "metrics": {
+    "upm": 2000,
+    "ascent": 0.9675,
+    "descent": 0.2325,
+    "cap": 0.735,
+    "x": 0.547
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": 75
+    },
+    {
+     "weight": 400,
+     "stretch": 100
+    }
+   ]
+  },
+  {
+   "family": "Archivo Narrow",
+   "category": "condensed",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "ArchivoNarrow-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      700
+     ]
+    },
+    {
+     "file": "ArchivoNarrow-var.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.035,
+    "descent": 0.312,
+    "cap": 0.686,
+    "x": 0.526
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "IBM Plex Sans Condensed",
+   "category": "condensed",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "IBMPlexSansCondensed-100.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      100
+     ]
+    },
+    {
+     "file": "IBMPlexSansCondensed-200.woff2",
+     "style": "normal",
+     "weight": [
+      200,
+      200
+     ]
+    },
+    {
+     "file": "IBMPlexSansCondensed-300.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      300
+     ]
+    },
+    {
+     "file": "IBMPlexSansCondensed-400-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "IBMPlexSansCondensed-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "IBMPlexSansCondensed-500.woff2",
+     "style": "normal",
+     "weight": [
+      500,
+      500
+     ]
+    },
+    {
+     "file": "IBMPlexSansCondensed-600.woff2",
+     "style": "normal",
+     "weight": [
+      600,
+      600
+     ]
+    },
+    {
+     "file": "IBMPlexSansCondensed-700-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      700,
+      700
+     ]
+    },
+    {
+     "file": "IBMPlexSansCondensed-700.woff2",
+     "style": "normal",
+     "weight": [
+      700,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.025,
+    "descent": 0.275,
+    "cap": 0.698,
+    "x": 0.506
+   },
+   "try": [
+    {
+     "weight": 100,
+     "stretch": null
+    },
+    {
+     "weight": 200,
+     "stretch": null
+    },
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 600,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Barlow Condensed",
+   "category": "condensed",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "BarlowCondensed-100.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      100
+     ]
+    },
+    {
+     "file": "BarlowCondensed-200.woff2",
+     "style": "normal",
+     "weight": [
+      200,
+      200
+     ]
+    },
+    {
+     "file": "BarlowCondensed-300.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      300
+     ]
+    },
+    {
+     "file": "BarlowCondensed-400-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "BarlowCondensed-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "BarlowCondensed-500.woff2",
+     "style": "normal",
+     "weight": [
+      500,
+      500
+     ]
+    },
+    {
+     "file": "BarlowCondensed-600.woff2",
+     "style": "normal",
+     "weight": [
+      600,
+      600
+     ]
+    },
+    {
+     "file": "BarlowCondensed-700-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      700,
+      700
+     ]
+    },
+    {
+     "file": "BarlowCondensed-700.woff2",
+     "style": "normal",
+     "weight": [
+      700,
+      700
+     ]
+    },
+    {
+     "file": "BarlowCondensed-800.woff2",
+     "style": "normal",
+     "weight": [
+      800,
+      800
+     ]
+    },
+    {
+     "file": "BarlowCondensed-900.woff2",
+     "style": "normal",
+     "weight": [
+      900,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.0,
+    "descent": 0.2,
+    "cap": 0.7,
+    "x": 0.501
+   },
+   "try": [
+    {
+     "weight": 100,
+     "stretch": null
+    },
+    {
+     "weight": 200,
+     "stretch": null
+    },
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 600,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 800,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Barlow Semi Condensed",
+   "category": "condensed",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "BarlowSemiCondensed-100.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      100
+     ]
+    },
+    {
+     "file": "BarlowSemiCondensed-200.woff2",
+     "style": "normal",
+     "weight": [
+      200,
+      200
+     ]
+    },
+    {
+     "file": "BarlowSemiCondensed-300.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      300
+     ]
+    },
+    {
+     "file": "BarlowSemiCondensed-400-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "BarlowSemiCondensed-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "BarlowSemiCondensed-500.woff2",
+     "style": "normal",
+     "weight": [
+      500,
+      500
+     ]
+    },
+    {
+     "file": "BarlowSemiCondensed-600.woff2",
+     "style": "normal",
+     "weight": [
+      600,
+      600
+     ]
+    },
+    {
+     "file": "BarlowSemiCondensed-700-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      700,
+      700
+     ]
+    },
+    {
+     "file": "BarlowSemiCondensed-700.woff2",
+     "style": "normal",
+     "weight": [
+      700,
+      700
+     ]
+    },
+    {
+     "file": "BarlowSemiCondensed-800.woff2",
+     "style": "normal",
+     "weight": [
+      800,
+      800
+     ]
+    },
+    {
+     "file": "BarlowSemiCondensed-900.woff2",
+     "style": "normal",
+     "weight": [
+      900,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.0,
+    "descent": 0.2,
+    "cap": 0.7,
+    "x": 0.501
+   },
+   "try": [
+    {
+     "weight": 100,
+     "stretch": null
+    },
+    {
+     "weight": 200,
+     "stretch": null
+    },
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 600,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 800,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Roboto Condensed",
+   "category": "condensed",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "RobotoCondensed-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "RobotoCondensed-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 0.9277,
+    "descent": 0.2441,
+    "cap": 0.7109,
+    "x": 0.5283
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Saira",
+   "category": "condensed",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Saira-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "Saira-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": [
+    50.0,
+    125.0
+   ],
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.135,
+    "descent": 0.439,
+    "cap": 0.688,
+    "x": 0.51
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": 62.5
+    },
+    {
+     "weight": 300,
+     "stretch": 75
+    },
+    {
+     "weight": 300,
+     "stretch": 100.0
+    },
+    {
+     "weight": 300,
+     "stretch": 112.5
+    },
+    {
+     "weight": 300,
+     "stretch": 125
+    },
+    {
+     "weight": 400,
+     "stretch": 62.5
+    },
+    {
+     "weight": 400,
+     "stretch": 75
+    },
+    {
+     "weight": 400,
+     "stretch": 100.0
+    },
+    {
+     "weight": 400,
+     "stretch": 112.5
+    },
+    {
+     "weight": 400,
+     "stretch": 125
+    },
+    {
+     "weight": 500,
+     "stretch": 62.5
+    },
+    {
+     "weight": 500,
+     "stretch": 75
+    },
+    {
+     "weight": 500,
+     "stretch": 100.0
+    },
+    {
+     "weight": 500,
+     "stretch": 112.5
+    },
+    {
+     "weight": 500,
+     "stretch": 125
+    },
+    {
+     "weight": 700,
+     "stretch": 62.5
+    },
+    {
+     "weight": 700,
+     "stretch": 75
+    },
+    {
+     "weight": 700,
+     "stretch": 100.0
+    },
+    {
+     "weight": 700,
+     "stretch": 112.5
+    },
+    {
+     "weight": 700,
+     "stretch": 125
+    },
+    {
+     "weight": 900,
+     "stretch": 62.5
+    },
+    {
+     "weight": 900,
+     "stretch": 75
+    },
+    {
+     "weight": 900,
+     "stretch": 100.0
+    },
+    {
+     "weight": 900,
+     "stretch": 112.5
+    },
+    {
+     "weight": 900,
+     "stretch": 125
+    }
+   ]
+  },
+  {
+   "family": "Fjalla One",
+   "category": "condensed",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "FjallaOne-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 1.0088,
+    "descent": 0.248,
+    "cap": 0.834,
+    "x": 0.6724
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Pathway Gothic One",
+   "category": "condensed",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "PathwayGothicOne-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.954,
+    "descent": 0.198,
+    "cap": 0.7,
+    "x": 0.54
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Antonio",
+   "category": "condensed",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Antonio-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    700
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 1.1548,
+    "descent": 0.1392,
+    "cap": 0.8594,
+    "x": 0.7324
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Teko",
+   "category": "condensed",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Teko-var.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    300,
+    700
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.958,
+    "descent": 0.475,
+    "cap": 0.622,
+    "x": 0.485
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Sofia Sans Condensed",
+   "category": "condensed",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "SofiaSansCondensed-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      1,
+      1000
+     ]
+    },
+    {
+     "file": "SofiaSansCondensed-var.woff2",
+     "style": "normal",
+     "weight": [
+      1,
+      1000
+     ]
+    }
+   ],
+   "weights": [
+    1,
+    1000
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.9,
+    "descent": 0.3,
+    "cap": 0.655,
+    "x": 0.4825
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Sofia Sans Extra Condensed",
+   "category": "condensed",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "SofiaSansExtraCondensed-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      1,
+      1000
+     ]
+    },
+    {
+     "file": "SofiaSansExtraCondensed-var.woff2",
+     "style": "normal",
+     "weight": [
+      1,
+      1000
+     ]
+    }
+   ],
+   "weights": [
+    1,
+    1000
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.9,
+    "descent": 0.3,
+    "cap": 0.655,
+    "x": 0.4821
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Mohave",
+   "category": "condensed",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Mohave-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      300,
+      700
+     ]
+    },
+    {
+     "file": "Mohave-var.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    300,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 2000,
+    "ascent": 0.99,
+    "descent": 0.403,
+    "cap": 0.75,
+    "x": 0.54
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Six Caps",
+   "category": "condensed",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "SixCaps-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 1.105,
+    "descent": 0.2109,
+    "cap": 0.8438,
+    "x": 0.75
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Big Shoulders Display",
+   "category": "condensed",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "BigShouldersDisplay-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2000,
+    "ascent": 0.984,
+    "descent": 0.213,
+    "cap": 0.8,
+    "x": 0.6
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Unbounded",
+   "category": "wide",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Unbounded-var.woff2",
+     "style": "normal",
+     "weight": [
+      200,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    200,
+    900
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.995,
+    "descent": 0.245,
+    "cap": 0.75,
+    "x": 0.563
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Syne",
+   "category": "wide",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Syne-var.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      800
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    800
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.925,
+    "descent": 0.275,
+    "cap": 0.65,
+    "x": 0.5
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Krona One",
+   "category": "wide",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "KronaOne-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 0.9912,
+    "descent": 0.2588,
+    "cap": 0.7632,
+    "x": 0.5767
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Lexend Zetta",
+   "category": "wide",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "LexendZetta-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.0,
+    "descent": 0.25,
+    "cap": 0.7,
+    "x": 0.5224
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Michroma",
+   "category": "wide",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Michroma-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 1.1562,
+    "descent": 0.2656,
+    "cap": 0.75,
+    "x": 0.5625
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Dela Gothic One",
+   "category": "wide",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "DelaGothicOne-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.16,
+    "descent": 0.288,
+    "cap": 0.726,
+    "x": 0.546
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Rubik Mono One",
+   "category": "wide",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "RubikMonoOne-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.932,
+    "descent": 0.306,
+    "cap": 0.7,
+    "x": 0.7
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Bowlby One",
+   "category": "wide",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "BowlbyOne-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 1.1113,
+    "descent": 0.4551,
+    "cap": 0.7383,
+    "x": 0.5845
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Syncopate",
+   "category": "wide",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Syncopate-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "Syncopate-700.woff2",
+     "style": "normal",
+     "weight": [
+      700,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    700
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 0.7598,
+    "descent": 0.208,
+    "cap": 0.6709,
+    "x": 0.6709
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Orbitron",
+   "category": "wide",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Orbitron-var.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    900
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.011,
+    "descent": 0.243,
+    "cap": 0.72,
+    "x": 0.58
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Zen Dots",
+   "category": "wide",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "ZenDots-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.93,
+    "descent": 0.27,
+    "cap": 0.715,
+    "x": 0.515
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Tinos",
+   "category": "serif",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "Tinos-400-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "Tinos-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "Tinos-700-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      700,
+      700
+     ]
+    },
+    {
+     "file": "Tinos-700.woff2",
+     "style": "normal",
+     "weight": [
+      700,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 0.8911,
+    "descent": 0.2163,
+    "cap": 0.6548,
+    "x": 0.459
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Newsreader",
+   "category": "serif",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "Newsreader-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      200,
+      800
+     ]
+    },
+    {
+     "file": "Newsreader-var.woff2",
+     "style": "normal",
+     "weight": [
+      200,
+      800
+     ]
+    }
+   ],
+   "weights": [
+    200,
+    800
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 2000,
+    "ascent": 0.735,
+    "descent": 0.265,
+    "cap": 0.7078,
+    "x": 0.4621
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Source Serif 4",
+   "category": "serif",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "SourceSerif4-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      200,
+      900
+     ]
+    },
+    {
+     "file": "SourceSerif4-var.woff2",
+     "style": "normal",
+     "weight": [
+      200,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    200,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.036,
+    "descent": 0.335,
+    "cap": 0.6738,
+    "x": 0.4874
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Literata",
+   "category": "serif",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "Literata-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      200,
+      900
+     ]
+    },
+    {
+     "file": "Literata-var.woff2",
+     "style": "normal",
+     "weight": [
+      200,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    200,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.177,
+    "descent": 0.308,
+    "cap": 0.7008,
+    "x": 0.5052
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Lora",
+   "category": "serif",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "Lora-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      700
+     ]
+    },
+    {
+     "file": "Lora-var.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.006,
+    "descent": 0.274,
+    "cap": 0.7,
+    "x": 0.5
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Libre Baskerville",
+   "category": "serif",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "LibreBaskerville-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      700
+     ]
+    },
+    {
+     "file": "LibreBaskerville-var.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.97,
+    "descent": 0.27,
+    "cap": 0.77,
+    "x": 0.53
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Spectral",
+   "category": "serif",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "Spectral-200.woff2",
+     "style": "normal",
+     "weight": [
+      200,
+      200
+     ]
+    },
+    {
+     "file": "Spectral-300.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      300
+     ]
+    },
+    {
+     "file": "Spectral-400-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "Spectral-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "Spectral-500.woff2",
+     "style": "normal",
+     "weight": [
+      500,
+      500
+     ]
+    },
+    {
+     "file": "Spectral-600.woff2",
+     "style": "normal",
+     "weight": [
+      600,
+      600
+     ]
+    },
+    {
+     "file": "Spectral-700-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      700,
+      700
+     ]
+    },
+    {
+     "file": "Spectral-700.woff2",
+     "style": "normal",
+     "weight": [
+      700,
+      700
+     ]
+    },
+    {
+     "file": "Spectral-800.woff2",
+     "style": "normal",
+     "weight": [
+      800,
+      800
+     ]
+    }
+   ],
+   "weights": [
+    200,
+    800
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.059,
+    "descent": 0.463,
+    "cap": 0.66,
+    "x": 0.45
+   },
+   "try": [
+    {
+     "weight": 200,
+     "stretch": null
+    },
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 600,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 800,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "IBM Plex Serif",
+   "category": "serif",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "IBMPlexSerif-100.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      100
+     ]
+    },
+    {
+     "file": "IBMPlexSerif-200.woff2",
+     "style": "normal",
+     "weight": [
+      200,
+      200
+     ]
+    },
+    {
+     "file": "IBMPlexSerif-300.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      300
+     ]
+    },
+    {
+     "file": "IBMPlexSerif-400-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "IBMPlexSerif-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "IBMPlexSerif-500.woff2",
+     "style": "normal",
+     "weight": [
+      500,
+      500
+     ]
+    },
+    {
+     "file": "IBMPlexSerif-600.woff2",
+     "style": "normal",
+     "weight": [
+      600,
+      600
+     ]
+    },
+    {
+     "file": "IBMPlexSerif-700-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      700,
+      700
+     ]
+    },
+    {
+     "file": "IBMPlexSerif-700.woff2",
+     "style": "normal",
+     "weight": [
+      700,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.025,
+    "descent": 0.275,
+    "cap": 0.698,
+    "x": 0.506
+   },
+   "try": [
+    {
+     "weight": 100,
+     "stretch": null
+    },
+    {
+     "weight": 200,
+     "stretch": null
+    },
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 600,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "PT Serif",
+   "category": "serif",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "PTSerif-400-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "PTSerif-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "PTSerif-700-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      700,
+      700
+     ]
+    },
+    {
+     "file": "PTSerif-700.woff2",
+     "style": "normal",
+     "weight": [
+      700,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.039,
+    "descent": 0.286,
+    "cap": 0.7,
+    "x": 0.5
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Instrument Serif",
+   "category": "serif",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "InstrumentSerif-400-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "InstrumentSerif-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.99,
+    "descent": 0.31,
+    "cap": 0.72,
+    "x": 0.51
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Fraunces",
+   "category": "serif",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "Fraunces-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "Fraunces-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 2000,
+    "ascent": 0.978,
+    "descent": 0.255,
+    "cap": 0.7217,
+    "x": 0.4658
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Young Serif",
+   "category": "serif",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "YoungSerif-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.046,
+    "descent": 0.366,
+    "cap": 0.763,
+    "x": 0.5
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Libre Caslon Text",
+   "category": "serif",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "LibreCaslonText-400-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "LibreCaslonText-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "LibreCaslonText-700.woff2",
+     "style": "normal",
+     "weight": [
+      700,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.97,
+    "descent": 0.26,
+    "cap": 0.77,
+    "x": 0.53
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Libre Caslon Display",
+   "category": "serif",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "LibreCaslonDisplay-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.97,
+    "descent": 0.266,
+    "cap": 0.69,
+    "x": 0.424
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "EB Garamond",
+   "category": "oldstyle",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "EBGaramond-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      800
+     ]
+    },
+    {
+     "file": "EBGaramond-var.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      800
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    800
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.007,
+    "descent": 0.298,
+    "cap": 0.653,
+    "x": 0.405
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Cormorant",
+   "category": "oldstyle",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "Cormorant-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      300,
+      700
+     ]
+    },
+    {
+     "file": "Cormorant-var.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    300,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.924,
+    "descent": 0.287,
+    "cap": 0.625,
+    "x": 0.386
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Cormorant Garamond",
+   "category": "oldstyle",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "CormorantGaramond-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      300,
+      700
+     ]
+    },
+    {
+     "file": "CormorantGaramond-var.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    300,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.924,
+    "descent": 0.287,
+    "cap": 0.625,
+    "x": 0.386
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Crimson Pro",
+   "category": "oldstyle",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "CrimsonPro-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      200,
+      900
+     ]
+    },
+    {
+     "file": "CrimsonPro-var.woff2",
+     "style": "normal",
+     "weight": [
+      200,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    200,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1024,
+    "ascent": 0.8965,
+    "descent": 0.2148,
+    "cap": 0.5752,
+    "x": 0.4171
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Bodoni Moda",
+   "category": "didone",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "BodoniModa-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      900
+     ]
+    },
+    {
+     "file": "BodoniModa-var.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 2000,
+    "ascent": 1.125,
+    "descent": 0.4,
+    "cap": 0.75,
+    "x": 0.46
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Playfair Display",
+   "category": "didone",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "PlayfairDisplay-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      900
+     ]
+    },
+    {
+     "file": "PlayfairDisplay-var.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.082,
+    "descent": 0.251,
+    "cap": 0.708,
+    "x": 0.519
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "DM Serif Display",
+   "category": "didone",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "DMSerifDisplay-400-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "DMSerifDisplay-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.036,
+    "descent": 0.335,
+    "cap": 0.66,
+    "x": 0.481
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Abril Fatface",
+   "category": "didone",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "AbrilFatface-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.058,
+    "descent": 0.291,
+    "cap": 0.7,
+    "x": 0.476
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Gloock",
+   "category": "didone",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "Gloock-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.975,
+    "descent": 0.225,
+    "cap": 0.75,
+    "x": 0.508
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Noto Serif Display",
+   "category": "didone",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "NotoSerifDisplay-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "NotoSerifDisplay-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": [
+    62.5,
+    100.0
+   ],
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.069,
+    "descent": 0.293,
+    "cap": 0.714,
+    "x": 0.536
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": 62.5
+    },
+    {
+     "weight": 300,
+     "stretch": 100
+    },
+    {
+     "weight": 400,
+     "stretch": 62.5
+    },
+    {
+     "weight": 400,
+     "stretch": 100
+    },
+    {
+     "weight": 500,
+     "stretch": 62.5
+    },
+    {
+     "weight": 500,
+     "stretch": 100
+    },
+    {
+     "weight": 700,
+     "stretch": 62.5
+    },
+    {
+     "weight": 700,
+     "stretch": 100
+    },
+    {
+     "weight": 900,
+     "stretch": 62.5
+    },
+    {
+     "weight": 900,
+     "stretch": 100
+    }
+   ]
+  },
+  {
+   "family": "Old Standard TT",
+   "category": "didone",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "OldStandardTT-400-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "OldStandardTT-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "OldStandardTT-700.woff2",
+     "style": "normal",
+     "weight": [
+      700,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.762,
+    "descent": 0.238,
+    "cap": 0.712,
+    "x": 0.456
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Bitter",
+   "category": "slab",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "Bitter-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "Bitter-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.935,
+    "descent": 0.265,
+    "cap": 0.6948,
+    "x": 0.5281
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Roboto Slab",
+   "category": "slab",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "RobotoSlab-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 1.0479,
+    "descent": 0.271,
+    "cap": 0.7109,
+    "x": 0.5283
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Zilla Slab",
+   "category": "slab",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "ZillaSlab-300.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      300
+     ]
+    },
+    {
+     "file": "ZillaSlab-400-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "ZillaSlab-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "ZillaSlab-500.woff2",
+     "style": "normal",
+     "weight": [
+      500,
+      500
+     ]
+    },
+    {
+     "file": "ZillaSlab-600.woff2",
+     "style": "normal",
+     "weight": [
+      600,
+      600
+     ]
+    },
+    {
+     "file": "ZillaSlab-700-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      700,
+      700
+     ]
+    },
+    {
+     "file": "ZillaSlab-700.woff2",
+     "style": "normal",
+     "weight": [
+      700,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    300,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.944,
+    "descent": 0.256,
+    "cap": 0.65,
+    "x": 0.444
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 600,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Arvo",
+   "category": "slab",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "Arvo-400-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "Arvo-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "Arvo-700-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      700,
+      700
+     ]
+    },
+    {
+     "file": "Arvo-700.woff2",
+     "style": "normal",
+     "weight": [
+      700,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 0.9609,
+    "descent": 0.2471,
+    "cap": 0.7402,
+    "x": 0.5059
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Josefin Slab",
+   "category": "slab",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "JosefinSlab-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      700
+     ]
+    },
+    {
+     "file": "JosefinSlab-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.75,
+    "descent": 0.25,
+    "cap": 0.7,
+    "x": 0.375
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Alfa Slab One",
+   "category": "slab",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "AlfaSlabOne-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.036,
+    "descent": 0.333,
+    "cap": 0.778,
+    "x": 0.556
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Ultra",
+   "category": "slab",
+   "generic": "serif",
+   "faces": [
+    {
+     "file": "Ultra-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 1.0088,
+    "descent": 0.2739,
+    "cap": 0.7192,
+    "x": 0.5381
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "JetBrains Mono",
+   "category": "mono",
+   "generic": "monospace",
+   "faces": [
+    {
+     "file": "JetBrainsMono-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      800
+     ]
+    },
+    {
+     "file": "JetBrainsMono-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      800
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    800
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.02,
+    "descent": 0.3,
+    "cap": 0.73,
+    "x": 0.55
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Space Mono",
+   "category": "mono",
+   "generic": "monospace",
+   "faces": [
+    {
+     "file": "SpaceMono-400-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "SpaceMono-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "SpaceMono-700-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      700,
+      700
+     ]
+    },
+    {
+     "file": "SpaceMono-700.woff2",
+     "style": "normal",
+     "weight": [
+      700,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.12,
+    "descent": 0.361,
+    "cap": 0.7,
+    "x": 0.496
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "IBM Plex Mono",
+   "category": "mono",
+   "generic": "monospace",
+   "faces": [
+    {
+     "file": "IBMPlexMono-100.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      100
+     ]
+    },
+    {
+     "file": "IBMPlexMono-200.woff2",
+     "style": "normal",
+     "weight": [
+      200,
+      200
+     ]
+    },
+    {
+     "file": "IBMPlexMono-300.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      300
+     ]
+    },
+    {
+     "file": "IBMPlexMono-400-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "IBMPlexMono-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "IBMPlexMono-500.woff2",
+     "style": "normal",
+     "weight": [
+      500,
+      500
+     ]
+    },
+    {
+     "file": "IBMPlexMono-600.woff2",
+     "style": "normal",
+     "weight": [
+      600,
+      600
+     ]
+    },
+    {
+     "file": "IBMPlexMono-700-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      700,
+      700
+     ]
+    },
+    {
+     "file": "IBMPlexMono-700.woff2",
+     "style": "normal",
+     "weight": [
+      700,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.025,
+    "descent": 0.275,
+    "cap": 0.698,
+    "x": 0.516
+   },
+   "try": [
+    {
+     "weight": 100,
+     "stretch": null
+    },
+    {
+     "weight": 200,
+     "stretch": null
+    },
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 600,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "DM Mono",
+   "category": "mono",
+   "generic": "monospace",
+   "faces": [
+    {
+     "file": "DMMono-300.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      300
+     ]
+    },
+    {
+     "file": "DMMono-400-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "DMMono-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "DMMono-500.woff2",
+     "style": "normal",
+     "weight": [
+      500,
+      500
+     ]
+    }
+   ],
+   "weights": [
+    300,
+    500
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.992,
+    "descent": 0.31,
+    "cap": 0.7,
+    "x": 0.496
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Geist Mono",
+   "category": "mono",
+   "generic": "monospace",
+   "faces": [
+    {
+     "file": "GeistMono-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "GeistMono-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.005,
+    "descent": 0.295,
+    "cap": 0.71,
+    "x": 0.53
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Fira Code",
+   "category": "mono",
+   "generic": "monospace",
+   "faces": [
+    {
+     "file": "FiraCode-var.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    300,
+    700
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2000,
+    "ascent": 0.99,
+    "descent": 0.322,
+    "cap": 0.687,
+    "x": 0.525
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Source Code Pro",
+   "category": "mono",
+   "generic": "monospace",
+   "faces": [
+    {
+     "file": "SourceCodePro-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      200,
+      900
+     ]
+    },
+    {
+     "file": "SourceCodePro-var.woff2",
+     "style": "normal",
+     "weight": [
+      200,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    200,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.984,
+    "descent": 0.273,
+    "cap": 0.659,
+    "x": 0.4802
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Roboto Mono",
+   "category": "mono",
+   "generic": "monospace",
+   "faces": [
+    {
+     "file": "RobotoMono-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      700
+     ]
+    },
+    {
+     "file": "RobotoMono-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 1.0479,
+    "descent": 0.271,
+    "cap": 0.7109,
+    "x": 0.5283
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Martian Mono",
+   "category": "mono",
+   "generic": "monospace",
+   "faces": [
+    {
+     "file": "MartianMono-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      800
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    800
+   ],
+   "stretch": [
+    75.0,
+    112.5
+   ],
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.0,
+    "descent": 0.2,
+    "cap": 0.8,
+    "x": 0.5976
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": 75
+    },
+    {
+     "weight": 300,
+     "stretch": 100.0
+    },
+    {
+     "weight": 300,
+     "stretch": 112.5
+    },
+    {
+     "weight": 400,
+     "stretch": 75
+    },
+    {
+     "weight": 400,
+     "stretch": 100.0
+    },
+    {
+     "weight": 400,
+     "stretch": 112.5
+    },
+    {
+     "weight": 500,
+     "stretch": 75
+    },
+    {
+     "weight": 500,
+     "stretch": 100.0
+    },
+    {
+     "weight": 500,
+     "stretch": 112.5
+    },
+    {
+     "weight": 700,
+     "stretch": 75
+    },
+    {
+     "weight": 700,
+     "stretch": 100.0
+    },
+    {
+     "weight": 700,
+     "stretch": 112.5
+    }
+   ]
+  },
+  {
+   "family": "Azeret Mono",
+   "category": "mono",
+   "generic": "monospace",
+   "faces": [
+    {
+     "file": "AzeretMono-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "AzeretMono-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.937,
+    "descent": 0.23,
+    "cap": 0.698,
+    "x": 0.548
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Red Hat Mono",
+   "category": "mono",
+   "generic": "monospace",
+   "faces": [
+    {
+     "file": "RedHatMono-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      300,
+      700
+     ]
+    },
+    {
+     "file": "RedHatMono-var.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    300,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.018,
+    "descent": 0.305,
+    "cap": 0.7,
+    "x": 0.481
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Spline Sans Mono",
+   "category": "mono",
+   "generic": "monospace",
+   "faces": [
+    {
+     "file": "SplineSansMono-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      300,
+      700
+     ]
+    },
+    {
+     "file": "SplineSansMono-var.woff2",
+     "style": "normal",
+     "weight": [
+      300,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    300,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 2000,
+    "ascent": 0.9635,
+    "descent": 0.2365,
+    "cap": 0.727,
+    "x": 0.5455
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Chivo Mono",
+   "category": "mono",
+   "generic": "monospace",
+   "faces": [
+    {
+     "file": "ChivoMono-Italic-var.woff2",
+     "style": "italic",
+     "weight": [
+      100,
+      900
+     ]
+    },
+    {
+     "file": "ChivoMono-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.94,
+    "descent": 0.25,
+    "cap": 0.686,
+    "x": 0.511
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Xanh Mono",
+   "category": "mono",
+   "generic": "monospace",
+   "faces": [
+    {
+     "file": "XanhMono-400-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "XanhMono-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.97,
+    "descent": 0.22,
+    "cap": 0.74,
+    "x": 0.54
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Major Mono Display",
+   "category": "mono",
+   "generic": "monospace",
+   "faces": [
+    {
+     "file": "MajorMonoDisplay-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.9,
+    "descent": 0.1,
+    "cap": 0.696,
+    "x": 0.696
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Share Tech Mono",
+   "category": "mono",
+   "generic": "monospace",
+   "faces": [
+    {
+     "file": "ShareTechMono-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.885,
+    "descent": 0.242,
+    "cap": 0.7,
+    "x": 0.5
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Anonymous Pro",
+   "category": "mono",
+   "generic": "monospace",
+   "faces": [
+    {
+     "file": "AnonymousPro-400-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "AnonymousPro-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "AnonymousPro-700-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      700,
+      700
+     ]
+    },
+    {
+     "file": "AnonymousPro-700.woff2",
+     "style": "normal",
+     "weight": [
+      700,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 0.8179,
+    "descent": 0.1821,
+    "cap": 0.6372,
+    "x": 0.4551
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Courier Prime",
+   "category": "typewriter",
+   "generic": "monospace",
+   "faces": [
+    {
+     "file": "CourierPrime-400-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "CourierPrime-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "CourierPrime-700-Italic.woff2",
+     "style": "italic",
+     "weight": [
+      700,
+      700
+     ]
+    },
+    {
+     "file": "CourierPrime-700.woff2",
+     "style": "normal",
+     "weight": [
+      700,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    700
+   ],
+   "stretch": null,
+   "italic": true,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 0.7812,
+    "descent": 0.3418,
+    "cap": 0.5796,
+    "x": 0.4512
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Cutive Mono",
+   "category": "typewriter",
+   "generic": "monospace",
+   "faces": [
+    {
+     "file": "CutiveMono-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 0.8286,
+    "descent": 0.2725,
+    "cap": 0.5718,
+    "x": 0.3779
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Special Elite",
+   "category": "typewriter",
+   "generic": "monospace",
+   "faces": [
+    {
+     "file": "SpecialElite-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 0.7031,
+    "descent": 0.2969,
+    "cap": 0.7061,
+    "x": 0.4816
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "VT323",
+   "category": "pixel",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "VT323-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.8,
+    "descent": 0.2,
+    "cap": 0.56,
+    "x": 0.4
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Silkscreen",
+   "category": "pixel",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Silkscreen-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "Silkscreen-700.woff2",
+     "style": "normal",
+     "weight": [
+      700,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    700
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.03,
+    "descent": 0.25,
+    "cap": 0.625,
+    "x": 0.625
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Press Start 2P",
+   "category": "pixel",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "PressStart2P-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.0,
+    "descent": 0.0,
+    "cap": 1.0,
+    "x": 0.75
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Pixelify Sans",
+   "category": "pixel",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "PixelifySans-var.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    700
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.92,
+    "descent": 0.28,
+    "cap": 0.631,
+    "x": 0.45
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "DotGothic16",
+   "category": "pixel",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "DotGothic16-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.16,
+    "descent": 0.288,
+    "cap": 0.787,
+    "x": 0.54
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Doto",
+   "category": "pixel",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Doto-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.95,
+    "descent": 0.25,
+    "cap": 0.6725,
+    "x": 0.4725
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Jersey 10",
+   "category": "pixel",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Jersey10-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1400,
+    "ascent": 0.8036,
+    "descent": 0.2679,
+    "cap": 0.5357,
+    "x": 0.4286
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Big Shoulders Stencil Display",
+   "category": "stencil",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "BigShouldersStencilDisplay-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2000,
+    "ascent": 0.984,
+    "descent": 0.213,
+    "cap": 0.8,
+    "x": 0.6
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Stardos Stencil",
+   "category": "stencil",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "StardosStencil-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    },
+    {
+     "file": "StardosStencil-700.woff2",
+     "style": "normal",
+     "weight": [
+      700,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    700
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 0.9736,
+    "descent": 0.4058,
+    "cap": 0.7012,
+    "x": 0.479
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Allerta Stencil",
+   "category": "stencil",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "AllertaStencil-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1024,
+    "ascent": 1.0322,
+    "descent": 0.2461,
+    "cap": 0.7197,
+    "x": 0.5508
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Saira Stencil One",
+   "category": "stencil",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "SairaStencilOne-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.135,
+    "descent": 0.439,
+    "cap": 0.688,
+    "x": 0.51
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Tilt Warp",
+   "category": "display",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "TiltWarp-var.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.99,
+    "descent": 0.272,
+    "cap": 0.68,
+    "x": 0.517
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Bungee",
+   "category": "display",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Bungee-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.02,
+    "descent": 0.3,
+    "cap": 0.72,
+    "x": 0.72
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Bungee Shade",
+   "category": "display",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "BungeeShade-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.02,
+    "descent": 0.3,
+    "cap": 0.73,
+    "x": 0.73
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Bungee Inline",
+   "category": "display",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "BungeeInline-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.02,
+    "descent": 0.3,
+    "cap": 0.72,
+    "x": 0.72
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Monoton",
+   "category": "display",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Monoton-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 1.1553,
+    "descent": 0.4014,
+    "cap": 0.8086,
+    "x": 0.7031
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Rubik Glitch",
+   "category": "display",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "RubikGlitch-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.935,
+    "descent": 0.25,
+    "cap": 0.7,
+    "x": 0.52
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Climate Crisis",
+   "category": "display",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "ClimateCrisis-var.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.07,
+    "descent": 0.26,
+    "cap": 0.75,
+    "x": 0.62
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Rubik Bubbles",
+   "category": "bubble",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "RubikBubbles-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.935,
+    "descent": 0.25,
+    "cap": 0.728,
+    "x": 0.536
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Bagel Fat One",
+   "category": "bubble",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "BagelFatOne-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.16,
+    "descent": 0.288,
+    "cap": 0.726,
+    "x": 0.5255
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Modak",
+   "category": "bubble",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Modak-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 0.9937,
+    "descent": 0.5122,
+    "cap": 0.6299,
+    "x": 0.5381
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Titan One",
+   "category": "bubble",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "TitanOne-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.97,
+    "descent": 0.175,
+    "cap": 0.71,
+    "x": 0.58
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Shrikhand",
+   "category": "bubble",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Shrikhand-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.026,
+    "descent": 0.432,
+    "cap": 0.666,
+    "x": 0.529
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Chango",
+   "category": "bubble",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Chango-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.995,
+    "descent": 0.216,
+    "cap": 0.701,
+    "x": 0.509
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "UnifrakturMaguntia",
+   "category": "blackletter",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "UnifrakturMaguntia-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 0.7847,
+    "descent": 0.2505,
+    "cap": 0.7261,
+    "x": 0.5202
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "UnifrakturCook",
+   "category": "blackletter",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "UnifrakturCook-700.woff2",
+     "style": "normal",
+     "weight": [
+      700,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    700,
+    700
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 1.0303,
+    "descent": 0.2783,
+    "cap": 0.7627,
+    "x": 0.5293
+   },
+   "try": [
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Pirata One",
+   "category": "blackletter",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "PirataOne-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.006,
+    "descent": 0.279,
+    "cap": 0.771,
+    "x": 0.571
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Grenze Gotisch",
+   "category": "blackletter",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "GrenzeGotisch-var.woff2",
+     "style": "normal",
+     "weight": [
+      100,
+      900
+     ]
+    }
+   ],
+   "weights": [
+    100,
+    900
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.1,
+    "descent": 0.38,
+    "cap": 0.6083,
+    "x": 0.4547
+   },
+   "try": [
+    {
+     "weight": 300,
+     "stretch": null
+    },
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    },
+    {
+     "weight": 900,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "New Rocker",
+   "category": "blackletter",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "NewRocker-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.946,
+    "descent": 0.283,
+    "cap": 0.746,
+    "x": 0.484
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Jacquard 24",
+   "category": "blackletter",
+   "generic": "sans-serif",
+   "faces": [
+    {
+     "file": "Jacquard24-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1290,
+    "ascent": 0.7907,
+    "descent": 0.2093,
+    "cap": 0.5814,
+    "x": 0.3953
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Mrs Saint Delafield",
+   "category": "script",
+   "generic": "cursive",
+   "faces": [
+    {
+     "file": "MrsSaintDelafield-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.906,
+    "descent": 0.619,
+    "cap": 0.749,
+    "x": 0.224
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Pinyon Script",
+   "category": "script",
+   "generic": "cursive",
+   "faces": [
+    {
+     "file": "PinyonScript-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 0.8633,
+    "descent": 0.3843,
+    "cap": 0.688,
+    "x": 0.3462
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Great Vibes",
+   "category": "script",
+   "generic": "cursive",
+   "faces": [
+    {
+     "file": "GreatVibes-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.851,
+    "descent": 0.401,
+    "cap": 0.797,
+    "x": 0.357
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Herr Von Muellerhoff",
+   "category": "script",
+   "generic": "cursive",
+   "faces": [
+    {
+     "file": "HerrVonMuellerhoff-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.925,
+    "descent": 0.497,
+    "cap": 0.759,
+    "x": 0.269
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Monsieur La Doulaise",
+   "category": "script",
+   "generic": "cursive",
+   "faces": [
+    {
+     "file": "MonsieurLaDoulaise-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 1.048,
+    "descent": 0.513,
+    "cap": 0.972,
+    "x": 0.202
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Allura",
+   "category": "script",
+   "generic": "cursive",
+   "faces": [
+    {
+     "file": "Allura-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.8,
+    "descent": 0.45,
+    "cap": 0.597,
+    "x": 0.303
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Parisienne",
+   "category": "script",
+   "generic": "cursive",
+   "faces": [
+    {
+     "file": "Parisienne-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 2048,
+    "ascent": 0.9155,
+    "descent": 0.4468,
+    "cap": 0.7148,
+    "x": 0.353
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Italianno",
+   "category": "script",
+   "generic": "cursive",
+   "faces": [
+    {
+     "file": "Italianno-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.8,
+    "descent": 0.45,
+    "cap": 0.547,
+    "x": 0.278
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Caveat",
+   "category": "hand",
+   "generic": "cursive",
+   "faces": [
+    {
+     "file": "Caveat-var.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      700
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    700
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.96,
+    "descent": 0.3,
+    "cap": 0.6557,
+    "x": 0.3551
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    },
+    {
+     "weight": 500,
+     "stretch": null
+    },
+    {
+     "weight": 700,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Homemade Apple",
+   "category": "hand",
+   "generic": "cursive",
+   "faces": [
+    {
+     "file": "HomemadeApple-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1024,
+    "ascent": 1.2959,
+    "descent": 0.8457,
+    "cap": 0.9009,
+    "x": 0.4707
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Reenie Beanie",
+   "category": "hand",
+   "generic": "cursive",
+   "faces": [
+    {
+     "file": "ReenieBeanie-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1000,
+    "ascent": 0.75,
+    "descent": 0.25,
+    "cap": 0.536,
+    "x": 0.376
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Permanent Marker",
+   "category": "hand",
+   "generic": "cursive",
+   "faces": [
+    {
+     "file": "PermanentMarker-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1024,
+    "ascent": 1.1094,
+    "descent": 0.3174,
+    "cap": 0.7275,
+    "x": 0.6006
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "Rock Salt",
+   "category": "hand",
+   "generic": "cursive",
+   "faces": [
+    {
+     "file": "RockSalt-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1024,
+    "ascent": 1.585,
+    "descent": 0.7695,
+    "cap": 1.041,
+    "x": 0.7754
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  },
+  {
+   "family": "La Belle Aurore",
+   "category": "hand",
+   "generic": "cursive",
+   "faces": [
+    {
+     "file": "LaBelleAurore-400.woff2",
+     "style": "normal",
+     "weight": [
+      400,
+      400
+     ]
+    }
+   ],
+   "weights": [
+    400,
+    400
+   ],
+   "stretch": null,
+   "italic": false,
+   "metrics": {
+    "upm": 1024,
+    "ascent": 1.0771,
+    "descent": 0.7754,
+    "cap": 0.6606,
+    "x": 0.3906
+   },
+   "try": [
+    {
+     "weight": 400,
+     "stretch": null
+    }
+   ]
+  }
+ ]
+}

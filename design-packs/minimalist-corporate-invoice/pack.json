@@ -1,37 +1,16 @@
 {
   "id": "minimalist-corporate-invoice",
-  "name": "IMG 2872",
-  "version": "1.0.0",
+  "name": "Minimalist Corporate Invoice",
   "category": "Editorial & Ledger",
-  "description": "A clean, high-contrast professional invoice layout utilizing a structured grid system and balanced typographic hierarchy. Features a distinct oval brand badge and a clean tabular data architecture for financial clarity.",
+  "description": "Ripped from a reference by the harvester. 6 type styles, 41 text frames, 20 art frames.",
+  "format": "rip",
+  "variants": [],
   "target": {
     "dimensions": {
       "format": "A4",
-      "width_mm": 210,
-      "height_mm": 297,
+      "width_mm": 210.0,
+      "height_mm": 297.0,
       "orientation": "portrait"
-    },
-    "margins_mm": {
-      "top": 12,
-      "right": 12,
-      "bottom": 12,
-      "left": 12
     }
-  },
-  "typography": {
-    "primaryFont": "Inter",
-    "displayFont": "Inter",
-    "monospaceFont": "Inter",
-    "modularScale": 1.2,
-    "lineHeightBase": 1.4
-  },
-  "colorTokens": {
-    "background": "#ffffff",
-    "textPrimary": "#000000",
-    "textSecondary": "#333333",
-    "accent": "#000000"
-  },
-  "spatialBudget": {
-    "strictSinglePage": true
   }
 }

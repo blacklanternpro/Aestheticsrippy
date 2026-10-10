@@ -1,0 +1,22 @@
+{
+  "person": {
+    "first": "Bailey",
+    "last": "Dupont",
+    "photo": "portrait-placeholder.png",
+    "signoff_name": "Bailey Dupont",
+    "signature": "Bailey Dupont"
+  },
+  "contact": ["+123-456-7890", "hello@reallygreatsite.com", "reallygreatsite.com"],
+  "letter": {
+    "date": "mm/dd/yyyy",
+    "recipient": "Name of the company\nCompany Address\nCity, Country",
+    "salutation": "Dear Korina Villanueva,",
+    "paragraphs": [
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Massa tincidunt nunc pulvinar sapien. Ut tristique et egestas quis ipsum suspendisse ultrices. Diam donec adipiscing tristique risus nec feugiat in. Neque convallis a cras semper auctor neque. Arcu dui vivamus arcu felis bibendum. Vitae suscipit tellus mauris a diam maecenas sed enim ut. Mollis aliquam ut porttitor leo a diam sollicitudin tempor. Ac odio tempor orci dapibus ultrices in. Cras semper auctor neque vitae tempus quam pellentesque.",
+      "Sit amet dictum sit amet justo donec enim. Cras adipiscing enim eu turpis egestas pretium aenean pharetra. Sit amet aliquam id diam maecenas ultricies. Bibendum neque egestas congue quisque egestas diam. Cras adipiscing enim eu turpis egestas pretium aenean pharetra magna. Vel facilisis volutpat est velit egestas dui id. Diam sollicitudin tempor id eu nisl nunc mi ipsum.",
+      "Egestas sed risus pretium quam vulputate. Enim nec dui nunc mattis enim ut tellus elementum sagittis. Pellentesque sit amet porttitor eget dolor morbi non arcu risus. Scelerisque fermentum dui faucibus in ornare. Feugiat vivamus at augue eget arcu dictum varius duis.",
+      "Mattis pellentesque id nibh tortor id aliquet lectus. Consectetur adipiscing elit ut aliquam purus sit amet. Enim lobortis scelerisque fermentum dui. Porta non pulvinar neque laoreet suspendisse interdum consectetur libero id."
+    ],
+    "signoff": "Sincerely,"
+  }
+}

@@ -1,0 +1,9 @@
+# Core
+pillow>=10.0
+numpy>=1.26
+opencv-python-headless>=4.9
+playwright>=1.45   # then run: python -m playwright install chromium
+fonttools[woff]>=4.50   # reads font metrics for the type cabinet (python -m engine.typecase)
+pytest>=8        # dev: python -m pytest -q
+# Not pip: Tesseract OCR 5 with English, for the harvester (brew/apt install tesseract).
+# Node 18+ runs the renderer unit tests: node --test "studio/tests/*.test.js"

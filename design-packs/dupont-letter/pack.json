@@ -1,0 +1,16 @@
+{
+  "id": "dupont-letter",
+  "name": "Dupont Letter",
+  "category": "Cover Letter",
+  "description": "Heavy two-line grotesque name with crushed leading over a greyscale portrait; three-point contact line; narrow meta column beside a justified letter body.",
+  "format": "rip",
+  "target": {
+    "dimensions": {
+      "format": "A4",
+      "width_mm": 210,
+      "height_mm": 297,
+      "orientation": "portrait"
+    }
+  },
+  "variants": []
+}

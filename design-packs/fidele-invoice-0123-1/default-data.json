@@ -1,1 +1,53 @@
-{}
+{
+  "list01": [
+    {
+      "c1": "Item:",
+      "c2": "Qty:",
+      "c3": "Cost:"
+    },
+    {
+      "c1": "Aliquam tincidunt mauris risus",
+      "c2": "1",
+      "c3": "€00,00"
+    },
+    {
+      "c1": "Vestibulum auctor dapibus",
+      "c2": "1",
+      "c3": "€00,00"
+    },
+    {
+      "c1": "Nunc dignissim risus id metu",
+      "c2": "1",
+      "c3": "€00,00"
+    }
+  ],
+  "list02": [
+    {
+      "c1": "Subtotal",
+      "c2": "€00,00"
+    },
+    {
+      "c1": "VAT",
+      "c2": "+00%"
+    },
+    {
+      "c1": "Shipping",
+      "c2": "€00,00"
+    }
+  ],
+  "t01": "Thank you for your ourchase at the Fidéle online shop.\nThis is your order invoice. Please write us with any questions or tips.",
+  "t02": "Invoice",
+  "t03": "0123",
+  "t04": "Date: Month 00, 2020",
+  "t05": "Ship to:\nName Surname",
+  "t06": "00 Street Name,\n00000 City",
+  "t07": "Fidele",
+  "t08": "Bill to:\nName Surname",
+  "t09": "00 Street Name,\n00000 City",
+  "t10": "Total",
+  "t11": "€00,00",
+  "t12": "Villa du Lavoir, 75010 Paris",
+  "t13": "|:@studio_fidele for studio:\nF:fidele.editions for press:",
+  "t14": "studio@ fidele-editions.com\neditions@",
+  "t15": "4a\n+33 148 03 0670"
+}

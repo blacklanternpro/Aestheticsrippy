@@ -1,0 +1,48 @@
+{
+  "person": { "first": "Juliana", "last": "Saraiva" },
+  "contact": [
+    "142/350 Eastern Hwy\nCarringbah, NSW 2229",
+    "juliana.saraiva@gmail.com\nlinkedin.com/in/julsaraiva\n+61 234 456 567"
+  ],
+  "summary": "IT professional experienced in Data Analysis focused on tailoring solutions to the needs of customers and businesses. Collaborative, communicative, organised and meticulous. Currently studying Master of Business Analytics and learning Salesforce system (hands-on) to further develop business acumen and CRM skills.",
+  "center": {
+    "title": "Work\nExperience",
+    "items": [
+      { "when": "Jul 2018 –\nPresent", "title": "Data Analyst (Remote)\nGumas Construction\nand Welding, Brazil",
+        "body": ["Analysis and problem solving, from root cause analysis to data cleansing. Data capture to help in decision making. Documented findings clearly and concisely. Identified and collected financial data."] },
+      { "when": "Apr 2011 –\nMay 2018", "title": "Business Data Analyst\nRNP, Brazil",
+        "lead": "RNP is Brazilian National Research and Education Network",
+        "body": ["Prepared and presented reports, results and briefs for internal stakeholders. Wrote project proposals. Automated reports and dashboards to help managers make better data-driven decisions. Designed and conducted test conditions, scenarios and cases."] },
+      { "when": "Jan 2009 –\nMar 2011", "title": "Business Data Analyst\nUniversity Salgado de\nOliveira, Brazil",
+        "body": ["Determine trends, patterns and insights with the data. Designed, tested and implemented new data analysis pipelines to solve problems related to the education sector. Reported and presented results for users in Level 1 and 2 support."] },
+      { "when": "Sep 2007 –\nJan 2009", "title": "Business Analyst\nTotvs, Brazil",
+        "lead": "Totvs is the leading company for ERP system in American continent and Europe",
+        "body": ["Expanded functional documents, database analyses and security. Developed and executed test case scenarios. Implemented, maintained and supported (Level 1 and 2) the ERP system for a variety of industrial business sectors."] }
+    ]
+  },
+  "left": {
+    "title": "Education",
+    "items": [
+      { "when": "Nov 2019 –\nPresent", "text": "Master of Business Analytics\nKaplan Business School\nSydney, Australia" },
+      { "when": "Aug 2019 –\nPresent", "text": "Salesforce Administrator\nTrailhead by Salesforce\nSydney, Australia" },
+      { "when": "Nov 2019 –\nMay 2020", "text": "Master of Data Analytics\n(Online Course)\nInfinitely, Sydney" },
+      { "when": "Jan 2001 –\nDec 2004", "text": "Bachelor of Data\nProcessing Technology\nIntegrated Colleges\nSimonsen, Brazil" }
+    ]
+  },
+  "left_lower": {
+    "title": "Volunteer",
+    "items": [
+      { "when": "Nov 2019 –\nPresent", "text": "Administrative\nArea Office Support\nYour Side, Sydney" },
+      { "when": "Jul 2001 –\nDec 2004", "text": "Corporate Account Support\nBank of Brazil (Internship)" }
+    ]
+  },
+  "right": {
+    "title": "Skills",
+    "items": [
+      { "when": "Software\nSkills", "text": "Salesforce Administrator\nMicrosoft SQL Server\nData World\nExcel/Google Sheets\nTableau/Splunk\nGIT/SVN" },
+      { "when": "Language", "text": "Fluent in English\nNative in Portuguese" },
+      { "when": "Other", "text": "Agile Methodologies\nDesign Thinking\nTrello/Jira/Confluence\nERP System\nTest Automation/TestLink" }
+    ]
+  },
+  "closing": "References available\nupon request"
+}

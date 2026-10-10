@@ -48,3 +48,13 @@ cloudflared.exe
 *.part
 *.tmp
 *.log
+
+# Generated output (render with `python -m engine.compiler` / `python -m eval.run`)
+export/*
+!export/.gitkeep
+eval/out/
+
+# Personal content: rendered locally, never committed
+content/private/
+content/uploads/
+eval/harvest-out/

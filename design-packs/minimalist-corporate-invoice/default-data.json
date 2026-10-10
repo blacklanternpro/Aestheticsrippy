@@ -1,1 +1,64 @@
-{}
+{
+  "list01": [
+    {
+      "c1": "Luxury Sofa Set",
+      "c2": "1"
+    },
+    {
+      "c1": "Dining Table Set",
+      "c2": "1"
+    },
+    {
+      "c1": "King Size Bed Frame",
+      "c2": "1"
+    },
+    {
+      "c1": "Wardrobe Cabinet",
+      "c2": "1"
+    },
+    {
+      "c1": "Office Desk & Chair Set",
+      "c2": "1"
+    }
+  ],
+  "t01": "Invoice.",
+  "t02": "Invoice No: 76785",
+  "t03": "Invoice Date: October 12, 2026",
+  "t04": "Due Date: October 12, 2026",
+  "t05": "TechGuru\nPlus",
+  "t06": "$5 200",
+  "t07": "Billed To:\nHANNAH MORALES",
+  "t08": "Account No: 123-456-7890",
+  "t09": "Payment Method:",
+  "t10": "Total Due:",
+  "t11": "New York City",
+  "t12": "Description",
+  "t13": "Account Name: Claudia Alves",
+  "t14": "Qty",
+  "t15": "Price",
+  "t16": "Total",
+  "t17": "$950",
+  "t18": "$1,200",
+  "t19": "$1,200",
+  "t20": "$950",
+  "t21": "Subtotal",
+  "t22": "$1,300",
+  "t23": "$1,100",
+  "t24": "$1,300",
+  "t25": "$1,100",
+  "t26": "$650",
+  "t27": "$5,200",
+  "t28": "Tax (10%)",
+  "t29": "Total Amount",
+  "t30": "$650",
+  "t31": "$5,720",
+  "t32": "Lorem ipsum dolor sit amet, consectetur",
+  "t33": "$520",
+  "t34": "Term and Conditions:",
+  "t35": "Rosa Maria Aguado",
+  "t36": "Payment is due within 14 days from the invoice date.",
+  "t37": "adipiscing elit. Ut posuere velit eu massa placerat fermentum. Nam pellentesque tempor scelerisque.",
+  "t38": "New York City",
+  "t39": "9999999999",
+  "t40": "www. TechGuruPlus"
+}

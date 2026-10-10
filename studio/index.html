@@ -1,175 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aesthetic Compiler | Design Pack Studio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Inter+Tight:wght@700;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aestheticsrippy</title>
+<link rel="stylesheet" href="/fonts/fonts.css">
 <link rel="stylesheet" href="studio.css">
+<script src="js/hyph-en-gb.js"></script>
+<script src="js/rip-renderer.js"></script>
 </head>
-<body>
-
-  <!-- Top Studio Header -->
-  <header class="studio-header">
-    <div class="header-inner">
-      
-      <!-- Brand -->
-      <div class="brand-badge">
-        <div class="brand-icon">AC</div>
-        <div>
-          <div class="brand-title">Aesthetic Compiler</div>
-          <div class="brand-subtitle">Design Pack Engine</div>
-        </div>
-      </div>
-
-      <!-- Design Pack Switcher Tabs -->
-      <nav class="pack-tabs">
-        <button class="pack-tab-btn active" data-pack="studio-neue">
-          <span>📄</span> Studio Neue
-        </button>
-        <button class="pack-tab-btn" data-pack="manifesto-red">
-          <span>🟥</span> Manifesto Red
-        </button>
-        <button class="pack-tab-btn" data-pack="buum-industrial">
-          <span>🎬</span> Buum Industrial
-        </button>
-        <button class="pack-tab-btn" data-pack="thermal-artifact">
-          <span>🧾</span> Thermal Artifact
-        </button>
-      </nav>
-
-      <!-- Actions -->
-      <div class="studio-actions">
-        <button class="action-btn btn-harvest" id="harvest-btn">✨ Harvest Scan</button>
-        <div class="mode-switch-group">
-          <button class="action-btn mode-btn active" id="text-mode-btn" title="Click any text in-line to edit">✏️ Edit Text</button>
-          <button class="action-btn mode-btn" id="move-mode-btn" title="Drag, rotate, resize, and jam any element">✥ Move &amp; Jam</button>
-        </div>
-        <button class="action-btn" id="reset-btn">🔄 Reset</button>
-        <button class="action-btn" id="settings-btn">⚙️ Settings</button>
-        <button class="action-btn btn-primary" id="print-btn">🖨️ Print / Vector PDF</button>
-      </div>
-
+<body data-pane="sheet">
+  <header class="topbar">
+    <div class="wordmark" aria-label="Aestheticsrippy">Aestheticsrippy</div>
+    <div class="doc-switch">
+      <button id="doc-button" class="doc-button" type="button" aria-haspopup="menu" aria-controls="doc-menu">
+        <span id="doc-name">No document</span>
+        <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+      </button>
+      <div id="doc-menu" class="menu" role="menu" hidden></div>
+    </div>
+    <div class="history">
+      <button id="undo" class="icon-button" type="button" aria-label="Undo" disabled></button>
+      <button id="redo" class="icon-button" type="button" aria-label="Redo" disabled></button>
+    </div>
+    <div class="topbar-actions">
+      <button id="save-file" class="button" type="button" hidden>Save to file</button>
+      <button id="export" class="button primary" type="button" disabled>Export PDF</button>
     </div>
   </header>
 
-  <!-- Interactive Artboard Stage -->
-  <main class="studio-stage">
-    <div class="artboard-viewport">
-      <iframe class="pack-frame" id="pack-frame" title="Design Pack Artboard"></iframe>
-    </div>
+  <main class="workspace">
+    <aside class="pane pane-content" aria-label="Content">
+      <div id="content-panel" class="pane-scroll"></div>
+    </aside>
+
+    <section class="pane pane-sheet" aria-label="Sheet">
+      <div id="sheet-area" class="sheet-area"></div>
+      <footer class="sheet-footer">
+        <p id="fit-status" class="fit-status" role="status" aria-live="polite"></p>
+        <div class="zoom" role="group" aria-label="Zoom">
+          <button id="zoom-out" class="icon-button small" type="button" aria-label="Zoom out">
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3.5 8h9" stroke="currentColor" stroke-width="1.4"/></svg>
+          </button>
+          <span id="zoom-value" class="zoom-value">100%</span>
+          <button id="zoom-in" class="icon-button small" type="button" aria-label="Zoom in">
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.4"/></svg>
+          </button>
+          <button id="zoom-fit" class="text-button" type="button">Fit</button>
+          <button id="zoom-actual" class="text-button" type="button">Actual size</button>
+        </div>
+      </footer>
+    </section>
+
+    <aside class="pane pane-style" aria-label="Style">
+      <div id="inspector" class="pane-scroll"></div>
+    </aside>
   </main>
 
-  <!-- Bottom Floating Spatial HUD -->
-  <footer class="studio-hud">
-    <div class="hud-item">
-      <span>Format:</span>
-      <span class="hud-value" id="hud-format">A4 (210 × 297mm)</span>
-    </div>
-    <div class="hud-item">
-      <div class="hud-indicator" id="hud-indicator"></div>
-      <span class="hud-value" id="hud-status">Strict 1-Sheet Locked</span>
-    </div>
-    <div class="hud-item typo-toolkit" id="typo-toolkit">
-      <span class="typo-label">TYPO:</span>
-      <button type="button" class="typo-btn" id="typo-tall-btn" title="Stretch Height (Tall Woodtype) [Ctrl+Shift+↑]">↕ Tall</button>
-      <button type="button" class="typo-btn" id="typo-wide-btn" title="Stretch Width (Extended Sans) [Ctrl+Shift+→]">↔ Wide</button>
-      <button type="button" class="typo-btn" id="typo-bunch-btn" title="Bunch Tracking [Ctrl+Shift+←]">⇥⇤ Bunch</button>
-      <button type="button" class="typo-btn" id="typo-spread-btn" title="Spread Tracking">⇤⇥ Spread</button>
-      <button type="button" class="typo-btn" id="typo-shadow-btn" title="Chromatic Screenprint Shadow [Ctrl+Shift+S]">❐ Shadow</button>
-      <button type="button" class="typo-btn" id="typo-skew-btn" title="Warp / Skew [Ctrl+Shift+K]">▱ Warp</button>
-      <button type="button" class="typo-btn" id="typo-rule-btn" title="Toggle Underline Rule [Ctrl+Shift+U]">━ Rule</button>
-      <button type="button" class="typo-btn" id="typo-minus-btn" title="Decrease Size [Ctrl+Shift+-]">A-</button>
-      <button type="button" class="typo-btn" id="typo-plus-btn" title="Increase Size [Ctrl+Shift+=]">A+</button>
-    </div>
-    <div class="hud-item hud-hint">
-      <span class="hud-hint-text">💡 Hold <kbd>Alt</kbd> to grab &amp; move • <kbd>[</kbd> / <kbd>]</kbd> for layers</span>
-    </div>
-  </footer>
+  <nav class="pane-tabs" role="tablist" aria-label="Panels">
+    <button type="button" role="tab" data-pane-tab="content" aria-selected="false">Content</button>
+    <button type="button" role="tab" data-pane-tab="sheet" aria-selected="true">Sheet</button>
+    <button type="button" role="tab" data-pane-tab="style" aria-selected="false">Style</button>
+  </nav>
 
-  <!-- Harvest Modal (Magic Harvester) -->
-  <div class="modal-overlay" id="harvest-modal">
-    <div class="modal-card harvest-card">
-      <div class="modal-header">
-        <div class="modal-title">✨ Magic Vision Harvester</div>
-        <button class="modal-close-btn" id="close-harvest-btn">&times;</button>
-      </div>
+  <dialog id="dialog" class="dialog"></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
-      <div class="harvest-dropzone" id="harvest-dropzone">
-        <div class="dropzone-empty" id="dropzone-empty">
-          <div class="dropzone-icon">📸</div>
-          <div class="dropzone-title">Drop reference scan or photo here</div>
-          <div class="dropzone-subtitle">Supports PNG, JPG, WebP (Posters, Receipts, Slips, Cards, Resumes)</div>
-          <button type="button" class="action-btn" id="browse-scan-btn" style="margin-top: 12px;">Browse Files</button>
-        </div>
-        <div class="dropzone-preview" id="dropzone-preview" style="display: none;">
-          <img id="harvest-preview-img" src="" alt="Scan Preview">
-          <div class="preview-info">
-            <span class="preview-badge" id="preview-aspect-badge">Aspect: 1.00</span>
-            <span class="preview-badge" id="preview-format-badge">Format: Auto</span>
-            <button type="button" class="preview-remove-btn" id="remove-preview-btn">✕ Replace</button>
-          </div>
-        </div>
-      </div>
-      <input type="file" id="scan-file-input" accept="image/png, image/jpeg, image/webp" style="display: none;">
-
-      <div class="form-group" style="margin-top: 16px;">
-        <label class="form-label" for="harvest-pack-name">Design Pack Name</label>
-        <input class="form-input" id="harvest-pack-name" type="text" placeholder="e.g. Avant-Garde Exhibition Poster">
-      </div>
-
-      <div class="harvest-progress" id="harvest-progress" style="display: none;">
-        <div class="progress-spinner"></div>
-        <div class="progress-label" id="harvest-progress-label">Deconstructing visual DNA with Gemini Vision...</div>
-      </div>
-
-      <div class="modal-actions" style="margin-top: 20px;">
-        <button class="action-btn" id="cancel-harvest-btn">Cancel</button>
-        <button class="action-btn btn-primary" id="start-harvest-btn" disabled>Compile Design Pack</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Settings Modal (Mobile BYOK & Model Selector) -->
-  <div class="modal-overlay" id="settings-modal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <div class="modal-title">Studio AI &amp; Engine Settings</div>
-        <button class="modal-close-btn" id="close-settings-btn">&times;</button>
-      </div>
-
-      <div class="status-badge" id="local-status-badge">
-        Checking local engine...
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="gemini-key-input">Google Gemini API Key (for Mobile / Web)</label>
-        <input class="form-input" id="gemini-key-input" type="password" placeholder="AIzaSy...">
-        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">
-          Saved securely in your browser's localStorage. Zero key required when running locally on localhost.
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="model-select">Gemini Model Generation</label>
-        <select class="form-select" id="model-select">
-          <option value="gemini-3.1-flash-lite" selected>Gemini 3.1 Flash Lite (High-Speed &amp; High Quota)</option>
-          <option value="gemini-3-flash-preview">Gemini 3 Flash Preview (Multimodal Vision)</option>
-          <option value="gemini-3.6-flash">Gemini 3.6 Flash (Flagship High-Fidelity)</option>
-          <option value="gemini-3.8-flash">Gemini 3.8 Flash (Pro Reasoning)</option>
-          <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro Preview (Complex Multimodal)</option>
-        </select>
-      </div>
-
-      <div class="modal-actions">
-        <button class="action-btn" id="save-key-btn">Save Settings</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="ai.js"></script>
-  <script src="app.js"></script>
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>

@@ -1,38 +1,16 @@
 {
   "id": "fidele-order-invoice",
-  "name": "8ed37b66f866c7c02373e30c6158216f",
-  "version": "1.0.0",
+  "name": "Fidèle Invoice (harvest D)",
   "category": "Identity & Ledger",
-  "description": "Minimalist Swiss-style invoice layout with vibrant cobalt blue typography, grid-aligned spec table, and printer calibration color strips.",
+  "description": "Ripped from a reference by the harvester. 5 type styles, 17 text frames, 18 art frames.",
+  "format": "rip",
+  "variants": [],
   "target": {
     "dimensions": {
       "format": "A4",
-      "width_mm": 210,
-      "height_mm": 297,
+      "width_mm": 210.0,
+      "height_mm": 297.0,
       "orientation": "portrait"
-    },
-    "margins_mm": {
-      "top": 12,
-      "right": 12,
-      "bottom": 12,
-      "left": 12
     }
-  },
-  "typography": {
-    "primaryFont": "Inter",
-    "displayFont": "Inter",
-    "monospaceFont": "Space Mono",
-    "modularScale": 1.2,
-    "lineHeightBase": 1.15
-  },
-  "colorTokens": {
-    "background": "#f2f1ec",
-    "textPrimary": "#1228b3",
-    "textSecondary": "#1228b3",
-    "accent": "#1228b3",
-    "border": "#1228b3"
-  },
-  "spatialBudget": {
-    "strictSinglePage": true
   }
 }

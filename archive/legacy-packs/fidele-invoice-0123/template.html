@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main class="page-sheet swiss-ledger-sheet">
+  <header class="ledger-header visual-object ac-movable">
+    <div class="top-notice">
+      Thank you for your ourchase at the Fidèle online shop.<br>
+      This is your order invoice. Please write us with any questions or tips.
+    </div>
+    <div class="header-main-row">
+      <h1 class="invoice-title">Invoice</h1>
+      <span class="invoice-number">0123</span>
+    </div>
+    <div class="date-row"><strong>Date: Month 00, 2020</strong></div>
+  </header>
+
+  <section class="ledger-table-container visual-object ac-movable">
+    <table class="ledger-grid">
+      <colgroup>
+        <col class="col-client">
+        <col class="col-item">
+        <col class="col-qty">
+        <col class="col-cost">
+      </colgroup>
+      <thead>
+        <tr class="header-row">
+          <th class="th-client" rowspan="4">
+            <div class="meta-block">
+              <strong>Ship to:</strong><br>
+              Name Surname<br>
+              00 Street Name,<br>
+              00000 City
+            </div>
+            <div class="meta-block bill-block">
+              <strong>Bill to:</strong><br>
+              Name Surname<br>
+              00 Street Name,<br>
+              00000 City
+            </div>
+          </th>
+          <th class="th-item">Item:</th>
+          <th class="th-qty">Qty:</th>
+          <th class="th-cost">Cost:</th>
+        </tr>
+        <tr class="item-row">
+          <td class="td-item">Aliquam tincidunt mauris risus</td>
+          <td class="td-qty">1</td>
+          <td class="td-cost">€00,00</td>
+        </tr>
+        <tr class="item-row">
+          <td class="td-item">Vestibulum auctor dapibus</td>
+          <td class="td-qty">1</td>
+          <td class="td-cost">€00,00</td>
+        </tr>
+        <tr class="item-row">
+          <td class="td-item">Nunc dignissim risus id metu</td>
+          <td class="td-qty">1</td>
+          <td class="td-cost">€00,00</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="body-spacer-row">
+          <td class="spacer-client"></td>
+          <td class="spacer-item"></td>
+          <td class="spacer-qty"></td>
+          <td class="spacer-cost"></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="tfoot-row">
+          <td class="tf-empty-client" rowspan="4"></td>
+          <td class="tf-empty-item" rowspan="3"></td>
+          <td class="tf-label">Subtotal</td>
+          <td class="tf-cost">€00,00</td>
+        </tr>
+        <tr class="tfoot-row">
+          <td class="tf-label">VAT</td>
+          <td class="tf-cost">+00%</td>
+        </tr>
+        <tr class="tfoot-row">
+          <td class="tf-label">Shipping</td>
+          <td class="tf-cost">€00,00</td>
+        </tr>
+        <tr class="tfoot-row total-row">
+          <td class="tf-empty-item"></td>
+          <td class="tf-label total-label">Total</td>
+          <td class="tf-cost total-cost">€00,00</td>
+        </tr>
+      </tfoot>
+    </table>
+  </section>
+
+  <footer class="ledger-footer visual-object ac-movable">
+    <h2 class="brand-wordmark">Fidèle</h2>
+    <table class="footer-table">
+      <tr>
+        <td class="foot-cell foot-address">
+          4a Villa du Lavoir, 75010 Paris<br>
+          +33 1 48 03 06 70
+        </td>
+        <td class="foot-cell foot-social">
+          I: @studio_fidele<br>
+          F: fidele.editions
+        </td>
+        <td class="foot-cell foot-emails">
+          for studio:&nbsp;&nbsp;&nbsp;&nbsp;studio@<br>
+          for press:&nbsp;&nbsp;&nbsp;&nbsp;editions@
+        </td>
+        <td class="foot-cell foot-web-swatch">
+          <div class="web-url">fidele-editions.com</div>
+          <div class="swatch-strip">
+            <span class="swatch-step s1"></span>
+            <span class="swatch-step s2"></span>
+            <span class="swatch-step s3"></span>
+            <span class="swatch-step s4"></span>
+            <span class="swatch-step s5"></span>
+            <span class="swatch-step s6"></span>
+            <span class="swatch-step s7"></span>
+            <span class="swatch-step s8"></span>
+            <span class="swatch-step s9"></span>
+            <span class="swatch-step s10"></span>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </footer>
+</main>
+</body>
+</html>

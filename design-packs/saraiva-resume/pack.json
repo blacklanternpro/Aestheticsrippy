@@ -1,0 +1,18 @@
+{
+  "id": "saraiva-resume",
+  "name": "Saraiva Resume",
+  "category": "Resume",
+  "description": "Light geometric caps name split to the margins over a pale grey sheet; three staggered columns with hanging date and label columns, short centred rules under section heads.",
+  "format": "rip",
+  "target": {
+    "dimensions": {
+      "format": "A4",
+      "width_mm": 210,
+      "height_mm": 297,
+      "orientation": "portrait"
+    }
+  },
+  "variants": [
+    "dense"
+  ]
+}

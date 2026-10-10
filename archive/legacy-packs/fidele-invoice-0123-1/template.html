@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Barlow+Condensed:wght@700;800;900&family=Archivo+Narrow:wght@600;700&family=Archivo+Black&family=Syne:wght@700;800;900&family=Montserrat:wght@800;900&family=Inter:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&family=Playfair+Display+SC:wght@900&family=Cinzel+Decorative:wght@700;900&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main class="page-sheet">
+  <header class="visual-object ac-movable">
+    <p style="color: #0033cc; font-size: 14px; margin-bottom: 4px;">Thank you for your ourchase at the Fidèle online shop.<br>This is your order invoice. Please write us with any questions or tips.</p>
+    <div style="display: flex; justify-content: space-between; align-items: baseline; margin: 20px 0;">
+      <h1 style="font-size: 48px; color: #0033cc; font-weight: 700;">Invoice</h1>
+      <span style="font-size: 48px; font-weight: 700;">0123</span>
+    </div>
+    <p style="font-weight: 700; margin-bottom: 20px;">Date: Month 00, 2020</p>
+  </header>
+
+  <section class="content-grid visual-object ac-movable" style="display: grid; grid-template-columns: 1fr 2fr; gap: 40px;">
+    <div class="address-block">
+      <p style="font-weight: 700; margin-bottom: 10px;">Ship to:<br><span style="font-weight: 400;">Name Surname<br>00 Street Name,<br>00000 City</span></p>
+      <p style="font-weight: 700; margin-top: 20px;">Bill to:<br><span style="font-weight: 400;">Name Surname<br>00 Street Name,<br>00000 City</span></p>
+    </div>
+    <table class="invoice-table invoice-grid">
+      <thead><tr><th>Item:</th><th>Qty:</th><th>Cost:</th></tr></thead>
+      <tbody>
+        <tr><td>Aliquam tincidunt mauris risus</td><td>1</td><td>€00,00</td></tr>
+        <tr><td>Vestibulum auctor dapibus</td><td>1</td><td>€00,00</td></tr>
+        <tr><td>Nunc dignissim risus id metu</td><td>1</td><td>€00,00</td></tr>
+      </tbody>
+      <tfoot>
+        <tr><td colspan="2">Subtotal</td><td>€00,00</td></tr>
+        <tr><td colspan="2">VAT</td><td>+00%</td></tr>
+        <tr><td colspan="2">Shipping</td><td>€00,00</td></tr>
+        <tr><td colspan="2" style="font-weight: 700;">Total</td><td style="font-weight: 700;">€00,00</td></tr>
+      </tfoot>
+    </table>
+  </section>
+
+  <footer class="visual-object ac-movable" style="position: absolute; bottom: 15mm; width: calc(100% - 30mm); border-top: 2px solid #000; padding-top: 10px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+      <div>
+        <h2 style="font-size: 32px; color: #0033cc; font-weight: 700; line-height: 1;">Fidèle</h2>
+        <p style="font-size: 12px;">4a Villa du Lavoir, 75010 Paris<br>+33 1 48 03 06 70</p>
+      </div>
+      <div style="display: flex; gap: 20px; font-size: 12px;">
+        <div>I: @studio_fidele<br>F: fidele.editions</div>
+        <div>for studio:<br>for press:</div>
+        <div>studio@<br>editions@</div>
+        <div style="font-weight: 700;">fidele-editions.com</div>
+      </div>
+    </div>
+  </footer>
+</main>
+</body>
+</html>

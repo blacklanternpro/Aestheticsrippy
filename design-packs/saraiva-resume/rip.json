@@ -1,0 +1,549 @@
+{
+  "rip": 1,
+  "id": "saraiva-resume",
+  "name": "Saraiva Resume",
+  "category": "Resume",
+  "description": "Light geometric caps name split to the margins over a pale grey sheet; three staggered columns with hanging date and label columns, short centred rules under section heads.",
+  "reference": {
+    "image": "assets/reference.jpg",
+    "notes": "Measured off a 402px pin: sheet 257x364px (A4). Sizes solved from widths and line breaks with engine/fit.py; body and labels carry ~0.08em tracking."
+  },
+  "page": {
+    "width_mm": 210,
+    "height_mm": 297,
+    "format": "A4",
+    "paper": "paper",
+    "ink": "ink"
+  },
+  "tokens": {
+    "paper": "#ebebeb",
+    "ink": "#161616"
+  },
+  "styles": {
+    "base": {
+      "font": "Jost",
+      "weight": 400,
+      "color": "ink"
+    },
+    "name": {
+      "font": "Jost",
+      "weight": 350,
+      "size": 46.8,
+      "leading": 1,
+      "tracking": 0,
+      "case": "upper"
+    },
+    "contact": {
+      "font": "Jost",
+      "weight": 480,
+      "size": 11.7,
+      "leading": 1.38,
+      "tracking": 0.1,
+      "case": "upper",
+      "align": "center"
+    },
+    "summary": {
+      "font": "Jost",
+      "weight": 480,
+      "size": 12.05,
+      "leading": 1.27,
+      "tracking": 0.08,
+      "wrap": "pretty"
+    },
+    "head": {
+      "font": "Jost",
+      "weight": 480,
+      "size": 13.5,
+      "leading": 1.2,
+      "tracking": 0.1,
+      "case": "upper",
+      "align": "center"
+    },
+    "label": {
+      "font": "Jost",
+      "weight": 480,
+      "size": 7.0,
+      "leading": 1.34,
+      "tracking": 0.08,
+      "case": "upper"
+    },
+    "body": {
+      "font": "Jost",
+      "weight": 480,
+      "size": 7.9,
+      "leading": 1.27,
+      "tracking": 0.08,
+      "wrap": "pretty"
+    },
+    "lead": {
+      "extends": "body",
+      "italic": true
+    },
+    "closing": {
+      "font": "Jost",
+      "weight": 480,
+      "size": 12.2,
+      "leading": 1.25,
+      "tracking": 0.1,
+      "case": "upper"
+    }
+  },
+  "frames": [
+    {
+      "id": "first-name",
+      "type": "text",
+      "style": "name",
+      "bind": "person.first",
+      "x": 7.6,
+      "y": 5.0,
+      "w": 100
+    },
+    {
+      "id": "last-name",
+      "type": "text",
+      "style": "name",
+      "bind": "person.last",
+      "x": 102.9,
+      "y": 5.0,
+      "w": 100,
+      "with": {
+        "align": "right"
+      }
+    },
+    {
+      "id": "contact",
+      "type": "stack",
+      "x": 45,
+      "y": 19.1,
+      "w": 120,
+      "gap": 2.6,
+      "children": [
+        {
+          "type": "repeat",
+          "bind": "contact",
+          "gap": 2.6,
+          "item": {
+            "type": "text",
+            "style": "contact",
+            "bind": "."
+          }
+        }
+      ]
+    },
+    {
+      "id": "summary",
+      "type": "text",
+      "style": "summary",
+      "bind": "summary",
+      "x": 8.2,
+      "y": 70.4,
+      "w": 195
+    },
+    {
+      "id": "col-center",
+      "type": "stack",
+      "x": 75.2,
+      "y": 100.2,
+      "w": 57.0,
+      "h": 188,
+      "gap": 0,
+      "fit": {
+        "min": 0.85,
+        "group": "columns"
+      },
+      "children": [
+        {
+          "type": "text",
+          "style": "head",
+          "bind": "center.title"
+        },
+        {
+          "type": "rule",
+          "w": 3.3,
+          "weight": 0.6,
+          "align": "center",
+          "mt": 2.3
+        },
+        {
+          "type": "repeat",
+          "bind": "center.items",
+          "gap": 4.4,
+          "mt": 5.4,
+          "item": {
+            "type": "stack",
+            "gap": 1.3,
+            "children": [
+              {
+                "type": "row",
+                "cols": [
+                  20.1,
+                  "1fr"
+                ],
+                "children": [
+                  {
+                    "type": "text",
+                    "style": "label",
+                    "bind": ".when",
+                    "keep": true
+                  },
+                  {
+                    "type": "stack",
+                    "children": [
+                      {
+                        "type": "text",
+                        "style": "label",
+                        "bind": ".title"
+                      },
+                      {
+                        "type": "text",
+                        "style": "body",
+                        "bind": ".text"
+                      },
+                      {
+                        "type": "repeat",
+                        "bind": ".lines",
+                        "gap": 0.9,
+                        "item": {
+                          "type": "text",
+                          "style": "body",
+                          "bind": "."
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "style": "lead",
+                "bind": ".lead"
+              },
+              {
+                "type": "repeat",
+                "bind": ".body",
+                "gap": 1.3,
+                "item": {
+                  "type": "text",
+                  "style": "body",
+                  "bind": "."
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "col-left",
+      "type": "stack",
+      "x": 8.2,
+      "y": 147.4,
+      "w": 60.0,
+      "h": 104,
+      "gap": 0,
+      "fit": {
+        "min": 0.85,
+        "group": "columns"
+      },
+      "children": [
+        {
+          "type": "text",
+          "style": "head",
+          "bind": "left.title"
+        },
+        {
+          "type": "rule",
+          "w": 3.3,
+          "weight": 0.6,
+          "align": "center",
+          "mt": 1.5
+        },
+        {
+          "type": "repeat",
+          "bind": "left.items",
+          "gap": 2.6,
+          "mt": 5.0,
+          "item": {
+            "type": "row",
+            "cols": [
+              20.1,
+              "1fr"
+            ],
+            "children": [
+              {
+                "type": "text",
+                "style": "label",
+                "bind": ".when",
+                "keep": true
+              },
+              {
+                "type": "stack",
+                "children": [
+                  {
+                    "type": "text",
+                    "style": "label",
+                    "bind": ".title"
+                  },
+                  {
+                    "type": "text",
+                    "style": "body",
+                    "bind": ".text"
+                  },
+                  {
+                    "type": "repeat",
+                    "bind": ".lines",
+                    "gap": 0.9,
+                    "item": {
+                      "type": "text",
+                      "style": "body",
+                      "bind": "."
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "col-left-lower",
+      "type": "stack",
+      "x": 8.2,
+      "y": 255.4,
+      "w": 60.0,
+      "h": 33,
+      "gap": 0,
+      "fit": {
+        "min": 0.85,
+        "group": "columns"
+      },
+      "children": [
+        {
+          "type": "text",
+          "style": "head",
+          "bind": "left_lower.title"
+        },
+        {
+          "type": "rule",
+          "w": 3.3,
+          "weight": 0.6,
+          "align": "center",
+          "mt": 2.3
+        },
+        {
+          "type": "repeat",
+          "bind": "left_lower.items",
+          "gap": 2.6,
+          "mt": 4.4,
+          "item": {
+            "type": "row",
+            "cols": [
+              20.1,
+              "1fr"
+            ],
+            "children": [
+              {
+                "type": "text",
+                "style": "label",
+                "bind": ".when",
+                "keep": true
+              },
+              {
+                "type": "stack",
+                "children": [
+                  {
+                    "type": "text",
+                    "style": "label",
+                    "bind": ".title"
+                  },
+                  {
+                    "type": "text",
+                    "style": "body",
+                    "bind": ".text"
+                  },
+                  {
+                    "type": "repeat",
+                    "bind": ".lines",
+                    "gap": 0.9,
+                    "item": {
+                      "type": "text",
+                      "style": "body",
+                      "bind": "."
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "col-right",
+      "type": "stack",
+      "x": 142.2,
+      "y": 147.4,
+      "w": 59.6,
+      "h": 128,
+      "gap": 0,
+      "fit": {
+        "min": 0.85,
+        "group": "columns"
+      },
+      "children": [
+        {
+          "type": "text",
+          "style": "head",
+          "bind": "right.title"
+        },
+        {
+          "type": "rule",
+          "w": 3.3,
+          "weight": 0.6,
+          "align": "center",
+          "mt": 1.5
+        },
+        {
+          "type": "repeat",
+          "bind": "right.items",
+          "gap": 2.6,
+          "mt": 5.0,
+          "item": {
+            "type": "row",
+            "cols": [
+              19.7,
+              "1fr"
+            ],
+            "children": [
+              {
+                "type": "text",
+                "style": "label",
+                "bind": ".when",
+                "keep": true
+              },
+              {
+                "type": "stack",
+                "children": [
+                  {
+                    "type": "text",
+                    "style": "label",
+                    "bind": ".title"
+                  },
+                  {
+                    "type": "text",
+                    "style": "body",
+                    "bind": ".text"
+                  },
+                  {
+                    "type": "repeat",
+                    "bind": ".lines",
+                    "gap": 0.9,
+                    "item": {
+                      "type": "text",
+                      "style": "body",
+                      "bind": "."
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "closing",
+      "type": "text",
+      "style": "closing",
+      "bind": "closing",
+      "x": 142.6,
+      "y": 277.6,
+      "w": 62
+    }
+  ],
+  "variants": {
+    "dense": {
+      "description": "Same type system for content roughly 1.5x the reference: all three columns start together under a tighter summary, the lower-left block gets more room.",
+      "frames": {
+        "contact": {
+          "y": 18.6
+        },
+        "summary": {
+          "y": 56
+        },
+        "col-center": {
+          "y": 86,
+          "h": 202
+        },
+        "col-left": {
+          "y": 86,
+          "h": 140
+        },
+        "col-left-lower": {
+          "y": 231,
+          "h": 57
+        },
+        "col-right": {
+          "y": 86,
+          "h": 186
+        }
+      },
+      "styles": {
+        "summary": {
+          "size": 11.2
+        },
+        "contact": {
+          "size": 10.6
+        }
+      }
+    }
+  },
+  "fields": {
+    "order": [
+      "person",
+      "contact",
+      "summary",
+      "center",
+      "left",
+      "left_lower",
+      "right",
+      "closing"
+    ],
+    "labels": {
+      "person": "Name",
+      "person.first": "First name",
+      "person.last": "Last name",
+      "contact": "Contact",
+      "contact.*": "Contact block",
+      "summary": "Summary",
+      "center": "Middle column",
+      "center.title": "Heading",
+      "center.items": "Entries",
+      "left": "Left column",
+      "left.title": "Heading",
+      "left.items": "Entries",
+      "left_lower": "Left column, lower",
+      "left_lower.title": "Heading",
+      "left_lower.items": "Entries",
+      "right": "Right column",
+      "right.title": "Heading",
+      "right.items": "Entries",
+      "*.items.*.when": "Date or label",
+      "*.items.*.title": "Title lines",
+      "*.items.*.text": "Text",
+      "*.items.*.lines": "Lines",
+      "*.items.*.lead": "Lead (italic)",
+      "*.items.*.body": "Paragraphs",
+      "closing": "Closing line"
+    },
+    "frames": {
+      "col-center": "the middle column",
+      "col-left": "the left column",
+      "col-left-lower": "the lower left block",
+      "col-right": "the right column",
+      "summary": "the summary",
+      "contact": "the contact block"
+    }
+  }
+}

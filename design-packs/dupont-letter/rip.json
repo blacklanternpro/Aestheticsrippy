@@ -1,0 +1,228 @@
+{
+  "rip": 1,
+  "id": "dupont-letter",
+  "name": "Dupont Letter",
+  "category": "Cover Letter",
+  "description": "Heavy two-line grotesque name with crushed leading over a greyscale portrait; three-point contact line; narrow meta column beside a justified letter body.",
+  "reference": {
+    "image": "assets/reference.jpg",
+    "crop": [
+      2,
+      152,
+      402,
+      718
+    ],
+    "notes": "Phone screenshot of a pin; sheet is the 400x566px region in crop (A4). Name tracking -0.075em solved from cap height and width; body size from the justified line breaks."
+  },
+  "page": {
+    "width_mm": 210,
+    "height_mm": 297,
+    "format": "A4",
+    "paper": "paper",
+    "ink": "ink"
+  },
+  "tokens": {
+    "paper": "#ffffff",
+    "ink": "#0d0d0d",
+    "quiet": "#3a3a3a"
+  },
+  "styles": {
+    "base": {
+      "font": "Inter",
+      "weight": 400,
+      "color": "ink"
+    },
+    "text": {
+      "font": "Inter",
+      "weight": 400,
+      "size": 10.6,
+      "leading": 1.07,
+      "tracking": 0.02
+    },
+    "body": {
+      "extends": "text",
+      "align": "justify",
+      "hyphenate": true
+    },
+    "name": {
+      "font": "Inter Tight",
+      "weight": 700,
+      "size": 87.4,
+      "leading": 0.828,
+      "tracking": -0.075,
+      "case": "upper",
+      "align": "center"
+    },
+    "signature": {
+      "font": "Mrs Saint Delafield",
+      "weight": 400,
+      "size": 27,
+      "leading": 1
+    },
+    "role": {
+      "extends": "text",
+      "case": "upper",
+      "tracking": 0.08,
+      "color": "quiet"
+    }
+  },
+  "frames": [
+    {
+      "id": "contact",
+      "type": "row",
+      "x": 20.4,
+      "y": 13.4,
+      "w": 169.3,
+      "justify": "space-between",
+      "children": [
+        {
+          "type": "text",
+          "style": "text",
+          "bind": "contact.0"
+        },
+        {
+          "type": "text",
+          "style": "text",
+          "bind": "contact.1"
+        },
+        {
+          "type": "text",
+          "style": "text",
+          "bind": "contact.2"
+        }
+      ]
+    },
+    {
+      "id": "photo",
+      "type": "image",
+      "bind": "person.photo",
+      "x": 78.2,
+      "y": 62.8,
+      "w": 54.6,
+      "h": 41.8,
+      "fit": "cover",
+      "position": "center 30%",
+      "filter": "grayscale",
+      "z": 1
+    },
+    {
+      "id": "name",
+      "type": "text",
+      "style": "name",
+      "text": "{person.first}\n{person.last}",
+      "x": 0,
+      "y": 27.0,
+      "w": 210,
+      "z": 2
+    },
+    {
+      "id": "meta",
+      "type": "stack",
+      "x": 20.4,
+      "y": 119.4,
+      "w": 52,
+      "gap": 5.4,
+      "children": [
+        {
+          "type": "text",
+          "style": "text",
+          "bind": "letter.date"
+        },
+        {
+          "type": "text",
+          "style": "text",
+          "bind": "letter.recipient"
+        }
+      ],
+      "h": 60,
+      "fit": {
+        "min": 0.88,
+        "group": "text"
+      }
+    },
+    {
+      "id": "letter",
+      "type": "stack",
+      "x": 78.9,
+      "y": 119.4,
+      "w": 110.8,
+      "h": 170,
+      "gap": 0,
+      "fit": {
+        "min": 0.88,
+        "group": "text"
+      },
+      "children": [
+        {
+          "type": "text",
+          "style": "text",
+          "bind": "letter.salutation"
+        },
+        {
+          "type": "repeat",
+          "bind": "letter.paragraphs",
+          "gap": 3.9,
+          "mt": 4.4,
+          "item": {
+            "type": "text",
+            "style": "body",
+            "bind": "."
+          }
+        },
+        {
+          "type": "text",
+          "style": "text",
+          "bind": "letter.signoff",
+          "mt": 4.8
+        },
+        {
+          "type": "text",
+          "style": "text",
+          "bind": "person.signoff_name",
+          "mt": 11.7
+        },
+        {
+          "type": "text",
+          "style": "signature",
+          "bind": "person.signature",
+          "mt": 1.5
+        },
+        {
+          "type": "text",
+          "style": "role",
+          "bind": "person.role",
+          "mt": 1.2
+        }
+      ]
+    }
+  ],
+  "fields": {
+    "order": [
+      "person",
+      "contact",
+      "letter"
+    ],
+    "labels": {
+      "person": "You",
+      "person.first": "First name",
+      "person.last": "Last name",
+      "person.photo": "Photo",
+      "person.signoff_name": "Name under sign-off",
+      "person.signature": "Signature (script)",
+      "person.role": "Role line",
+      "contact": "Contact line",
+      "contact.*": "Contact item",
+      "letter": "Letter",
+      "letter.date": "Date",
+      "letter.recipient": "Recipient",
+      "letter.salutation": "Salutation",
+      "letter.paragraphs": "Paragraphs",
+      "letter.signoff": "Sign-off"
+    },
+    "frames": {
+      "letter": "the letter body",
+      "meta": "the date and address",
+      "name": "the name"
+    }
+  }
+}

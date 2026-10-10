@@ -1,0 +1,124 @@
+{
+  "recorded": "2026-10-09",
+  "packs": {
+    "creative-studio-office-card": {
+      "score": 29.3,
+      "layout": 43.4,
+      "structure": 55.2,
+      "tone": 87.7,
+      "aspect": 100.0
+    },
+    "drumaq-tour-poster": {
+      "score": 1.7,
+      "layout": 3.5,
+      "structure": 30.6,
+      "tone": 82.6,
+      "aspect": 85.6
+    },
+    "dupont-letter": {
+      "score": 85.8,
+      "layout": 93.6,
+      "structure": 85.1,
+      "tone": 97.3,
+      "aspect": 99.9
+    },
+    "fidele-invoice-0123": {
+      "score": 43.5,
+      "layout": 62.1,
+      "structure": 66.2,
+      "tone": 87.6,
+      "aspect": 99.8
+    },
+    "fidele-invoice-0123-1": {
+      "score": 12.1,
+      "layout": 29.9,
+      "structure": 59.0,
+      "tone": 86.5,
+      "aspect": 99.4
+    },
+    "fidele-invoice-template": {
+      "score": 0.0,
+      "layout": 5.8,
+      "structure": 60.9,
+      "tone": 82.3,
+      "aspect": 99.4
+    },
+    "fidele-order-invoice": {
+      "score": 35.2,
+      "layout": 51.6,
+      "structure": 66.3,
+      "tone": 89.0,
+      "aspect": 99.4
+    },
+    "forecaster-prototype-card": {
+      "score": 29.6,
+      "layout": 41.2,
+      "structure": 63.4,
+      "tone": 90.7,
+      "aspect": 99.6
+    },
+    "handshake-receipt-card": {
+      "score": 0.0,
+      "layout": 0.0,
+      "structure": 24.9,
+      "tone": 94.0,
+      "aspect": 4.8
+    },
+    "handshake-receipt-ledger": {
+      "score": 15.3,
+      "layout": 31.4,
+      "structure": 29.5,
+      "tone": 94.5,
+      "aspect": 41.9
+    },
+    "lsd-event-poster": {
+      "score": 17.3,
+      "layout": 40.8,
+      "structure": 51.0,
+      "tone": 69.6,
+      "aspect": 80.0
+    },
+    "lsd-magick-city-poster": {
+      "score": 0.0,
+      "layout": 0.0,
+      "structure": 49.4,
+      "tone": 75.1,
+      "aspect": 80.2
+    },
+    "minimalist-corporate-invoice": {
+      "score": 30.4,
+      "layout": 46.2,
+      "structure": 54.7,
+      "tone": 96.8,
+      "aspect": 99.6
+    },
+    "pangpang-receipt-poster": {
+      "score": 51.8,
+      "layout": 80.6,
+      "structure": 41.3,
+      "tone": 90.2,
+      "aspect": 90.8
+    },
+    "pangpang-receipt-repro": {
+      "score": 28.3,
+      "layout": 43.2,
+      "structure": 42.9,
+      "tone": 93.9,
+      "aspect": 90.6
+    },
+    "public-records-event-ledger": {
+      "score": 27.0,
+      "layout": 38.8,
+      "structure": 36.1,
+      "tone": 89.0,
+      "aspect": 83.6
+    },
+    "saraiva-resume": {
+      "score": 78.2,
+      "layout": 88.5,
+      "structure": 77.2,
+      "tone": 98.0,
+      "aspect": 99.6
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "creative-studio-office-card",
+  "name": "Creative Studio Office Card",
+  "version": "1.0.0",
+  "category": "Editorial & Poster | Identity | Technical Ephemera",
+  "description": "A brutalist technical test-pattern style card featuring high-density optical alignment marks, camera reticles, dual-tone typography, and an overprinted red oval stamp.",
+  "target": {
+    "dimensions": {
+      "format": "Card-Square",
+      "width_mm": 180,
+      "height_mm": 180,
+      "orientation": "portrait"
+    },
+    "margins_mm": {
+      "top": 10,
+      "right": 10,
+      "bottom": 10,
+      "left": 10
+    }
+  },
+  "typography": {
+    "primaryFont": "Space Mono",
+    "displayFont": "Space Grotesk",
+    "monospaceFont": "Space Mono",
+    "modularScale": 1.25,
+    "lineHeightBase": 1.0
+  },
+  "colorTokens": {
+    "background": "#eae8e3",
+    "textPrimary": "#1a1a1a",
+    "textSecondary": "#444444",
+    "accent": "#d9251d"
+  },
+  "spatialBudget": {
+    "strictSinglePage": true
+  }
+}

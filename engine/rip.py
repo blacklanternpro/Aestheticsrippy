@@ -1,0 +1,268 @@
+"""
+Aestheticsrippy - Rip packs from Python.
+
+The Rip format is rendered by exactly one implementation, studio/js/rip-renderer.js,
+which the studio runs live in the browser. This module drives that same file
+headlessly: it writes a small loader page (fonts + renderer + your data) and
+lets Chromium do the rest, so a PDF from here is identical to the canvas.
+
+A Rip separates a design into three things that change at different rates:
+
+  styles   named type styles: font, size (pt), weight, width, tracking (em),
+           leading, case, alignment, colour, hyphenation
+  frames   absolutely placed boxes in millimetres, and flowing stack / row /
+           repeat / text / image / rule / space frames inside them
+  data     the content: plain JSON that frames bind to by path
+
+See the header of studio/js/rip-renderer.js for the frame vocabulary.
+
+CLI
+---
+  python -m engine.rip build saraiva-resume          # template.html + pack.json from default data
+  python -m engine.rip build --all
+  python -m engine.rip render saraiva-resume --data content/private/resume.json \
+         --out export/resume.pdf [--variant dense] [--png] [--html]
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+from pathlib import Path
+from typing import Dict, Iterable, List, Optional
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
+PACKS_DIR = BASE_DIR / "design-packs"
+FONTS_CSS = BASE_DIR / "fonts" / "fonts.css"
+RENDERER_JS = BASE_DIR / "studio" / "js" / "rip-renderer.js"
+HYPHENATION_JS = BASE_DIR / "studio" / "js" / "hyph-en-gb.js"
+
+
+class RipError(ValueError):
+    pass
+
+
+def load_rip(pack_dir: Path) -> Dict:
+    path = Path(pack_dir) / "rip.json"
+    if not path.exists():
+        raise FileNotFoundError(f"No rip.json in {pack_dir}")
+    rip = json.loads(path.read_text(encoding="utf-8"))
+    for key in ("id", "page", "frames"):
+        if key not in rip:
+            raise RipError(f"rip.json missing '{key}'")
+    return rip
+
+
+def find_assets(data: object, asset_dirs: Iterable[Path], out_dir: Path) -> Dict[str, str]:
+    """
+    Map every short string in the data that names a file in one of the asset
+    folders to a URL relative to the page, so `"photo": "me.jpg"` just works.
+    """
+    dirs = [Path(d) for d in asset_dirs if d]
+    found: Dict[str, str] = {}
+
+    def walk(v: object) -> None:
+        if isinstance(v, dict):
+            for x in v.values():
+                walk(x)
+        elif isinstance(v, list):
+            for x in v:
+                walk(x)
+        elif isinstance(v, str) and 0 < len(v) < 200 and "\n" not in v and v not in found:
+            if v.startswith(("data:", "http:", "https:")) or "/" in v or "\\" in v:
+                return
+            for d in dirs:
+                p = d / v
+                if p.is_file():
+                    found[v] = _rel(p, out_dir)
+                    break
+
+    walk(data)
+    return found
+
+
+def _frame_srcs(rip: Dict) -> List[str]:
+    """Fixed images named by frames (art the pack owns, not content)."""
+    out: List[str] = []
+
+    def walk(f: Dict) -> None:
+        if isinstance(f.get("src"), str):
+            out.append(f["src"])
+        for c in f.get("children", []):
+            walk(c)
+        for k in ("item", "header"):
+            if isinstance(f.get(k), dict):
+                walk(f[k])
+
+    for f in rip.get("frames", []):
+        walk(f)
+    return out
+
+
+def _rel(path: Path, out_dir: Path) -> str:
+    return Path(os.path.relpath(Path(path).resolve(), Path(out_dir).resolve())).as_posix()
+
+
+def loader_html(rip: Dict, data: Dict, out_dir: Path, asset_dirs: Iterable[Path],
+                variant: Optional[str] = None, styles: Optional[Dict] = None,
+                tokens: Optional[Dict] = None, extra_assets: Optional[Dict[str, str]] = None,
+                pack_dirs: Optional[List[Path]] = None) -> str:
+    """
+    A self-contained page that renders `data` through `rip` with the shared renderer.
+    Frame `src` art is looked up only in `pack_dirs` (when given), so a content
+    file can never stand in for a pack's own art.
+    `extra_assets` maps refs used in the data (e.g. "asset:3f9a") to URLs or data URLs,
+    which is how photos uploaded in the studio travel to export.
+    """
+    if variant and variant not in rip.get("variants", {}):
+        raise RipError(f"unknown variant '{variant}' (have: {', '.join(rip.get('variants', {})) or 'none'})")
+    payload = json.dumps({
+        "rip": rip, "data": data, "variant": variant, "styles": styles or {}, "tokens": tokens or {},
+        "assets": {**find_assets(data, asset_dirs, out_dir),
+                   **find_assets(_frame_srcs(rip), pack_dirs if pack_dirs is not None else asset_dirs, out_dir),
+                   **(extra_assets or {})},
+    }, ensure_ascii=False).replace("</", "<\\/")
+    title = rip.get("name", rip.get("id", "Rip")).replace("<", "&lt;")
+    return f"""<!DOCTYPE html>
+<html lang="{rip.get('lang', 'en')}">
+<head>
+<meta charset="utf-8">
+<title>{title}</title>
+<!-- Generated by engine/rip.py. Rendered by studio/js/rip-renderer.js; edit the rip or the data, not this file. -->
+<link rel="stylesheet" href="{_rel(FONTS_CSS, out_dir)}">
+<script src="{_rel(HYPHENATION_JS, out_dir)}"></script>
+<script src="{_rel(RENDERER_JS, out_dir)}"></script>
+</head>
+<body>
+<script id="rip-data" type="application/json">{payload}</script>
+<script>
+var D = JSON.parse(document.getElementById("rip-data").textContent);
+Rip.mountPage(document, D.rip, D.data, {{variant: D.variant, styles: D.styles, tokens: D.tokens,
+                                        assets: D.assets, hyphenation: window.RIP_HYPH_EN_GB}});
+</script>
+</body>
+</html>
+"""
+
+
+def build_html(pack_dir: Path, data: Dict, out_path: Path, data_dir: Optional[Path] = None,
+               variant: Optional[str] = None, styles: Optional[Dict] = None,
+               tokens: Optional[Dict] = None, extra_assets: Optional[Dict[str, str]] = None) -> str:
+    pack_dir = Path(pack_dir)
+    rip = load_rip(pack_dir)
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    page = loader_html(rip, data, out_path.parent, [data_dir, pack_dir / "assets", pack_dir],
+                       variant=variant, styles=styles, tokens=tokens, extra_assets=extra_assets,
+                       pack_dirs=[pack_dir / "assets", pack_dir])
+    out_path.write_text(page, encoding="utf-8")
+    return page
+
+
+def build_pack(pack_dir: Path) -> Path:
+    pack_dir = Path(pack_dir)
+    data_path = pack_dir / "default-data.json"
+    data = json.loads(data_path.read_text(encoding="utf-8")) if data_path.exists() else {}
+    out = pack_dir / "template.html"
+    build_html(pack_dir, data, out)
+    sync_pack_json(pack_dir)
+    return out
+
+
+def sync_pack_json(pack_dir: Path) -> None:
+    """Keep pack.json (read by the pack list, compiler and eval) in step with rip.json."""
+    rip = load_rip(pack_dir)
+    spec_path = Path(pack_dir) / "pack.json"
+    spec = json.loads(spec_path.read_text(encoding="utf-8")) if spec_path.exists() else {}
+    page = rip["page"]
+    spec.update({
+        "id": rip["id"],
+        "name": rip.get("name", rip["id"]),
+        "category": rip.get("category", spec.get("category", "Editorial")),
+        "description": rip.get("description", spec.get("description", "")),
+        "format": "rip",
+        "variants": sorted(rip.get("variants", {})),
+    })
+    spec["target"] = {"dimensions": {
+        "format": page.get("format", "Custom"),
+        "width_mm": page["width_mm"], "height_mm": page["height_mm"],
+        "orientation": "landscape" if page["width_mm"] > page["height_mm"] else "portrait",
+    }}
+    spec_path.write_text(json.dumps(spec, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def rip_packs() -> List[Path]:
+    return [p for p in sorted(PACKS_DIR.iterdir()) if (p / "rip.json").exists()]
+
+
+def render_pdf(pack: str, data: Dict, data_dir: Optional[Path] = None, variant: Optional[str] = None,
+               styles: Optional[Dict] = None, tokens: Optional[Dict] = None,
+               extra_assets: Optional[Dict[str, str]] = None, renderer=None):
+    """Render to PDF (and optionally PNG) in memory. Returns the RenderResult."""
+    from engine.render import Renderer
+
+    pack_dir = PACKS_DIR / pack
+    tmp = pack_dir / f".render-{os.getpid()}.html"
+    build_html(pack_dir, data, tmp, data_dir=data_dir, variant=variant, styles=styles, tokens=tokens,
+               extra_assets=extra_assets)
+    try:
+        if renderer is not None:
+            return renderer.render_file(tmp, pack_id=pack)
+        with Renderer() as r:
+            return r.render_file(tmp, pack_id=pack)
+    finally:
+        tmp.unlink(missing_ok=True)
+
+
+def main(argv: Optional[List[str]] = None) -> int:
+    ap = argparse.ArgumentParser(description="Build and render Rip packs")
+    sub = ap.add_subparsers(dest="cmd", required=True)
+
+    b = sub.add_parser("build", help="Write template.html for a pack from its default data")
+    b.add_argument("pack", nargs="?")
+    b.add_argument("--all", action="store_true")
+
+    r = sub.add_parser("render", help="Render a pack with your own data to PDF")
+    r.add_argument("pack")
+    r.add_argument("--data", required=True, help="JSON content file")
+    r.add_argument("--out", required=True, help="Output PDF path")
+    r.add_argument("--variant", help="Named layout variant from rip.json")
+    r.add_argument("--png", action="store_true", help="Also write a PNG preview")
+    r.add_argument("--html", action="store_true", help="Also keep the loader HTML next to the PDF")
+
+    args = ap.parse_args(argv)
+
+    if args.cmd == "build":
+        packs = rip_packs() if args.all or not args.pack else [PACKS_DIR / args.pack]
+        for p in packs:
+            print(f"[OK] built {build_pack(p).relative_to(BASE_DIR)}")
+        return 0
+
+    data_path = Path(args.data).expanduser().resolve()
+    out_pdf = Path(args.out).expanduser().resolve()
+    data = json.loads(data_path.read_text(encoding="utf-8"))
+    res = render_pdf(args.pack, data, data_dir=data_path.parent, variant=args.variant)
+    out_pdf.parent.mkdir(parents=True, exist_ok=True)
+    out_pdf.write_bytes(res.pdf)
+    if args.png:
+        out_pdf.with_suffix(".png").write_bytes(res.png)
+    if args.html:
+        build_html(PACKS_DIR / args.pack, data, out_pdf.with_suffix(".html"),
+                   data_dir=data_path.parent, variant=args.variant)
+    rep = res.report or {}
+    fits = ", ".join(f"{k} {v:.2f}" for k, v in rep.get("fit", {}).items() if v < 1)
+    status = "OK" if res.single_sheet and not rep.get("overflow") else "WARN"
+    print(f"[{status}] {out_pdf}  pages={res.pages}"
+          + (f"  type scaled: {fits}" if fits else "")
+          + (f"  OVERFLOW: {', '.join(rep['overflow'])}" if rep.get("overflow") else "")
+          + (f"  errors: {'; '.join(res.errors)}" if res.errors else ""))
+    return 0 if status == "OK" else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

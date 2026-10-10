@@ -1,1 +1,59 @@
-{}
+{
+  "list01": [
+    {
+      "c1": "WEBSITE",
+      "c2": "FUN"
+    },
+    {
+      "c1": "@® INSTAGRAM",
+      "c2": "HANDSHAKE.FUN"
+    },
+    {
+      "c1": "FILE NAME",
+      "c2": "CARMENSTUDIO_X_HANDSHAKE"
+    },
+    {
+      "c1": "CAT. OF ITEMS",
+      "c2": "MERCHANDISING"
+    }
+  ],
+  "list02": [
+    {
+      "c1": "Size",
+      "c2": "Time:"
+    },
+    {
+      "c1": "8,5CM",
+      "c2": "FAST"
+    },
+    {
+      "c1": "Materials",
+      "c2": "Inks in use:"
+    },
+    {
+      "c1": "100%",
+      "c2": "C:0"
+    },
+    {
+      "c1": "235",
+      "c2": "BLACK"
+    }
+  ],
+  "t01": "BOOKS & FUN",
+  "t02": "DESCRIPTION",
+  "t03": "OF",
+  "t04": "CONTENTS",
+  "t05": "WWW",
+  "t06": "HANDSHAKE",
+  "t07": "TTT",
+  "t08": "POLYESTER\nG/M?",
+  "t09": "14,5CM",
+  "t10": "DELIVERY",
+  "t11": "all the products:",
+  "t12": "FINISHED\nPURCHASE",
+  "t13": "K:100\n#000000",
+  "t14": "STATUS\nCollaborating to create unique and",
+  "t15": "Www. HANDSHAKE. FUN",
+  "t16": "TICKET\nTotal price of",
+  "t17": "experimental editorial design projects while having fun in the process."
+}
