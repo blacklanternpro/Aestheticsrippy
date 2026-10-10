@@ -124,8 +124,9 @@ class Block:
 
 # ---------------------------------------------------------------------- ink
 
-def ink_mask(crop: np.ndarray) -> Tuple[np.ndarray, np.ndarray, bool]:
-    """Ink mask for a small crop, the paper colour, and whether the ink is lighter."""
+def ink_mask(crop: np.ndarray, with_dist: bool = False):
+    """Ink mask for a small crop, the paper colour, and whether the ink is lighter
+    (and, when asked, the raw darkness map the mask was cut from)."""
     lab = cv2.cvtColor(crop, cv2.COLOR_BGR2LAB).astype(np.float32)
     flat = lab.reshape(-1, 3)
     q = (flat // 12).astype(np.int32)
@@ -138,6 +139,8 @@ def ink_mask(crop: np.ndarray) -> Tuple[np.ndarray, np.ndarray, bool]:
     t, _ = cv2.threshold(d8, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     mask = d8 > max(t, 36)
     inverted = bool(paper[0] < 110 and lab[..., 0][mask].mean() > paper[0]) if mask.any() else False
+    if with_dist:
+        return mask, paper, inverted, dist
     return mask, paper, inverted
 
 
@@ -151,18 +154,45 @@ def measure(img: np.ndarray, words: Sequence[Word], text: str) -> Optional[Ink]:
     crop = img[Y0:Y1, X0:X1]
     if crop.size == 0:
         return None
-    mask, paper, inverted = ink_mask(crop)
+    mask, paper, inverted, dist = ink_mask(crop, with_dist=True)
     n, labels, stats, _ = cv2.connectedComponentsWithStats(mask.astype(np.uint8), 8)
     band0, band1 = y0 - Y0, y1 - Y0
     slack = 0.15 * hgt
-    comps = [stats[i] for i in range(1, n) if stats[i][cv2.CC_STAT_AREA] >= 2]
+    keep = [i for i in range(1, n) if stats[i][cv2.CC_STAT_AREA] >= 2]
     # Keep glyphs inside the words' band; rules and neighbours bleed in otherwise.
-    comps = [c for c in comps if c[1] >= band0 - slack and c[1] + c[3] <= band1 + slack
-             and c[3] <= 1.3 * hgt]
-    if not comps:
+    keep = [i for i in keep if stats[i][1] >= band0 - slack
+            and stats[i][1] + stats[i][3] <= band1 + slack and stats[i][3] <= 1.3 * hgt]
+    if not keep:
         return None
-    bottoms = np.array([c[1] + c[3] for c in comps], np.float32)
-    tops = np.array([c[1] for c in comps], np.float32)
+    comps = [stats[i] for i in keep]
+    # Glyph extents at the half-darkness level: the mask's bounding box rides
+    # the antialias fringe, and a half pixel top and bottom reads as a few
+    # percent on body type. Each column crosses half its own peak darkness at
+    # a sub-pixel row; a glyph's top is the highest crossing (an ascender is
+    # one stem among bowl columns, so no averaging across columns).
+    tops_l, bots_l = [], []
+    for i, c in zip(keep, comps):
+        cx0, cy0, cw, ch = c[0], c[1], c[2], c[3]
+        sub = np.where(labels[cy0:cy0 + ch, cx0:cx0 + cw] == i,
+                       dist[cy0:cy0 + ch, cx0:cx0 + cw], 0.0)
+        colmax = sub.max(axis=0)
+        strong = colmax >= 0.6 * float(np.median(colmax[colmax > 0]))
+        top_g, bot_g = float(ch), 0.0
+        for j in np.nonzero(strong)[0]:
+            col = sub[:, j]
+            lvl = 0.5 * colmax[j]
+            on = np.nonzero(col >= lvl)[0]
+            r0, r1 = int(on[0]), int(on[-1])
+            top = r0 - (col[r0] - lvl) / (col[r0] - col[r0 - 1]) if r0 > 0 and col[r0 - 1] < lvl                 and col[r0] > col[r0 - 1] else float(r0)
+            bot = r1 + (col[r1] - lvl) / (col[r1] - col[r1 + 1]) if r1 < ch - 1 and col[r1 + 1] < lvl                 and col[r1] > col[r1 + 1] else float(r1)
+            top_g = min(top_g, top)
+            bot_g = max(bot_g, bot + 1.0)
+        if bot_g <= top_g:
+            top_g, bot_g = 0.0, float(ch)
+        tops_l.append(cy0 + top_g)
+        bots_l.append(cy0 + bot_g)
+    bottoms = np.array(bots_l, np.float32)
+    tops = np.array(tops_l, np.float32)
     heights = bottoms - tops
     widths = np.array([c[2] for c in comps], np.float32)
     big = heights >= 0.3 * heights.max()

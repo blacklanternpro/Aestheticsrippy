@@ -88,6 +88,11 @@ def test_type_is_recognised(ripped):
     assert family(body["font"])["category"] in ("neo-grotesque", "grotesque", "geometric")
     # The A5 sheet snaps to A4 proportions, so sizes scale; their ratio must hold.
     assert abs(body["size"] / title["size"] - 10 / 44) < 0.03
+    # Absolute size holds where the cabinet owns the face (the title's face is
+    # substituted, which moves nominal points while the pixels match). The
+    # rasterizer quantises x-height to whole pixels - ~3% of a 10pt body on
+    # this sheet - so the bound prices that floor in and catches gross drift.
+    assert abs(body["size"] * 148 / ripped.rip["page"]["width_mm"] / 10 - 1) < 0.05, body
     assert family(note["font"])["category"] in ("mono", "typewriter")
 
 

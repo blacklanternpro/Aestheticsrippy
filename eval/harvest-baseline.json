@@ -2,13 +2,13 @@
   "recorded": "2026-10-11",
   "packs": {
     "creative-studio-office-card": {
-      "score": 97.2,
+      "score": 97.3,
       "live": 0.194,
-      "type": 0.876,
+      "type": 0.877,
       "styles": 4,
       "text_frames": 8,
       "frames": 48,
-      "seconds": 51.3
+      "seconds": 54.1
     },
     "drumaq-tour-poster": {
       "score": 79.7,
@@ -17,79 +17,79 @@
       "styles": 5,
       "text_frames": 15,
       "frames": 21,
-      "seconds": 83.4
+      "seconds": 83.1
     },
     "dupont-letter": {
-      "score": 93.0,
+      "score": 92.8,
       "live": 0.64,
-      "type": 0.738,
-      "styles": 6,
+      "type": 0.751,
+      "styles": 4,
       "text_frames": 24,
       "frames": 32,
-      "seconds": 49.1
+      "seconds": 45.8
     },
     "fidele-invoice-0123": {
-      "score": 94.4,
+      "score": 94.3,
       "live": 0.925,
-      "type": 0.798,
+      "type": 0.799,
       "styles": 6,
       "text_frames": 23,
       "frames": 39,
-      "seconds": 40.9
+      "seconds": 40.1
     },
     "fidele-invoice-0123-1": {
-      "score": 95.8,
+      "score": 96.2,
       "live": 0.932,
-      "type": 0.79,
+      "type": 0.792,
       "styles": 4,
       "text_frames": 23,
       "frames": 42,
-      "seconds": 38.8
+      "seconds": 40.5
     },
     "fidele-invoice-template": {
       "score": 95.1,
       "live": 0.931,
-      "type": 0.796,
+      "type": 0.797,
       "styles": 5,
-      "text_frames": 23,
-      "frames": 42,
-      "seconds": 38.4
+      "text_frames": 20,
+      "frames": 40,
+      "seconds": 40.2
     },
     "fidele-order-invoice": {
       "score": 95.1,
       "live": 0.931,
-      "type": 0.796,
+      "type": 0.797,
       "styles": 5,
-      "text_frames": 23,
-      "frames": 42,
-      "seconds": 37.8
+      "text_frames": 20,
+      "frames": 40,
+      "seconds": 38.6
     },
     "forecaster-prototype-card": {
       "score": 95.2,
       "live": 0.971,
-      "type": 0.806,
+      "type": 0.808,
       "styles": 2,
       "text_frames": 19,
       "frames": 22,
-      "seconds": 30.1
+      "seconds": 29.9
     },
     "handshake-receipt-card": {
-      "score": 92.9,
+      "score": 92.6,
       "live": 0.451,
-      "type": 0.685,
-      "styles": 9,
-      "text_frames": 27,
-      "frames": 54,
-      "seconds": 65.2
+      "type": 0.714,
+      "styles": 8,
+      "text_frames": 24,
+      "frames": 51,
+      "seconds": 62.7
     },
     "handshake-receipt-ledger": {
-      "score": 90.6,
+      "score": 89.5,
       "live": 0.486,
-      "type": 0.729,
-      "styles": 11,
+      "type": 0.732,
+      "styles": 12,
       "text_frames": 18,
       "frames": 52,
-      "seconds": 56.1
+      "seconds": 53.1
     },
     "lsd-event-poster": {
       "score": 85.5,
@@ -98,61 +98,61 @@
       "styles": 12,
       "text_frames": 17,
       "frames": 28,
-      "seconds": 56.2
+      "seconds": 55.9
     },
     "lsd-magick-city-poster": {
-      "score": 87.1,
+      "score": 86.7,
       "live": 0.496,
-      "type": 0.796,
+      "type": 0.787,
       "styles": 9,
       "text_frames": 17,
       "frames": 37,
-      "seconds": 92.5
+      "seconds": 92.3
     },
     "minimalist-corporate-invoice": {
       "score": 94.3,
       "live": 0.976,
-      "type": 0.76,
-      "styles": 5,
-      "text_frames": 20,
-      "frames": 42,
-      "seconds": 40.5
+      "type": 0.767,
+      "styles": 7,
+      "text_frames": 19,
+      "frames": 41,
+      "seconds": 43.5
     },
     "pangpang-receipt-poster": {
-      "score": 93.4,
+      "score": 94.7,
       "live": 0.225,
-      "type": 0.625,
-      "styles": 8,
-      "text_frames": 28,
-      "frames": 46,
-      "seconds": 68.3
+      "type": 0.624,
+      "styles": 9,
+      "text_frames": 29,
+      "frames": 47,
+      "seconds": 69.5
     },
     "pangpang-receipt-repro": {
-      "score": 94.4,
+      "score": 94.5,
       "live": 0.224,
-      "type": 0.652,
+      "type": 0.651,
       "styles": 11,
       "text_frames": 33,
       "frames": 45,
-      "seconds": 78.2
+      "seconds": 76.5
     },
     "public-records-event-ledger": {
-      "score": 82.9,
-      "live": 0.355,
-      "type": 0.595,
-      "styles": 11,
-      "text_frames": 18,
-      "frames": 50,
-      "seconds": 96.2
+      "score": 82.4,
+      "live": 0.365,
+      "type": 0.594,
+      "styles": 10,
+      "text_frames": 19,
+      "frames": 51,
+      "seconds": 85.9
     },
     "saraiva-resume": {
-      "score": 82.1,
-      "live": 0.425,
-      "type": 0.725,
-      "styles": 8,
-      "text_frames": 17,
-      "frames": 60,
-      "seconds": 133.5
+      "score": 85.8,
+      "live": 0.424,
+      "type": 0.747,
+      "styles": 6,
+      "text_frames": 16,
+      "frames": 58,
+      "seconds": 130.9
     }
   }
 }
