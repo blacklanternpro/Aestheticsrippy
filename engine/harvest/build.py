@@ -364,7 +364,8 @@ def _borrow_matches(h: "Harvest") -> None:
                               dict(m.scores))
 
 
-def _table_frame(t, n: int, styles: Dict[str, Dict], sheet: Sheet, data: Dict, labels: Dict) -> Dict:
+def _table_frame(t, n: int, styles: Dict[str, Dict], sheet: Sheet, data: Dict, labels: Dict,
+                 run_track: Optional[Dict[int, float]] = None) -> Dict:
     """A repeat of rows: each row a grid of cells (with spacers) at the measured column edges."""
     mm = sheet.mm
     k = len(t.styles)
@@ -408,8 +409,55 @@ def _table_frame(t, n: int, styles: Dict[str, Dict], sheet: Sheet, data: Dict, l
     labels[key] = f"List {n + 1}"
     for c in range(k):
         labels[f"{key}.*.c{c + 1}"] = f"Column {c + 1}"
-    return {"id": key, "type": "repeat", "bind": key, "x": round(mm(S[0]), 2), "y": round(mm(top), 2),
-            "gap": 0, "item": {"type": "row", "cols": cols, "gap": 0, "align": "baseline", "children": children}}
+    frame = {"id": key, "type": "repeat", "bind": key, "x": round(mm(S[0]), 2), "y": round(mm(top), 2),
+             "gap": 0, "item": {"type": "row", "cols": cols, "gap": 0, "align": "baseline", "children": children}}
+    if t.header:
+        _table_header(frame, t, key, cols, base, styles, sheet, data, labels, run_track or {})
+    return frame
+
+
+def _table_header(frame: Dict, t, key: str, cols, row_base: float, styles: Dict[str, Dict], sheet: Sheet,
+                  data: Dict, labels: Dict, run_track: Dict[int, float]) -> None:
+    """
+    Column titles on the list's own grid, once above the rows. The repeat moves
+    up to the header's baseline, and a gap below it puts the first row's
+    baseline back where it was.
+    """
+    mm = sheet.mm
+    hkey = f"{key}_head"
+    lead = 1.2
+    head_children, fbs, tails = [], [], []
+    for c, (run, sty) in enumerate(zip(t.header, t.header_styles)):
+        if c:
+            head_children.append({"type": "space", "h": 0})
+        if run is None:
+            head_children.append({"type": "space", "h": 0})
+            continue
+        size = styles[sty]["size"] / PT_PER_MM * sheet.px_per_mm
+        fb = first_baseline(size, lead, styles[sty]["font"])
+        fbs.append(fb)
+        tails.append(lead * size - fb)
+        cell = {"type": "text", "style": sty, "bind": f"{hkey}.c{c + 1}", "with": {"wrap": "nowrap", "leading": lead}}
+        if t.aligns[c] != "left":
+            cell["with"]["align"] = t.aligns[c]
+        own = run_track.get(id(run), 0.0)
+        if abs(own - styles[sty].get("tracking", 0.0)) > 0.012:   # spaced titles keep their spacing
+            cell["with"]["tracking"] = round(own, 3)
+        head_children.append(cell)
+    head_base = max(fbs)
+    head_h = head_base + max(tails)
+    head_line = float(np.median([r.baseline for r in t.header if r is not None]))
+    top = head_line - head_base
+    gap = (t.rows[0][0].baseline - row_base) - (top + head_h)
+    frame["y"] = round(mm(top), 2)
+    frame["header"] = {"type": "row", "cols": list(cols), "gap": 0, "align": "baseline", "children": head_children}
+    if gap > 0:
+        frame["header_gap"] = round(mm(gap), 2)
+    data[hkey] = {f"c{c + 1}": r.text for c, r in enumerate(t.header) if r is not None}
+    labels[hkey] = f"List {key[-2:].lstrip('0')} header"
+    for c, r in enumerate(t.header):
+        if r is not None:
+            labels[f"{hkey}.c{c + 1}"] = f"Column {c + 1} title"
 
 
 def _rotated_frames(h: "Harvest", styles: Dict[str, Dict], specs, names, data, labels, tokens) -> List[Dict]:
@@ -589,8 +637,9 @@ def build_rip(h: Harvest, pack_id: str, name: str, asset_names: Dict[int, str],
     data: Dict[str, object] = {}
     labels: Dict[str, str] = {}
     counters: Dict[str, int] = {}
+    run_track = {id(r): block_track.get(bi, 0.0) for bi, b in blocks for r in b.runs}
     for n, t in enumerate(tables):
-        frames.append(_table_frame(t, n, styles, sheet, data, labels))
+        frames.append(_table_frame(t, n, styles, sheet, data, labels, run_track))
     for k, (bi, b) in enumerate(order):
         sname = names[style_of[bi]]
         st = styles[sname]

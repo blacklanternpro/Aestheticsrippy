@@ -106,14 +106,30 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
         say("Looking for type set at an angle")
         from .rotated import find as find_rotated
         import os
-        rotated, regions = ([], regions) if os.environ.get("RIP_NO_ROTATED") else \
-            find_rotated(sheet.image, regions, bg)
+        # A letter or two read level beside angled ink may be the start of a tilted
+        # word: lend it to the angled reader, and drop it if an angled line takes it.
+        loose = [(bi, b.runs[0].box) for bi, b in enumerate(blocks)
+                 if len(b.runs) == 1 and sum(c.isalnum() for c in b.text()) <= 3]
+        rotated, regions, absorbed = ([], regions, []) if os.environ.get("RIP_NO_ROTATED") else \
+            find_rotated(sheet.image, regions, bg, loose=loose)
+        if absorbed:
+            keep = [i for i in range(len(blocks)) if i not in absorbed]
+            matches = {k: matches[i] for k, i in enumerate(keep) if i in matches}
+            blocks = [blocks[i] for i in keep]
+            text_lines = [r.line for b in blocks for r in b.runs]
         if rotated:
             notes.append(f"Read {len(rotated)} {'line' if len(rotated) == 1 else 'lines'} of type set at an angle.")
         covered = art_mod.text_mask(sheet.image.shape, text_lines) | (rule_mask > 0)
         for reg in regions:
             x0, y0, x1, y1 = reg.box
             covered[y0:y1, x0:x1] = True
+        # Angled lines are type too: keep their ink out of the paper estimate.
+        if rotated:
+            tilt = np.zeros(covered.shape, np.uint8)
+            for t in rotated:
+                pts = cv2.boxPoints(((t.cx, t.cy), (t.width + 0.6 * t.cap, 1.8 * t.cap), t.angle))
+                cv2.fillPoly(tilt, [np.round(pts).astype(np.int32)], 1)
+            covered |= tilt > 0
         live = live_share(sheet.image, bg, text_lines, rule_mask, regions)
         x_heights = [r.ink.x_height for b in blocks for r in b.runs if r.ink and r.ink.x_height]
         if x_heights and np.median(x_heights) < 6:

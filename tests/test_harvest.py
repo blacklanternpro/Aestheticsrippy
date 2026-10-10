@@ -158,12 +158,15 @@ KNOWN2 = {
         "row": {"font": "Inter", "weight": 400, "size": 11, "leading": 1.2, "color": "ink"},
         "poster": {"font": "Archivo", "weight": 800, "size": 30, "leading": 1.0, "color": "ink", "case": "upper"},
         "angled": {"font": "Inter", "weight": 600, "size": 16, "leading": 1.0, "color": "ink"},
+        "head": {"font": "Inter", "weight": 700, "size": 8, "tracking": 0.12, "color": "ink", "case": "upper"},
     },
     "frames": [
         {"id": "p1", "type": "text", "style": "poster", "bind": "p1", "x": 20, "y": 14, "w": 108,
          "with": {"align": "center", "wrap": "nowrap"}},
         {"id": "p2", "type": "text", "style": "poster", "bind": "p2", "x": 20, "y": 27, "w": 108,
          "with": {"align": "center", "wrap": "nowrap", "tracking": 0.32}},
+        {"id": "h1", "type": "text", "style": "head", "bind": "h1", "x": 16, "y": 53},
+        {"id": "h2", "type": "text", "style": "head", "bind": "h2", "x": 96, "y": 53, "w": 36, "with": {"align": "right"}},
         {"id": "rows", "type": "repeat", "bind": "rows", "x": 16, "y": 60, "gap": 4, "item": {
             "type": "row", "cols": [80, 36], "children": [
                 {"type": "text", "style": "row", "bind": ".item"},
@@ -173,7 +176,7 @@ KNOWN2 = {
     ],
 }
 DATA2 = {
-    "p1": "Tom of England", "p2": "Ivan Berko",
+    "p1": "Tom of England", "p2": "Ivan Berko", "h1": "Item", "h2": "Price",
     "rows": [{"item": "Oak dining table", "price": "1,200"}, {"item": "Linen armchair", "price": "950"},
              {"item": "Walnut shelving unit", "price": "1,100"}, {"item": "Brass floor lamp", "price": "650"}],
     "tilt": "SEASON CLOSING SALE",
@@ -205,6 +208,18 @@ def test_rows_become_a_list(ripped2):
     assert cells[-1]["with"].get("align") == "right"
 
 
+def test_list_header_rides_on_the_repeat(ripped2):
+    rep = next(f for f in ripped2.rip["frames"] if f.get("type") == "repeat")
+    assert "header" in rep, rep
+    cells = [c for c in rep["header"]["children"] if c.get("type") == "text"]
+    titles = [ripped2.data[c["bind"].split(".")[0]][c["bind"].split(".")[1]] for c in cells]
+    assert [t.upper() for t in titles] == ["ITEM", "PRICE"]
+    assert cells[-1]["with"].get("align") == "right"
+    loose = [ripped2.data[f["bind"]] for f in ripped2.rip["frames"]
+             if f.get("type") == "text" and isinstance(ripped2.data.get(f["bind"]), str)]
+    assert not any(t.upper() in ("ITEM", "PRICE") for t in loose), loose
+
+
 def test_angled_type_is_read_and_rotated(ripped2):
     rot = [f for f in ripped2.rip["frames"] if f.get("rotate")]
     assert rot, "no rotated frame"
@@ -222,6 +237,125 @@ def test_forced_width_lines_get_their_own_tracking(ripped2):
     st = ripped2.rip["styles"]
     track = lambda f: (f.get("with") or {}).get("tracking", st[f["style"]].get("tracking", 0))  # noqa: E731
     assert track(ivan) - track(tom) > 0.15
+
+
+# ------------------------------------------------------------ list headers
+
+def _cell(text, left, right, baseline, cap=14.0):
+    from engine.harvest.layout import Block, Ink, Run
+    box = (left, baseline - cap, right, baseline)
+    ink = Ink(baseline, None, cap, "cap", (20, 20, 20), left, right, baseline - cap, baseline)
+    run = Run([Word(text, box, 95)], Line([Word(text, box, 95)], box, baseline, 0, cap, 0, 0), ink)
+    return Block([run], hard=[False])
+
+
+def _list_sheet(header_rows):
+    """Four item/price rows at a 30 px step under whatever header cells are given."""
+    blocks, style = [], {}
+    for text, l, r, base, st in header_rows:
+        style[len(blocks)] = st
+        blocks.append(_cell(text, l, r, base))
+    for i, (item, price) in enumerate([("OAK TABLE", "1,200"), ("LINEN CHAIR", "950"),
+                                       ("WALNUT SHELF", "1,100"), ("BRASS LAMP", "650")]):
+        base = 200 + 30 * i
+        style[len(blocks)] = "row"
+        blocks.append(_cell(item, 100, 100 + 12 * len(item), base))
+        style[len(blocks)] = "row"
+        blocks.append(_cell(price, 420 - 12 * len(price), 420, base))
+    return blocks, style
+
+
+def test_list_header_in_its_own_style_joins_the_list():
+    from engine.harvest.tables import find_tables
+    blocks, style = _list_sheet([("ITEM", 100, 150, 160, "head"), ("PRICE", 362, 420, 160, "head")])
+    tables = find_tables(blocks, style)
+    assert len(tables) == 1
+    t = tables[0]
+    assert len(t.rows) == 4
+    assert [c.text if c else None for c in t.header] == ["ITEM", "PRICE"]
+    assert t.header_styles == ["head", "head"]
+    assert {0, 1} <= set(t.blocks)
+
+
+def test_a_title_across_the_columns_is_not_a_header():
+    from engine.harvest.tables import find_tables
+    blocks, style = _list_sheet([("SPRING PRICE LIST", 140, 380, 160, "head")])
+    t = find_tables(blocks, style)[0]
+    assert t.header is None and 0 not in t.blocks
+
+
+def test_a_row_far_above_the_list_is_not_a_header():
+    from engine.harvest.tables import find_tables
+    blocks, style = _list_sheet([("ITEM", 100, 150, 60, "head"), ("PRICE", 362, 420, 60, "head")])
+    t = find_tables(blocks, style)[0]
+    assert t.header is None
+
+
+# ------------------------------------------------------------ mixed angles
+
+def _angled_layer(shape, text, org, angle):
+    """Hershey text drawn level from `org`, then turned `angle` degrees clockwise about `org`."""
+    import cv2
+    layer = np.zeros(shape, np.uint8)
+    cv2.putText(layer, text, org, cv2.FONT_HERSHEY_DUPLEX, 1.1, 255, 3, cv2.LINE_AA)
+    m = cv2.getRotationMatrix2D(org, -angle, 1.0)
+    return cv2.warpAffine(layer, m, (shape[1], shape[0])) > 120
+
+
+def test_mixed_angles_split_into_families():
+    from engine.harvest.rotated import split_angles
+    shape = (700, 700)
+    down = _angled_layer(shape, "SALT CELLAR", (150, 110), 45) | _angled_layer(shape, "COOTIE CATCHER", (100, 140), 45)
+    up = _angled_layer(shape, "ELEMENTARY", (335, 385), -45) | _angled_layer(shape, "FORTUNE TELLER", (360, 435), -45)
+    mask = down | up
+    fams = split_angles(mask, [45.0, -45.0])
+    assert set(fams) == {45.0, -45.0}
+    for ang, truth in ((45.0, down), (-45.0, up)):
+        got = fams[ang]
+        assert (got & truth).sum() / truth.sum() > 0.95, ang
+        assert (got & ~truth).sum() / got.sum() < 0.05, ang
+
+
+KNOWN3 = {
+    "rip": 1, "id": "known3", "name": "Known 3", "page": {"width_mm": 148, "height_mm": 148, "paper": "paper", "ink": "ink"},
+    "tokens": {"paper": "#ffffff", "ink": "#111111"},
+    "styles": {"arm": {"font": "Inter", "weight": 600, "size": 15, "leading": 1.0, "color": "ink", "case": "upper"}},
+    "frames": [
+        {"id": "l1", "type": "text", "style": "arm", "bind": "l1", "x": 10, "y": 52, "w": 80, "rotate": 40, "with": {"wrap": "nowrap"}},
+        {"id": "l2", "type": "text", "style": "arm", "bind": "l2", "x": 4, "y": 60, "w": 80, "rotate": 40, "with": {"wrap": "nowrap"}},
+        {"id": "r1", "type": "text", "style": "arm", "bind": "r1", "x": 40, "y": 44, "w": 80, "rotate": -40, "with": {"wrap": "nowrap"}},
+        {"id": "r2", "type": "text", "style": "arm", "bind": "r2", "x": 46, "y": 52, "w": 80, "rotate": -40, "with": {"wrap": "nowrap"}},
+    ],
+}
+DATA3 = {"l1": "SALT CELLAR", "l2": "COOTIE CATCHER", "r1": "ELEMENTARY", "r2": "FORTUNE TELLER"}
+
+
+@pytest.fixture(scope="module")
+def ripped3(tmp_path_factory):
+    from engine.harvest.pipeline import harvest
+    from engine.render import Renderer
+    from engine.rip import loader_html
+
+    work = tmp_path_factory.mktemp("known3")
+    page = work / "known3.html"
+    page.write_text(loader_html(KNOWN3, DATA3, work, [work]), encoding="utf-8")
+    with Renderer() as r:
+        (work / "known3.png").write_bytes(r.render_file(page, pdf=False).png)
+        return harvest(work / "known3.png", "Known 3", out_dir=work / "pack", renderer=r, refine_rounds=0)
+
+
+def test_v_of_angled_type_reads_both_arms(ripped3):
+    rot = {ripped3.data[f["bind"]]: f["rotate"] for f in ripped3.rip["frames"] if f.get("rotate")}
+    for text, ang in (("SALT CELLAR", 40), ("COOTIE CATCHER", 40), ("ELEMENTARY", -40), ("FORTUNE TELLER", -40)):
+        assert text in rot, rot
+        assert abs(rot[text] - ang) < 4, (text, rot[text])
+    # Nothing of the arms is left as level text or as art.
+    level = [ripped3.data[f["bind"]] for f in ripped3.rip["frames"] if f.get("type") == "text" and not f.get("rotate")]
+    assert not level, level
+    # (The rendered sheet carries a hairline at its bottom edge; only art over the V counts.)
+    page_h = ripped3.rip["page"]["height_mm"]
+    over_v = [f for f in ripped3.rip["frames"] if f.get("type") == "image" and f["y"] + f["h"] / 2 < 0.8 * page_h]
+    assert not over_v, over_v
 
 
 def test_cabinet_is_complete():

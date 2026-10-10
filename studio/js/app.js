@@ -41,6 +41,7 @@ function imagePaths() {
     if (f.type === "image" && f.bind && !f.bind.startsWith(".")) out.add(f.bind);
     (f.children || []).forEach(walk);
     if (f.item) walk(f.item);
+    if (f.header) walk(f.header);
   };
   pack.rip.frames.forEach(walk);
   return out;

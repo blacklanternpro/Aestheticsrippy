@@ -441,6 +441,14 @@
       const itemPath = `${listPath}.${i}`;
       return this.render(child, { item: entry, itemPath, itemRoot: itemPath });
     });
+    // An optional header row (column titles in their own style) sits once above
+    // the items, on the same grid; its binds are read outside the item context.
+    if (f.header) {
+      const head = this.render(JSON.parse(JSON.stringify(f.header)), { item: ctx.item, itemPath: ctx.itemPath });
+      if (head) {
+        parts.unshift(f.header_gap ? `<div style="margin-bottom: ${mm(f.header_gap)}">${head}</div>` : head);
+      }
+    }
     const css = this.placeCss(f, absolute).concat(["display: flex", "flex-direction: column",
       `gap: ${mm(f.gap === undefined ? 0 : f.gap)}`]);
     const extra = this.opts.editable ? ` data-list="${escapeHtml(listPath)}"` : "";

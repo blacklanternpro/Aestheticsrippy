@@ -95,8 +95,9 @@ def _frame_srcs(rip: Dict) -> List[str]:
             out.append(f["src"])
         for c in f.get("children", []):
             walk(c)
-        if isinstance(f.get("item"), dict):
-            walk(f["item"])
+        for k in ("item", "header"):
+            if isinstance(f.get(k), dict):
+                walk(f[k])
 
     for f in rip.get("frames", []):
         walk(f)

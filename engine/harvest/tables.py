@@ -10,7 +10,7 @@ uses up entirely, so nothing is left half in a list and half out of it.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 
@@ -24,6 +24,53 @@ class Table:
     aligns: List[str]                     # "left" | "right" | "center" per column
     blocks: List[int] = field(default_factory=list)   # block indices it uses up
     step: float = 0.0                     # baseline to baseline, px
+    header: Optional[List[Optional[Run]]] = None      # column titles, None where a column has none
+    header_styles: Optional[List[Optional[str]]] = None
+
+
+def _header(rows, above: int, cells, aligns, step: float, style_of, blocks, taken) -> Optional[Tuple]:
+    """
+    The row just above a list, if it titles the list's columns: every piece of it
+    sits over one column (by that column's alignment, or inside its span), no
+    piece crosses into a neighbouring column, at least two columns are titled,
+    and it is close (within three rows' steps). A heading across the whole list
+    is not a header. Returns (cells by column, styles by column, block indices).
+    """
+    if above < 0:
+        return None
+    k = len(aligns)
+    lefts = [min(row[c].left for row in cells) for c in range(k)]
+    rights = [max(row[c].right for row in cells) for c in range(k)]
+    size = float(np.median([r.size for row in cells for r in row]))
+    tol = 0.6 * size
+    row = [(bi, r) for bi, r in rows[above] if (above, id(r)) not in taken]
+    if not row or cells[0][0].baseline - row[0][1].baseline > 3 * step:
+        return None
+    head: List[Optional[Run]] = [None] * k
+    sty: List[Optional[str]] = [None] * k
+    used = set()
+    for bi, r in row:
+        mid = (r.left + r.right) / 2
+        hits = []
+        for c in range(k):
+            by_align = {"left": abs(r.left - lefts[c]), "right": abs(r.right - rights[c]),
+                        "center": abs(mid - (lefts[c] + rights[c]) / 2)}[aligns[c]] <= tol
+            inside = r.left >= lefts[c] - tol and r.right <= rights[c] + tol
+            if by_align or inside:
+                hits.append(c)
+        if len(hits) != 1 or head[hits[0]] is not None:
+            return None
+        c = hits[0]
+        # A title may be wider than its column, but not into the next one.
+        if (c + 1 < k and r.right > lefts[c + 1] - 0.3 * size) or (c > 0 and r.left < rights[c - 1] + 0.3 * size):
+            return None
+        head[c], sty[c] = r, style_of[bi]
+        used.add(bi)
+    if sum(h is not None for h in head) < 2:
+        return None
+    if not all(all(any(r is h for h in head) for r in blocks[bi].runs) for bi in used):
+        return None
+    return head, sty, used
 
 
 def _rows(runs: Sequence[Tuple[int, Run]]) -> List[List[Tuple[int, Run]]]:
@@ -124,7 +171,17 @@ def find_tables(blocks: Sequence[Block], style_of: Dict[int, str], same=None) ->
         in_rows = {id(r) for ch in chains for _, r in ch}
         if all(all(id(r) in in_rows for r in blocks[bi].runs) for bi in involved):
             steps = np.diff([rows[g][0][1].baseline for g in group])
-            tables.append(Table(cells, sig, aligns, sorted(involved), float(np.median(steps))))
+            step = float(np.median(steps))
+            t = Table(cells, sig, aligns, sorted(involved), step)
+            # Column titles in a style of their own never join the chains: look above.
+            head = _header(rows, group[0] - 1, cells, aligns, step, style_of, blocks, taken)
+            if head:
+                t.header, t.header_styles, used = head
+                t.blocks = sorted(involved | used)
+                for bi, r in rows[group[0] - 1]:
+                    if any(r is h for h in t.header):
+                        taken.add((group[0] - 1, id(r)))
+            tables.append(t)
             for g, row_i in enumerate(group):
                 for ch in chains:
                     taken.add((row_i, id(ch[g][1])))

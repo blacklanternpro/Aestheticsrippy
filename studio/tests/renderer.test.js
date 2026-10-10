@@ -87,6 +87,23 @@ test("shipped packs render with their default data and every variant", () => {
   }
 });
 
+test("a repeat's header row renders once, above the items, outside the item context", () => {
+  const rip = { id: "h", page: { width_mm: 80, height_mm: 60 }, styles: { head: { font: "Inter", weight: 700 }, row: { font: "Inter" } },
+    frames: [{ id: "list", type: "repeat", bind: "rows", x: 5, y: 5, header_gap: 1.5,
+      header: { type: "row", cols: [40, 20], children: [
+        { type: "text", style: "head", bind: "rows_head.c1" }, { type: "text", style: "head", bind: "rows_head.c2" }] },
+      item: { type: "row", cols: [40, 20], children: [
+        { type: "text", style: "row", bind: ".c1" }, { type: "text", style: "row", bind: ".c2" }] } }] };
+  const data = { rows_head: { c1: "Item", c2: "Price" }, rows: [{ c1: "Oak table", c2: "1,200" }, { c1: "Lamp", c2: "650" }] };
+  const html = Rip.renderSheet(rip, data, { editable: true });
+  assert.equal((html.match(/>Item</g) || []).length, 1);
+  assert.ok(html.indexOf(">Item<") < html.indexOf(">Oak table<"));
+  assert.match(html, /data-path="rows_head\.c1"/);
+  assert.match(html, /margin-bottom: 1\.5mm/);
+  // No rows, no header: an empty list leaves nothing behind.
+  assert.doesNotMatch(Rip.renderSheet(rip, { rows_head: data.rows_head, rows: [] }), />Item</);
+});
+
 test("box frames draw fills, outlines and ellipses", () => {
   const rip = { id: "b", page: { width_mm: 50, height_mm: 50 }, tokens: { accent: "#ff0066" }, styles: {},
     frames: [
