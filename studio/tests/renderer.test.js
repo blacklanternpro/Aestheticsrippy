@@ -104,6 +104,44 @@ test("a repeat's header row renders once, above the items, outside the item cont
   assert.doesNotMatch(Rip.renderSheet(rip, { rows_head: data.rows_head, rows: [] }), />Item</);
 });
 
+test("path frames set text along a curve, editable and styled", () => {
+  const rip = { id: "p", page: { width_mm: 80, height_mm: 80 }, tokens: { ink: "#112233" },
+    styles: { arc: { font: "Inter", size: 12, weight: 700, tracking: 0.1, case: "upper", color: "ink" } },
+    frames: [{ id: "ring", type: "path", style: "arc", bind: "ring", x: 10, y: 10, w: 40, h: 40,
+      points: [[0, 20], [20, 0], [40, 20]], offset: 2.5 }] };
+  const html = Rip.renderSheet(rip, { ring: "Last Saturday" }, { editable: true });
+  assert.match(html, /data-frame="ring" class="rip-path"/);
+  assert.match(html, /<svg[^>]*overflow: visible/);
+  // Points in mm become CSS px (96 per inch) in the path.
+  assert.match(html, /<path id="[^"]+" d="M0 75\.59 L75\.59 0 L151\.18 75\.59"/);
+  assert.match(html, /<textPath href="#[^"]+" startOffset="9\.45">LAST SATURDAY<\/textPath>/);
+  assert.match(html, /letter-spacing: 0\.1em/);
+  assert.match(html, /color: #112233/);
+  assert.match(html, /data-path="ring"/);
+  // Two path frames on one sheet get distinct path ids.
+  const two = Rip.renderSheet({ ...rip, frames: [rip.frames[0], { ...rip.frames[0], id: "ring2" }] }, { ring: "A" });
+  const ids = [...two.matchAll(/<path id="([^"]+)"/g)].map((m) => m[1]);
+  assert.equal(new Set(ids).size, 2);
+});
+
+test("pitched path frames place letters at even steps, upright or along the curve", () => {
+  const base = { id: "stem", type: "path", style: "s", bind: "t", x: 0, y: 0, w: 10, h: 40,
+    points: [[5, 0], [5, 40]], offset: 5, pitch: 10 };
+  const rip = { id: "q", page: { width_mm: 50, height_mm: 50 }, styles: { s: { font: "Inter", size: 20 } },
+    frames: [base] };
+  const html = Rip.renderSheet(rip, { t: "LAS" });
+  const glyphs = [...html.matchAll(/<text x="([\d.]+)" y="([\d.]+)"[^>]*>(.)<\/text>/g)];
+  assert.deepEqual(glyphs.map((m) => m[3]), ["L", "A", "S"]);
+  // Down a vertical stem: same x, y every 10 mm starting 5 mm in.
+  assert.deepEqual(glyphs.map((m) => +m[2]), [18.9, 56.69, 94.49]);
+  assert.ok(glyphs.every((m) => m[1] === "18.9"));
+  assert.match(html, /text-anchor="middle"/);
+  // Along the curve the letters turn with it (90deg on a downward stem); upright they don't.
+  assert.match(html, /rotate\(90 18\.9 18\.9\)/);
+  const up = Rip.renderSheet({ ...rip, frames: [{ ...base, upright: true }] }, { t: "LAS" });
+  assert.doesNotMatch(up, /rotate\(/);
+});
+
 test("box frames draw fills, outlines and ellipses", () => {
   const rip = { id: "b", page: { width_mm: 50, height_mm: 50 }, tokens: { accent: "#ff0066" }, styles: {},
     frames: [

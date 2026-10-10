@@ -342,6 +342,7 @@ class Harvest:
     frame_blocks: Dict[str, int] = field(default_factory=dict)
     type_match: float = 0.0
     rotated: List = field(default_factory=list)
+    curved: List = field(default_factory=list)
 
 
 def _metrics(family: str) -> Dict:

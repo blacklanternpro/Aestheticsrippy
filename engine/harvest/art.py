@@ -35,6 +35,8 @@ class Region:
     mask: Optional[np.ndarray] = None   # bool mask over the box
     radius: Optional[str] = None        # "ellipse" for round outlines
     notes: List[str] = field(default_factory=list)
+    fill: Optional[np.ndarray] = None   # bool over the box: pixels to paint over with the
+    #                                     mark's own colour (light letters read out of it)
 
 
 def paper_colour(img: np.ndarray) -> Tuple[int, int, int]:

@@ -119,6 +119,11 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
             text_lines = [r.line for b in blocks for r in b.runs]
         if rotated:
             notes.append(f"Read {len(rotated)} {'line' if len(rotated) == 1 else 'lines'} of type set at an angle.")
+        from .curved import find as find_curved
+        curved, regions = ([], regions) if os.environ.get("RIP_NO_CURVED") else \
+            find_curved(sheet.image, regions, bg)
+        if curved:
+            notes.append(f"Read {len(curved)} {'line' if len(curved) == 1 else 'lines'} of type set along a curve.")
         covered = art_mod.text_mask(sheet.image.shape, text_lines) | (rule_mask > 0)
         for reg in regions:
             x0, y0, x1, y1 = reg.box
@@ -138,7 +143,7 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
         plate = art_mod.plate(sheet.image, covered, paper)
         if plate is not None:
             notes.append("The paper is not flat; kept it as a paper image under everything.")
-        h = Harvest(sheet, blocks, matches, rules, regions, paper, notes, rotated=rotated)
+        h = Harvest(sheet, blocks, matches, rules, regions, paper, notes, rotated=rotated, curved=curved)
         say("Writing the pack")
         if pack_dir.exists():
             shutil.rmtree(pack_dir)

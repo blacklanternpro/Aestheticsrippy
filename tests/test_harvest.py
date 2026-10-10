@@ -315,6 +315,63 @@ def test_a_real_second_family_still_earns_its_place():
     assert [faces[i].family for i in range(4)] == ["Grotesk", "Grotesk", "Serif", "Serif"]
 
 
+# ------------------------------------------------------------ curved text
+
+def _circle(cx, cy, r, a0=180, a1=540, step=6):
+    import math
+    return [[round(cx + r * math.cos(math.radians(a)), 2), round(cy + r * math.sin(math.radians(a)), 2)]
+            for a in range(a0, a1 + 1, step)]
+
+
+KNOWN4 = {
+    "rip": 1, "id": "known4", "name": "Known 4", "page": {"width_mm": 148, "height_mm": 148, "paper": "paper", "ink": "ink"},
+    "tokens": {"paper": "#ffffff", "ink": "#111111"},
+    "styles": {"arc": {"font": "Inter", "weight": 700, "size": 16, "tracking": 0.12, "color": "ink", "case": "upper"},
+               "big": {"font": "Inter", "weight": 700, "size": 20, "color": "ink", "case": "upper"}},
+    "frames": [
+        {"id": "ring", "type": "path", "style": "arc", "bind": "ring", "x": 10, "y": 8, "w": 60, "h": 60,
+         "points": _circle(30, 30, 24, 180, 470)},
+        {"id": "wave", "type": "path", "style": "arc", "bind": "wave", "x": 20, "y": 85, "w": 100, "h": 50,
+         "points": [[round(5 + 90 * t / 60, 2), round(25 + 16 * __import__("math").sin(t / 60 * 6.2832), 2)]
+                    for t in range(61)], "offset": 4},
+        {"id": "stem", "type": "path", "style": "big", "bind": "stem", "x": 120, "y": 10, "w": 14, "h": 80,
+         "points": [[7, 0], [7, 80]], "offset": 6, "pitch": 15, "upright": True},
+    ],
+}
+DATA4 = {"ring": "Last Saturday Dance", "wave": "Fortune Teller", "stem": "Party"}
+
+
+@pytest.fixture(scope="module")
+def ripped4(tmp_path_factory):
+    from engine.harvest.pipeline import harvest
+    from engine.render import Renderer
+    from engine.rip import loader_html
+
+    work = tmp_path_factory.mktemp("known4")
+    page = work / "known4.html"
+    page.write_text(loader_html(KNOWN4, DATA4, work, [work]), encoding="utf-8")
+    with Renderer() as r:
+        (work / "known4.png").write_bytes(r.render_file(page, pdf=False).png)
+        return harvest(work / "known4.png", "Known 4", out_dir=work / "pack", renderer=r, refine_rounds=0)
+
+
+def test_curved_text_is_read_onto_paths(ripped4):
+    paths = {ripped4.data[f["bind"]].upper(): f for f in ripped4.rip["frames"] if f.get("type") == "path"}
+    assert set(paths) >= {"LAST SATURDAY DANCE", "FORTUNE TELLER", "PARTY"}, paths.keys()
+    stem = paths["PARTY"]
+    assert stem.get("upright") and stem.get("pitch"), stem
+    # Spaced 15 mm apart on the page (scaled with any paper-size snap).
+    scale = ripped4.rip["page"]["width_mm"] / KNOWN4["page"]["width_mm"]
+    assert abs(stem["pitch"] / (15 * scale) - 1) < 0.08, stem["pitch"]
+    assert not paths["LAST SATURDAY DANCE"].get("pitch")
+    # The letters are not also left behind as art or level text.
+    page_h = ripped4.rip["page"]["height_mm"]
+    art = [f for f in ripped4.rip["frames"] if f.get("type") == "image" and f["y"] + f["h"] / 2 < 0.9 * page_h]
+    assert not art, art
+    level = [ripped4.data[f["bind"]] for f in ripped4.rip["frames"] if f.get("type") == "text"]
+    assert not level, level
+
+
 # ------------------------------------------------------------ list headers
 
 def _cell(text, left, right, baseline, cap=14.0):
