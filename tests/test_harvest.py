@@ -472,6 +472,58 @@ def _ransom_page() -> str:
             "</style>" + "".join(spans))
 
 
+RING_JITTER = [8, -14, 10, -6, 12]
+
+
+def _ring_page(word: str) -> str:
+    """Light letters knocked out of a dark band round a counter, clockwise from
+    the top, each turned with the ring give or take a hand's jitter."""
+    import math
+    spans = []
+    n = len(word)
+    for i, (ch, j) in enumerate(zip(word, RING_JITTER)):
+        th = -90 + 360 * i / n                     # degrees, screen-clockwise from the top
+        x = 350 + 165 * math.cos(math.radians(th))
+        y = 350 + 165 * math.sin(math.radians(th))
+        spans.append(f'<span style="position:absolute;left:{x - 22:.0f}px;top:{y - 30:.0f}px;'
+                     f'width:44px;text-align:center;line-height:60px;'
+                     f'transform:rotate({th + 90 + j:.0f}deg)">{ch}</span>')
+    font = (ROOT / "fonts" / "Inter-var.woff2").resolve()
+    return ("<!doctype html><meta charset=\"utf-8\"><style>"
+            f"@font-face {{ font-family:'Inter'; src: url('file://{font}'); }}"
+            "body { background:#fff; margin:0; width:700px; height:700px; position:relative;"
+            " font-family:Inter; font-weight:700; font-size:52px; color:#fff; }"
+            ".ring { position:absolute; left:120px; top:120px; width:460px; height:460px;"
+            " border-radius:50%; border:115px solid #151515; box-sizing:border-box; }"
+            "</style><div class=\"ring\"></div>" + "".join(spans))
+
+
+def test_ring_lettering_reads_round_its_counter(tmp_path):
+    # Letters cut out round a counter chain in whatever order the tree breaks
+    # the loop; the ring is found from geometry, read clockwise from the top.
+    from engine.harvest.pipeline import harvest
+    from engine.render import Renderer
+
+    page = tmp_path / "ring.html"
+    page.write_text(_ring_page("NIGHT"), encoding="utf-8")
+    with Renderer() as r:
+        (tmp_path / "ring.png").write_bytes(r.render_file(page, pdf=False).png)
+        res = harvest(tmp_path / "ring.png", "Ring", out_dir=tmp_path / "pack",
+                      renderer=r, refine_rounds=0)
+    paths = [res.data[f["bind"]] for f in res.rip["frames"] if f.get("type") == "path"]
+    assert "NIGHT" in paths, paths
+
+
+def test_wordness_hears_words_not_digit_dodges():
+    from engine.harvest.curved import _lexical, _wordness
+    assert _wordness("LAST") > _wordness("IAST") > _wordness("1AST") - 1   # sanity of order
+    assert _wordness("LAST") > _wordness("1AST")
+    assert _wordness("DANCE") > _wordness("DANGE")
+    assert _wordness("SATURDAY") > _wordness("YADRUTAS")
+    assert _lexical("DANCE") and _lexical("LAST SATURDAY")
+    assert not _lexical("D4ZOE") and not _lexical("ADENO")
+
+
 def test_ransom_lettering_reads_with_per_letter_angles(tmp_path):
     from engine.harvest.pipeline import harvest
     from engine.render import Renderer

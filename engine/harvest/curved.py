@@ -331,18 +331,90 @@ def _char_conf(tile: np.ndarray) -> Optional[Tuple[float, str]]:
     return float(w.conf), w.text
 
 
+_WORDS: Optional[frozenset] = None
+
+
+def _words() -> frozenset:
+    """Common English words (top-20k by frequency, vendored): the whole-word
+    ear that settles what bigrams cannot - DANCE and DANGE share every pair."""
+    global _WORDS
+    if _WORDS is None:
+        import gzip
+        import os
+        path = os.path.join(os.path.dirname(__file__), "data", "words-en.txt.gz")
+        _WORDS = frozenset(gzip.decompress(open(path, "rb").read()).decode().split())
+    return _WORDS
+
+
+def _lexical(text: str) -> bool:
+    """Every run of three or more letters is a common word, and there is one."""
+    toks = "".join(c if c.isalnum() else " " for c in text.upper()).split()
+    long = [t for t in toks if len(t) >= 3]
+    return bool(long) and all(t.isalpha() and t in _words() for t in long)
+
+
+_BIGRAMS = {b: w for bs, w in (
+    ("TH HE IN ER AN RE ON AT EN ND TI ES OR TE OF ED IS IT AL AR ST TO NT NG SE HA AS OU IO LE VE CO ME DE HI RI RO IC NE EA RA CE", 1.0),
+    ("LI CH LL BE MA SI OM UR CA EL TA LA NS DI FO HO PE EC PR NO CT US AC OT IL TR LY NC ET UT SS SO RS UN LO WA GE IE WH EE WI EM AD OL RT", 0.6),
+    ("PO WE NA UL NI TS MO QU BI RU PA SH OW KE PU CK DO AP PL AY GH AI SA SU DU UE UA UP DA GO BY MY GA AB BO FA", 0.3),
+) for b in bs.split()}
+
+
+def _wordness(text: str) -> float:
+    """
+    A rough ear for language: common-bigram share, enough to tell "SATURDAY"
+    from "YADRUTAS" when the reader cannot. Only ever used comparatively.
+    Digits count as pair members - neutral among themselves (a year, a price),
+    costly inside a word ("1AST" must never outscore "LAST" by shedding the
+    pairs its digit broke).
+    """
+    chars = [c for c in text.upper() if c.isalnum()]
+    if len(chars) < 2:
+        return 0.0
+    tot = 0.0
+    for a, b in zip(chars, chars[1:]):
+        if a.isdigit() and b.isdigit():
+            pass
+        elif a.isdigit() or b.isdigit():
+            tot -= 0.6
+        else:
+            tot += _BIGRAMS.get(a + b, -0.4)
+    base = tot / (len(chars) - 1)
+    # Whole words get the final say ("DANCE" and "DANGE" share every pair).
+    # A token is a word only when it is all letters: a digit does not split
+    # a run into bonus-earning fragments ("D4ZOE" contains no "ZOE").
+    toks = "".join(c if c.isalnum() else " " for c in text.upper()).split()
+    alpha = sum(c.isalpha() for c in text.upper())
+    hits = sum(len(t) for t in toks if t.isalpha() and len(t) >= 3 and t in _words())
+    return base + (0.6 * hits / alpha if alpha else 0.0)
+
+
 class _OutOfTime(Exception):
     """The sheet's time for reading curves ran out mid-sweep."""
 
 
+def _window(anchor: float) -> List[float]:
+    """Candidate turns for a letter: about the path tangent, its half-turn, and upright."""
+    out: List[float] = []
+    for base, half in ((anchor, 40), (anchor + 180, 40), (0.0, 24)):
+        for d in range(-half, half + 1, 8):
+            a = (base + d + 180) % 360 - 180
+            if all(abs(a - o) > 3 for o in out):
+                out.append(a)
+    return out
+
+
 def _ransom_candidates(sel: Sequence[_Piece], anchors: Sequence[float],
-                       deadline: Optional[float] = None) -> List[List[Tuple[float, float]]]:
+                       deadline: Optional[float] = None,
+                       glyphs=None) -> List[List[Tuple[float, float, str]]]:
     """
-    Candidate rotations per letter (degrees, CSS-clockwise), best first. In the
-    designs this serves, a letter is turned roughly with the path, or stands
-    roughly upright, give or take hand-placed jitter - so the sweep anchors on
-    the local tangent and on upright, not on every possible angle, which also
-    starves the classic traps (an N turned 90 reads as a perfectly fine Z).
+    Candidate rotations per letter (degrees, CSS-clockwise), best first, with
+    the character each one reads as. In the designs this serves, a letter is
+    turned roughly with the path, or stands roughly upright, give or take
+    hand-placed jitter - so the sweep anchors on the local tangent, its
+    half-turn and upright, not on every possible angle, which also starves
+    the classic traps (an N turned 90 reads as a perfectly fine Z).
+    The glyph atlas does this in microseconds; OCR is the fallback oracle.
     """
     out = []
     for p, anchor in zip(sel, anchors):
@@ -350,30 +422,36 @@ def _ransom_candidates(sel: Sequence[_Piece], anchors: Sequence[float],
         if cached is not None and cached[0] == round(anchor):
             out.append(cached[1])
             continue
-        tile = 255 - 255 * p.mask.astype(np.uint8)
-        bases = [anchor]
-        for b in (anchor + 180, 0.0):   # the path walked the other way; or upright letters
-            if all(_cdiff(b, o) > 20 for o in bases):
-                bases.append(b)
-        scored = []
-        for off in (0, 15, -15, 30, -30):
-            for base in bases:
-                if deadline is not None and time.monotonic() > deadline:
-                    raise _OutOfTime
-                a = (base + off + 180) % 360 - 180
-                r = _char_conf(_right(tile, a))
-                if r:
-                    scored.append((r[0], float(a)))
-        scored.sort(reverse=True)
-        keep: List[Tuple[float, float]] = []    # (angle, own conf)
-        for conf, a in scored:
-            if conf < max(55.0, scored[0][0] - 25):
-                break
-            if all(_cdiff(a, o) > 20 for o, _ in keep):
-                keep.append((a, conf))
-            if len(keep) >= 2:
-                break
-        keep = keep or [(float(anchor), 0.0)]
+        keep: List[Tuple[float, float, str]] = []    # (angle, own conf, char)
+        if glyphs is not None:
+            # The atlas is cheap enough to try every turn: hand-placed letters
+            # wander much further from the path than any window would allow.
+            for sc, a, ch in glyphs.classify(p.mask, range(-180, 180, 10)):
+                keep.append((a, 100.0 * sc, ch))
+        else:
+            tile = 255 - 255 * p.mask.astype(np.uint8)
+            bases = [anchor]
+            for b in (anchor + 180, 0.0):   # the path walked the other way; or upright letters
+                if all(_cdiff(b, o) > 20 for o in bases):
+                    bases.append(b)
+            scored = []
+            for off in (0, 15, -15, 30, -30):
+                for base in bases:
+                    if deadline is not None and time.monotonic() > deadline:
+                        raise _OutOfTime
+                    a = (base + off + 180) % 360 - 180
+                    r = _char_conf(_right(tile, a))
+                    if r:
+                        scored.append((r[0], float(a), r[1]))
+            scored.sort(reverse=True)
+            for conf, a, ch in scored:
+                if conf < max(55.0, scored[0][0] - 25):
+                    break
+                if all(_cdiff(a, o) > 20 for o, _, _ in keep):
+                    keep.append((a, conf, ch))
+                if len(keep) >= 2:
+                    break
+        keep = keep or [(float(anchor), 0.0, "")]
         p.cands = (round(anchor), keep)
         out.append(keep)
     return out
@@ -384,23 +462,104 @@ def _cdiff(a: float, b: float) -> float:
     return min(d, 360 - d)
 
 
+def _ring_spin(sel: Sequence[_Piece], anchors: Sequence[float], deadline, glyphs
+               ) -> List[Tuple[List[_Piece], List[float]]]:
+    """
+    Letters cut out around a counter form a closed ring, and the chain's cut
+    falls wherever the tree happened to break the loop ("ADEON" for a ring
+    spelling DANCE). When the two ends sit one letter-gap apart, offer the
+    few cuts whose letters best speak language - every rotation, both ways,
+    judged cheaply from the atlas candidates - for the row read to referee.
+    """
+    pts = np.array([p.centre for p in sel], dtype=float)
+    n = len(sel)
+    if n < 4:
+        return []
+    # A ring is a matter of geometry, not of the chain's order: the tree may
+    # zig-zag across the counter (A-D-E-N-C round a D). Letters sitting on an
+    # ellipse about their centroid - even radii once each axis is scaled to
+    # its spread, no wide empty arc - are put in clockwise order and become
+    # the cycle; their anchors follow the ring's tangent.
+    ctr = pts.mean(axis=0)
+    sd = np.maximum(pts.std(axis=0), 1e-6)
+    q = (pts - ctr) / sd
+    rad = np.hypot(q[:, 0], q[:, 1])
+    th = np.arctan2(q[:, 1], q[:, 0])
+    srt = np.sort(th)
+    wide = float(np.max(np.diff(np.concatenate([srt, [srt[0] + 2 * np.pi]]))))
+    if float(rad.std() / max(1e-6, rad.mean())) < 0.2 and wide < np.radians(130):
+        polar = [int(i) for i in np.argsort(th)]
+        sel = [sel[i] for i in polar]
+        pts = pts[polar]
+        anchors = [float(np.degrees(t)) + 90.0 for t in th[polar]]
+    else:
+        gaps = [float(np.hypot(*(pts[i + 1] - pts[i]))) for i in range(n - 1)]
+        if float(np.hypot(*(pts[0] - pts[-1]))) > 1.7 * float(np.median(gaps)):
+            return []
+    try:
+        cands = _ransom_candidates(sel, anchors, deadline, glyphs)
+    except _OutOfTime:
+        return []
+
+    def score(order):
+        front = {}
+        for _, cf, ch in cands[order[0]]:
+            front[ch] = max(front.get(ch, -1e9), 0.03 * cf)
+        for i in order[1:]:
+            nxt = {}
+            for _, cf, ch in cands[i]:
+                v = max(v0 + _BIGRAMS.get(p0 + ch, -0.4) for p0, v0 in front.items()) + 0.03 * cf
+                if v > nxt.get(ch, -1e9):
+                    nxt[ch] = v
+            front = nxt
+        return max(front.values())
+
+    # Ring lettering follows the clock: it reads clockwise, starting near the
+    # top (clock faces, seals, coin edges - and DANCE round the D). Geometry
+    # gets a voice beside language, or every rotation of the same letters
+    # sounds alike ("ONADE" and "DANCE" share a cycle).
+    ang = [float(np.arctan2(p[1] - ctr[1], p[0] - ctr[0])) for p in pts]
+
+    def prior(order):
+        steps = [(ang[order[k + 1]] - ang[order[k]] + np.pi) % (2 * np.pi) - np.pi
+                 for k in range(len(order) - 1)]
+        clockwise = 0.6 if sum(steps) > 0 else 0.0       # y runs down: positive is clockwise
+        top = 0.6 * max(0.0, float(np.cos(ang[order[0]] + np.pi / 2)))
+        return clockwise + top
+
+    ranked = []
+    for flip in (False, True):
+        idx = list(range(n))[::-1] if flip else list(range(n))
+        for r in range(n):
+            order = idx[r:] + idx[:r]
+            ranked.append((score(order) + prior(order), prior(order), order, flip))
+    ranked.sort(key=lambda t: -t[0])
+    out = []
+    for _, pr, order, flip in ranked[:3]:
+        turn = 180.0 if flip else 0.0
+        out.append(([sel[i] for i in order], [anchors[i] + turn for i in order], pr))
+    return out
+
+
 def _ransom_read(sel: Sequence[_Piece], size: float, anchors: Sequence[float],
-                 deadline: Optional[float] = None) -> Optional[Tuple[float, str, List[float], List[np.ndarray]]]:
+                 deadline: Optional[float] = None,
+                 glyphs=None) -> Optional[Tuple[float, str, List[float], List[np.ndarray], np.ndarray]]:
     """
     Right each letter and read the row, letting the row read choose between
     each letter's candidate turns (greedy, a few passes). Returns
     (conf, text, angles, righted tiles) of the best row.
     """
     try:
-        cands = _ransom_candidates(sel, anchors, deadline)
+        cands = _ransom_candidates(sel, anchors, deadline, glyphs)
     except _OutOfTime:
         return None
     gap = max(2, int(round(0.35 * size)))
 
-    def assemble(choice):
+    def assemble(choice, angles=None):
         tiles = []
         for i, p in enumerate(sel):
-            t = _right(255 - 255 * p.mask.astype(np.uint8), cands[i][choice[i]][0])
+            a = angles[i] if angles is not None else cands[i][choice[i]][0]
+            t = _right(255 - 255 * p.mask.astype(np.uint8), a)
             on = np.nonzero((t < 128).any(axis=1))[0]
             if len(on):
                 t = t[on[0]:on[-1] + 1]      # trim rotation padding to the ink
@@ -419,8 +578,10 @@ def _ransom_read(sel: Sequence[_Piece], size: float, anchors: Sequence[float],
         bonus = (18.0 if miss == 0 else 12.0) if miss <= max(1, int(0.25 * len(sel))) else 0.0
         # Honest turns: the chosen angle must also be one the letter itself reads
         # well at, or the row ascent beats a two-word chain into confident nonsense.
+        # And language gets a word: between readings the OCR likes equally well,
+        # the one that sounds like words wins ("LAST" over "LYST").
         own = float(np.mean([cands[i][choice[i]][1] for i in range(len(sel))]))
-        return r[0] + bonus + 0.4 * own, r
+        return r[0] + bonus + 0.4 * own + 8.0 * _wordness(r[1]), r
 
     choice = [0] * len(sel)
     tiles, row = assemble(choice)
@@ -440,8 +601,103 @@ def _ransom_read(sel: Sequence[_Piece], size: float, anchors: Sequence[float],
                 best_v, best_r, choice, tiles, best_row = v, r, trial, t2, row2
     if best_r is None:
         return None
+    conf, text = best_r[0], best_r[1]
+    if glyphs is not None:
+        kept = [c for c in text if c.isalnum()]
+        if len(kept) == len(sel):
+            # The row reader chose the characters; now the atlas gets a say,
+            # letter by letter, with language refereeing. A shape the atlas
+            # knows surely (an eroded S the row read as N) beats a row-context
+            # guess, but never against the ear ("U8" never beats "UR").
+            chars = [c.upper() for c in kept]
+            final = [cands[i][choice[i]][0] for i in range(len(sel))]
+            changed = False
+            for i, p in enumerate(sel):
+                # Every character the shape could be, each at its own best
+                # turn (a C at the ring's bottom hides behind O in classify's
+                # angle-separated shortlist; chart lets it speak).
+                ch_chart = getattr(p, "chart", None)
+                if ch_chart is None:
+                    ch_chart = p.chart = glyphs.chart(p.mask, range(-180, 180, 10))
+                props = {ch: (100.0 * sc, a) for sc, a, ch in ch_chart if ch}
+                # The letter standing there has two witnesses: the atlas (if
+                # it charted it) and the row reader, who saw it in context
+                # with all its print detail. It keeps the better word.
+                cur_sc = max(props.get(chars[i], (0.0, 0.0))[0], conf - 15.0)
+                best_gain, best_ch = 0.0, None
+                for ch, (sc, a) in props.items():
+                    if ch == chars[i] or sc < 70.0:
+                        continue
+                    sub = chars[:i] + [ch] + chars[i + 1:]
+                    gain = (8.0 * (_wordness("".join(sub)) - _wordness("".join(chars)))
+                            + 0.25 * (sc - cur_sc))
+                    if gain > best_gain:
+                        best_gain, best_ch = gain, ch
+                if best_ch is not None:
+                    chars[i] = best_ch
+                    final[i] = props[best_ch][1]
+                    changed = True
+            # Spaces come from the gaps, not the reader: letters spread evenly
+            # are one word however the row image smudged them together.
+            cs = np.array([p.centre for p in sel])
+            gaps = np.hypot(*np.diff(cs, axis=0).T)
+            med = float(np.median(gaps)) if len(gaps) else 0.0
+            text = chars[0]
+            for k in range(1, len(chars)):
+                if med and gaps[k - 1] > 1.6 * med:
+                    text += " "
+                text += chars[k]
+            if changed:
+                tiles, best_row = assemble(choice, final)
+            angles = [_tighten(p, a) for p, a in zip(sel, final)]
+            return conf, text, angles, tiles, best_row
     angles = [_tighten(p, cands[i][choice[i]][0]) for i, p in enumerate(sel)]
-    return best_r[0], best_r[1], angles, tiles, best_row
+    return conf, text, angles, tiles, best_row
+
+
+def _glyph_fallback(sel: Sequence[_Piece], anchors: Sequence[float], glyphs, size: float
+                    ) -> Optional[Tuple[float, str, List[float], List[np.ndarray], np.ndarray]]:
+    """
+    A reading straight from the atlas, for lettering OCR cannot confirm even
+    righted (eroded knockouts). Both directions are read; the one that sounds
+    like language wins. Held to a higher bar than a confirmed reading.
+    """
+    def reading(seq, anchs):
+        got = [glyphs.classify(p.mask, range(-180, 180, 10), top=1) for p, a in zip(seq, anchs)]
+        if any(not g for g in got):
+            return None
+        scores = [g[0][0] for g in got]
+        angles = [g[0][1] for g in got]
+        chars = [g[0][2] for g in got]
+        c = np.array([p.centre for p in seq])
+        gaps = np.hypot(*np.diff(c, axis=0).T)
+        med = float(np.median(gaps)) if len(gaps) else 0.0
+        text = chars[0]
+        for k in range(1, len(chars)):
+            if med and gaps[k - 1] > 1.6 * med:
+                text += " "
+            text += chars[k]
+        return float(np.mean(scores)) * 100.0, text, angles
+
+    fwd = reading(sel, anchors)
+    bwd = reading(list(sel)[::-1], [a + 180 for a in reversed(anchors)])
+    if fwd is None and bwd is None:
+        return None
+    pick_bwd = bwd is not None and (fwd is None or _wordness(bwd[1]) > _wordness(fwd[1]) + 0.05)
+    conf, text, angles = (bwd if pick_bwd else fwd)
+    seq = list(sel)[::-1] if pick_bwd else list(sel)
+    if conf < 84 or len({c for c in text if c.isalnum()}) < 3:
+        return None
+    tiles = []
+    for p, a in zip(seq, angles):
+        t = _right(255 - 255 * p.mask.astype(np.uint8), a)
+        on = np.nonzero((t < 128).any(axis=1))[0]
+        tiles.append(t[on[0]:on[-1] + 1] if len(on) else t)
+    gap = max(2, int(round(0.35 * size)))
+    hmax = max(t.shape[0] for t in tiles)
+    row = np.hstack([cv2.copyMakeBorder(t, hmax - t.shape[0], 0, 0, gap, cv2.BORDER_CONSTANT, value=255)
+                     for t in tiles])
+    return conf - 2.0, text, angles, tiles, cv2.GaussianBlur(row, (3, 3), 0.7), seq
 
 
 def _tighten(p: _Piece, a: float, span: int = 12) -> float:
@@ -511,7 +767,7 @@ def _geometry(centres: np.ndarray, size: float) -> Tuple[bool, bool, float]:
 
 def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: float = 80,
          loose: Sequence[Tuple[int, Tuple[float, float, float, float]]] = (),
-         time_budget: float = 30.0) -> Tuple[List[PathText], List[Region], List[int]]:
+         time_budget: float = 30.0, glyphs=None) -> Tuple[List[PathText], List[Region], List[int]]:
     """
     Curved text in the marks, the regions with it taken out (or marked to be
     painted over), and which of the `loose` level readings (id, box) its chains
@@ -529,6 +785,24 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: f
     pieces: List[_Piece] = []
     marks = [(ri, reg) for ri, reg in enumerate(regions)
              if reg.kind == "mark" and reg.mask is not None and reg.mask.sum() >= 60]
+    for ri, reg in enumerate(regions):
+        # A "photo" that is really flat ink with paper cut out (a textured
+        # letterform full of knockouts misreads as photographic): its ink
+        # levels sit at two poles with hardly anything between. Adopt it as
+        # a mark so its holes get read like any other lettering.
+        if reg.kind == "photo" and reg.mask is not None and reg.mask.sum() >= 500:
+            x0, y0, x1, y1 = reg.box
+            inside = ink_map(img[y0:y1, x0:x1], bg[y0:y1, x0:x1])[reg.mask].astype(np.float32)
+            tot = float(inside.var())
+            if tot <= 0:
+                continue
+            u8 = np.clip(255 * inside / max(1e-6, float(inside.max())), 0, 255).astype(np.uint8)
+            t, _ = cv2.threshold(u8, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            lo, hi = inside[u8 <= t], inside[u8 > t]
+            if len(lo) and len(hi):
+                w = len(lo) / len(inside)
+                if w * (1 - w) * (lo.mean() - hi.mean()) ** 2 / tot >= 0.85:
+                    marks.append((ri, reg))
     for ri, reg in marks:
         x0, y0, x1, y1 = reg.box
         dist = ink_map(img[y0:y1, x0:x1], bg[y0:y1, x0:x1])
@@ -665,7 +939,7 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: f
             continue    # a straight, tight chain is the line readers' business, not ours
         if not _varied(sel):
             continue    # a row of identical marks (ticks, dots): a pattern, not text
-        got = _read_chain(img, sel, spacing, min_conf, ransom_budget, deadline)
+        got = _read_chain(img, sel, spacing, min_conf, ransom_budget, deadline, glyphs)
         if (got is None or got.conf < min_conf) and len(sel) >= 8:
             # Two texts can share a chain (one word's arc running into the next
             # word's stem): split at the longest internal gap and try each side.
@@ -720,8 +994,57 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: f
     return found, kept, absorbed
 
 
+def _mend(sel: Sequence[_Piece]) -> List[_Piece]:
+    """
+    Fragments rejoined to their letter: an eroded knockout can print as a
+    letter plus a crumb (the tail of an S cut off by ink spread), and the crumb
+    then counts as a letter of its own. A piece much smaller than the chain's
+    letters whose box all but touches a neighbour's is folded into it. Thin
+    letters (I, 1) are spared: they are as tall as the rest.
+    """
+    sel = list(sel)
+    if len(sel) < 4:
+        return sel
+    while True:
+        area = float(np.median([p.mask.sum() for p in sel]))
+        size = float(np.median([p.size for p in sel]))
+        crumbs = [i for i, p in enumerate(sel)
+                  if p.mask.sum() < 0.35 * area and p.size < 0.65 * size]
+        if not crumbs:
+            return sel
+        i = crumbs[0]
+        c = sel[i]
+
+        def gap(o):
+            dx = max(o.x - (c.x + c.mask.shape[1]), c.x - (o.x + o.mask.shape[1]), 0)
+            dy = max(o.y - (c.y + c.mask.shape[0]), c.y - (o.y + o.mask.shape[0]), 0)
+            return float(np.hypot(dx, dy))
+
+        near = [j for j in (i - 1, i + 1) if 0 <= j < len(sel)]
+        if not near:
+            return sel
+        j = min(near, key=lambda k: gap(sel[k]))
+        if gap(sel[j]) > 0.15 * size:
+            return sel     # a crumb on its own: leave the gates to judge it
+        o = sel[j]
+        x0, y0 = min(c.x, o.x), min(c.y, o.y)
+        x1 = max(c.x + c.mask.shape[1], o.x + o.mask.shape[1])
+        y1 = max(c.y + c.mask.shape[0], o.y + o.mask.shape[0])
+        m = np.zeros((y1 - y0, x1 - x0), bool)
+        for q in (c, o):
+            m[q.y - y0:q.y - y0 + q.mask.shape[0], q.x - x0:q.x - x0 + q.mask.shape[1]] |= q.mask
+        ac, ao = float(c.mask.sum()), float(o.mask.sum())
+        cen = (c.centre * ac + o.centre * ao) / (ac + ao)
+        sel[j] = _Piece(m, x0, y0, cen, float(max(m.shape)), o.src, o.group, o.t)
+        del sel[i]
+        if len(sel) < 4:
+            return sel
+
+
 def _read_chain(img, sel: Sequence[_Piece], spacing: float, min_conf: float,
-                ransom_budget: Optional[List[int]] = None, deadline: Optional[float] = None) -> Optional[PathText]:
+                ransom_budget: Optional[List[int]] = None, deadline: Optional[float] = None,
+                glyphs=None) -> Optional[PathText]:
+    sel = _mend(sel)
     # Read left to right, or top to bottom: the chain's own order is arbitrary.
     ends = sel[-1].centre - sel[0].centre
     if (abs(ends[0]) >= abs(ends[1]) and ends[0] < 0) or (abs(ends[1]) > abs(ends[0]) and ends[1] < 0):
@@ -778,24 +1101,28 @@ def _read_chain(img, sel: Sequence[_Piece], spacing: float, min_conf: float,
         j0, j1 = max(0, j - 3), min(len(dense) - 1, j + 3)
         d = dense[j1] - dense[j0]
         anchors.append(float(np.degrees(np.arctan2(d[1], d[0]))) if np.hypot(*d) > 0 else 0.0)
-    stand_conf = turned_conf = 0.0
+    stand_conf = turned_conf = turn_gain = 0.0
     if best is None or best[0] < 92:
-        def lettered(r):
-            # A confident "_" or ">" is no letter: only alphanumeric readings count.
-            return r[0] if r and any(ch.isalnum() for ch in r[1]) else 0.0
-
         sv, tv = [], []
         for k in sorted({0, len(sel) // 2, len(sel) - 1}):
-            tile = 255 - 255 * sel[k].mask.astype(np.uint8)
-            sv.append(lettered(_char_conf(tile)))
-            tv.append(max(sv[-1], max((lettered(_char_conf(_right(tile, a)))
-                                       for a in (anchors[k], anchors[k] + 180)), default=0.0))
-                      if sv[-1] < 70 else sv[-1])
+            if glyphs is not None:
+                sv.append(100.0 * max((sc for sc, _, _ in glyphs.classify(
+                    sel[k].mask, [-16, -8, 0, 8, 16], top=1)), default=0.0))
+                tv.append(max(sv[-1], 100.0 * max((sc for sc, _, _ in glyphs.classify(
+                    sel[k].mask, range(-180, 180, 10), top=1)), default=0.0)))
+            else:
+                def lettered(r):
+                    # A confident "_" or ">" is no letter: only alphanumeric readings count.
+                    return r[0] if r and any(ch.isalnum() for ch in r[1]) else 0.0
+
+                tile = 255 - 255 * sel[k].mask.astype(np.uint8)
+                sv.append(lettered(_char_conf(tile)))
+                tv.append(max(sv[-1], max((lettered(_char_conf(_right(tile, a)))
+                                           for a in (anchors[k], anchors[k] + 180)), default=0.0))
+                          if sv[-1] < 70 else sv[-1])
         stand_conf, turned_conf = float(np.mean(sv)), float(np.mean(tv))
         turn_gain = max(t - v for t, v in zip(tv, sv))
-    else:
-        turn_gain = 0.0
-    stands = stand_conf >= 68
+    stands = stand_conf >= (80 if glyphs is not None else 68)
     if stands and (best is None or best[0] < 92):
         gap = max(2, int(round(0.35 * size)))
         tiles = [255 - 255 * p.mask.astype(np.uint8) for p in sel]
@@ -814,27 +1141,77 @@ def _read_chain(img, sel: Sequence[_Piece], spacing: float, min_conf: float,
     # arbiter, so one letter righted wrong does not decide anything.
     angs = righted = None
     may_ransom = ransom_budget is None or ransom_budget[0] > 0
-    if may_ransom and (best is None or best[0] < 88) and 4 <= len(sel) <= 10:
+    if may_ransom and (best is None or best[0] < 88) and 4 <= len(sel) <= 12:
         # The probe gates the full per-letter sweep: ticks, dots and texture must
         # not pay for it. The local path direction anchors each letter's turn.
         # Ransom lettering has letters that read turned far better than standing
         # (others may stand: an upright T, a symmetric S). A chain zig-zagging
         # across two lines of ordinary text passes every other test, but its
         # letters all read standing, so turning gains nothing and it stops here.
-        letterish = turned_conf >= 62 and turn_gain >= 25
+        letterish = (turned_conf >= 80 and turn_gain >= 4) if glyphs is not None \
+            else (turned_conf >= 62 and turn_gain >= 25)
         if letterish and ransom_budget is not None:
             ransom_budget[0] -= 1
-        got = _ransom_read(sel, size, anchors, deadline) if letterish else None
-        if got is not None and len(sel) >= 5 and len(set(c for c in got[1] if c.isalnum())) <= 2:
-            got = None     # "IIIII", "lll": a row of strokes, not words
-        if letterish and (got is None or got[0] < min_conf):
-            # The chain may read the other way (text running up a stroke): the
-            # reversed order is a rescue, as elsewhere, never a competitor.
-            rev = _ransom_read(sel[::-1], size, [a + 180 for a in reversed(anchors)], deadline)
-            if rev and (got is None or rev[0] > got[0]):
-                got = rev
-                sel = list(sel)[::-1]
-        if got and (best is None or got[0] > best[0] + 3):
+        n = len(sel)
+
+        def good(r):
+            # Confident, accounts for the chain's letters, and is not one stroke
+            # over and over ("IIIII"): a partial or junk reading must not block
+            # the rescues just by being loud. A reading that spells real words
+            # is its own evidence, and may be a little less loud.
+            return (r is not None
+                    and r[0] >= (min_conf - 6 if _lexical(r[1]) else min_conf)
+                    and abs(_letters(r[1]) - n) <= max(1, int(0.25 * n))
+                    and (n < 5 or len(set(c for c in r[1] if c.isalnum())) > 2))
+
+        got = None
+        rings = _ring_spin(sel, anchors, deadline, glyphs) if letterish and glyphs is not None else []
+        ring_key = None
+        for sel2, anch2, pr in rings:
+            # A ring's cuts all hold the same letters, and the row reader's
+            # confidence across cuts is mostly noise. Real words come first
+            # (DANCE over a louder ANGED); then the reading, the ear for
+            # language and the ring's own geometry (clockwise, from the top).
+            if deadline is not None and time.monotonic() > deadline:
+                break
+            r2 = _ransom_read(sel2, size, anch2, deadline, glyphs)
+            if r2 is None or not good(r2) or _letters(r2[1]) != len(sel2):
+                continue
+            key = (_lexical(r2[1]), r2[0] + 8.0 * _wordness(r2[1]) + 5.0 * pr)
+            if ring_key is None or key > ring_key:
+                ring_key, got, sel, anchors = key, r2, sel2, anch2
+        if got is None:
+            got = _ransom_read(sel, size, anchors, deadline, glyphs) if letterish else None
+        if letterish and not ring_key and (not good(got) or (glyphs is not None and not _lexical(got[1]))):
+            # The chain may read the other way (text running up a stroke). The
+            # reader is happy to read nonsense backwards with confidence
+            # ("YADFUTAS"), so the reversal is a rescue, never a competitor on
+            # confidence alone - but language may call it: a reading that
+            # spells words, or sounds clearly more like them, takes the turn.
+            rev = _ransom_read(sel[::-1], size, [a + 180 for a in reversed(anchors)], deadline, glyphs)
+            if rev is not None:
+                if not good(got):
+                    take = good(rev) or got is None or rev[0] > got[0]
+                else:
+                    take = good(rev) and (_lexical(rev[1])
+                                          or _wordness(rev[1]) > _wordness(got[1]) + 0.3)
+                if take:
+                    got = rev
+                    sel = list(sel)[::-1]
+        if letterish and glyphs is not None and not good(got):
+            # The last resort: read straight from the atlas, with language as the
+            # judge of direction. Eroded knockouts land here, where OCR reads nothing.
+            fb = _glyph_fallback(sel, anchors, glyphs, size)
+            if fb is not None and good(fb[:5]):
+                got = fb[:5]
+                sel = fb[5]
+        if not good(got):
+            got = None
+        # A loud reading that cannot account for the chain's letters (the
+        # whole band read as one "4") is no reading: it must not outbid a
+        # ransom reading that accounts for every letter.
+        if got and (best is None or got[0] > best[0] + 3
+                    or abs(_letters(best[1]) - len(sel)) > max(1, int(0.25 * len(sel)))):
             best = (got[0], got[1], "ransom", False)
             angs, righted, best_img = got[2], got[3], got[4]
     if best is None:

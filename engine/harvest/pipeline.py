@@ -128,8 +128,12 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
         # path read level one by one, and belong to the path instead.
         loose = [(bi, b.runs[0].box) for bi, b in enumerate(blocks)
                  if len(b.runs) == 1 and sum(c.isalnum() for c in b.text()) <= 3]
-        curved, regions, absorbed = ([], regions, []) if os.environ.get("RIP_NO_CURVED") else \
-            find_curved(sheet.image, regions, bg, loose=loose)
+        if os.environ.get("RIP_NO_CURVED"):
+            curved, regions, absorbed = [], regions, []
+        else:
+            from .letters import atlas
+            curved, regions, absorbed = find_curved(sheet.image, regions, bg, loose=loose,
+                                                    glyphs=atlas(r._browser))
         if absorbed:
             keep = [i for i in range(len(blocks)) if i not in absorbed]
             matches = {k: matches[i] for k, i in enumerate(keep) if i in matches}
