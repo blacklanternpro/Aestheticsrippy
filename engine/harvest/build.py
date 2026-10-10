@@ -369,6 +369,7 @@ class Harvest:
     frame_blocks: Dict[str, int] = field(default_factory=dict)
     type_match: float = 0.0
     rotated: List = field(default_factory=list)
+    curved: List = field(default_factory=list)
 
 
 def _metrics(family: str) -> Dict:
@@ -596,6 +597,75 @@ def _rotated_frames(h: "Harvest", styles: Dict[str, Dict], specs, names, data, l
     return frames
 
 
+def _path_frames(h: "Harvest", styles: Dict[str, Dict], specs, names, data, labels, tokens) -> List[Dict]:
+    """
+    Curved lines become path frames: text set along the measured curve in the
+    sheet's main face, sized from the letters' height and tracked to the
+    measured arc. Spaced-out lettering gets a pitch (and `upright` when the
+    letters stood upright while the path turned).
+    """
+    if not h.curved:
+        return []
+    from ..typecase import matcher_data
+    sheet = h.sheet
+    mm = sheet.mm
+    main = max(specs, key=lambda sp: sp.chars).face if specs else Face("Inter", 500)
+    inst = next((m for m in matcher_data()["instances"] if m["family"] == main.family
+                 and int(m["weight"]) == main.weight and (m.get("stretch") or None) == main.stretch), None)
+    if inst is None:
+        inst = next(m for m in matcher_data()["instances"] if m["family"] == main.family)
+    frames, made = [], {}
+    for k, pt in enumerate(h.curved):
+        size_px = pt.cap / max(0.3, inst["cap"])
+        size_pt = mm(size_px) * PT_PER_MM
+        sname = None
+        colour = min(tokens, key=lambda t: _dist_hex(tokens[t], pt.colour)) if tokens else "ink"
+        for n, st in styles.items():
+            if st["font"] == main.family and st["weight"] == main.weight and st.get("stretch") == main.stretch \
+                    and st["color"] == colour and abs(st["size"] / size_pt - 1) <= 0.06:
+                sname = n
+                break
+        for n, st in made.items():
+            if sname is None and st["color"] == colour \
+                    and abs(st["size"] - size_pt) <= max(0.08 * size_pt, mm(2.2) * PT_PER_MM):
+                sname = n
+                break
+        if sname is None:
+            sname = "curve" if not made else f"curve-{'bcdefghij'[(len(made) - 1) % 9]}"
+            made[sname] = {"font": main.family, "weight": main.weight, "size": round(size_pt, 1),
+                           "leading": 1.0, "color": colour}
+            if main.stretch:
+                made[sname]["stretch"] = main.stretch
+        st = made.get(sname) or styles[sname]
+        size_px = st["size"] / PT_PER_MM * sheet.px_per_mm
+        x0, y0 = float(pt.points[:, 0].min()), float(pt.points[:, 1].min())
+        rel = [[round(mm(p[0] - x0), 2), round(mm(p[1] - y0), 2)] for p in pt.points]
+        key = f"c{k + 1:02d}"
+        data[key] = pt.text
+        labels[key] = f"Curved {k + 1}"
+        f = {"id": key, "type": "path", "style": sname, "bind": key,
+             "x": round(mm(x0), 2), "y": round(mm(y0), 2),
+             "w": round(mm(float(np.ptp(pt.points[:, 0]))), 2) or 0.1,
+             "h": round(mm(float(np.ptp(pt.points[:, 1]))), 2) or 0.1,
+             "points": rel}
+        if pt.offset:
+            f["offset"] = round(mm(pt.offset), 2)
+        if pt.pitch:
+            f["pitch"] = round(mm(pt.pitch), 2)
+            if pt.upright:
+                f["upright"] = True
+        else:
+            # Tight text along the curve: track it to the measured arc, as set type.
+            adv = sum(inst["adv"].get(c, inst["adv"].get("n", 0.55)) for c in pt.text)
+            n = max(2, len(pt.text))
+            track = float(np.clip((pt.length / size_px - adv + 0.06) / (n - 1), -0.1, 0.6))
+            if abs(track - st.get("tracking", 0.0)) > 0.012:
+                f["with"] = {"tracking": round(track, 3)}
+        frames.append(f)
+    styles.update(made)
+    return frames
+
+
 def _dist_hex(hexstr: str, bgr) -> float:
     r, g, b = int(hexstr[1:3], 16), int(hexstr[3:5], 16), int(hexstr[5:7], 16)
     return float(np.linalg.norm(np.array([b, g, r], float) - np.array(bgr, float)))
@@ -806,6 +876,7 @@ def build_rip(h: Harvest, pack_id: str, name: str, asset_names: Dict[int, str],
                                "y": round(mm(r.y0 - r.thickness / 2), 2), "w": round(mm(r.x1 - r.x0), 2),
                                "weight": weight_pt, "color": col, "z": 0})
     frames += _rotated_frames(h, styles, specs, names, data, labels, tokens)
+    frames += _path_frames(h, styles, specs, names, data, labels, tokens)
     for f in frames:
         f["z"] = 2
     if paper_image:

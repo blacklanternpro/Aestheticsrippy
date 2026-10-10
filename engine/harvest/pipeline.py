@@ -123,10 +123,30 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
             text_lines = [r.line for b in blocks for r in b.runs]
         if rotated:
             notes.append(f"Read {len(rotated)} {'line' if len(rotated) == 1 else 'lines'} of type set at an angle.")
+        from .curved import find as find_curved
+        # One-or-two-letter level readings beside the art: letters spaced along a
+        # path read level one by one, and belong to the path instead.
+        loose = [(bi, b.runs[0].box) for bi, b in enumerate(blocks)
+                 if len(b.runs) == 1 and sum(c.isalnum() for c in b.text()) <= 3]
+        curved, regions, absorbed = ([], regions, []) if os.environ.get("RIP_NO_CURVED") else \
+            find_curved(sheet.image, regions, bg, loose=loose)
+        if absorbed:
+            keep = [i for i in range(len(blocks)) if i not in absorbed]
+            matches = {k: matches[i] for k, i in enumerate(keep) if i in matches}
+            blocks = [blocks[i] for i in keep]
+            text_lines = [r.line for b in blocks for r in b.runs]
+        if curved:
+            notes.append(f"Read {len(curved)} {'line' if len(curved) == 1 else 'lines'} of type set along a curve.")
         covered = art_mod.text_mask(sheet.image.shape, text_lines) | (rule_mask > 0)
         for reg in regions:
             x0, y0, x1, y1 = reg.box
             covered[y0:y1, x0:x1] = True
+        if curved:
+            cmask = np.zeros(covered.shape, np.uint8)
+            for t in curved:
+                th = int(max(3, 2.4 * t.cap))
+                cv2.polylines(cmask, [np.round(t.points).astype(np.int32)], False, 1, thickness=th)
+            covered |= cmask > 0
         # Angled lines are type too: keep their ink out of the paper estimate.
         if rotated:
             tilt = np.zeros(covered.shape, np.uint8)
@@ -142,7 +162,7 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
         plate = art_mod.plate(sheet.image, covered, paper)
         if plate is not None:
             notes.append("The paper is not flat; kept it as a paper image under everything.")
-        h = Harvest(sheet, blocks, matches, rules, regions, paper, notes, rotated=rotated)
+        h = Harvest(sheet, blocks, matches, rules, regions, paper, notes, rotated=rotated, curved=curved)
         say("Writing the pack")
         if pack_dir.exists():
             shutil.rmtree(pack_dir)

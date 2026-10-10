@@ -35,6 +35,8 @@ class Region:
     mask: Optional[np.ndarray] = None   # bool mask over the box
     radius: Optional[str] = None        # "ellipse" for round outlines
     notes: List[str] = field(default_factory=list)
+    fill: Optional[np.ndarray] = None   # bool over the box: pixels to paint over with the
+    #                                     mark's own colour (light letters read out of it)
 
 
 def paper_colour(img: np.ndarray) -> Tuple[int, int, int]:
@@ -385,6 +387,14 @@ def write_assets(img: np.ndarray, regs: Sequence[Region], out_dir, bg: Optional[
         elif r.kind == "mark":
             name = f"mark-{i + 1:02d}.png"
             back = bg[y0:y1, x0:x1] if bg is not None else np.full_like(crop, 255)
+            if r.fill is not None and r.mask is not None:
+                # Letters read out of this mark (holes, or a tint on the shape): paint
+                # them with the shape's own colour, and the type renders on top.
+                body = r.mask & ~cv2.dilate(r.fill.astype(np.uint8), np.ones((5, 5), np.uint8)).astype(bool)
+                paint = crop[body if body.any() else r.mask]
+                crop = crop.copy()
+                crop[r.fill] = np.median(paint, axis=0).astype(crop.dtype)
+                r.mask = r.mask | r.fill
             d = ink_map(crop, back)
             alpha = np.clip((d - 8) / 60.0, 0, 1)
             if r.mask is not None:

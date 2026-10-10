@@ -315,6 +315,70 @@
     return `<${tag} ${this.attrs(f, "text", css, "", ctx, extra)}>${body}</${tag}>`;
   };
 
+  /** The point `dist` mm along a polyline, with the direction there in degrees (null past its end). */
+  function pointAt(pts, dist, closed) {
+    const p = closed && pts.length ? pts.concat([pts[0]]) : pts;
+    let left = dist;
+    for (let i = 1; i < p.length; i++) {
+      const dx = p[i][0] - p[i - 1][0], dy = p[i][1] - p[i - 1][1];
+      const len = Math.hypot(dx, dy);
+      if (len === 0) continue;
+      if (left <= len || i === p.length - 1 && left <= len + 1e-6) {
+        const t = Math.max(0, left) / len;
+        return { x: p[i - 1][0] + dx * t, y: p[i - 1][1] + dy * t, angle: Math.atan2(dy, dx) * 180 / Math.PI };
+      }
+      left -= len;
+    }
+    return null;
+  }
+
+  const PX_PER_MM = 96 / 25.4;
+  const pxNum = (v) => String(Math.round(v * PX_PER_MM * 100) / 100);
+
+  /**
+   * Text set along a curve. `points` is the baseline as [x, y] pairs in mm,
+   * relative to the frame; `offset` (mm) is where along it the text starts.
+   * The SVG works in CSS px so the style's font size applies as it does on text.
+   */
+  Builder.prototype.r_path = function (f, ctx, absolute) {
+    const value = this.boundValue(f, ctx);
+    if (isEmpty(value) && !f.keep) return "";
+    const s = resolveStyle(this.styles, f.style, f.with);
+    let text = isEmpty(value) ? "" : String(value).replace(/\s*\n\s*/g, " ");
+    if (s.case === "upper") text = text.toUpperCase();
+    else if (s.case === "lower") text = text.toLowerCase();
+    const keep = (c) => !/^(line-height|text-align|text-align-last|text-wrap|text-indent|hyphens|text-transform)/.test(c);
+    const css = this.placeCss(f, absolute).concat(styleCss(s, this.tokens).filter(keep));
+    const fid = f.id || this.nextId("path");
+    const pid = `rip-path-${escapeHtml(fid)}-${this.nextId("p")}`;
+    const pts = f.points || [];
+    const d = pts.map((p, i) => `${i ? "L" : "M"}${pxNum(p[0])} ${pxNum(p[1])}`).join(" ") + (f.closed ? " Z" : "");
+    let body;
+    if (f.pitch) {
+      // Letters at even steps along the path (spaced-out lettering): each centred on
+      // its point, turned with the curve unless `upright`. Needs no glyph measuring.
+      body = [...text].map((ch, i) => {
+        if (ch === " ") return "";
+        const at = pointAt(pts, (f.offset || 0) + i * f.pitch, f.closed);
+        if (!at) return "";
+        const x = pxNum(at.x), y = pxNum(at.y);
+        const turn = f.upright ? "" : ` transform="rotate(${Math.round(at.angle * 100) / 100} ${x} ${y})"`;
+        return `<text x="${x}" y="${y}" dy="0.36em" text-anchor="middle" fill="currentColor"${turn}>${escapeHtml(ch)}</text>`;
+      }).join("");
+    } else {
+      const offset = f.offset ? ` startOffset="${pxNum(f.offset)}"` : "";
+      body = `<defs><path id="${pid}" d="${d}"/></defs>` +
+        `<text fill="currentColor"><textPath href="#${pid}"${offset}>${escapeHtml(text)}</textPath></text>`;
+    }
+    const svg = `<svg width="100%" height="100%" style="overflow: visible; display: block">${body}</svg>`;
+    let extra = "";
+    if (this.opts.editable) {
+      extra += ` data-style="${escapeHtml(Array.isArray(f.style) ? f.style.join(" ") : (f.style || ""))}"`;
+      if ("bind" in f) extra += ` data-path="${escapeHtml(absolutePath(f.bind, ctx.itemPath))}"`;
+    }
+    return `<div ${this.attrs({ ...f, id: fid }, "path", css, "", ctx, extra)}>${svg}</div>`;
+  };
+
   Builder.prototype.findAsset = function (ref) {
     if (/^(https?:|data:|blob:)/.test(ref)) return ref;
     const assets = this.opts.assets || {};
