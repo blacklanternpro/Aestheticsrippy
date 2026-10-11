@@ -22,6 +22,7 @@ import numpy as np
 
 from .art import ink_map
 from .curved import PathText, _lexical, _wordness
+from .letters import cells as _cells, verify as _verify
 from .ocr import read_lines
 
 CAP_FALLBACK = 14.0
@@ -395,60 +396,6 @@ def _read_ring(img, raw, cx, cy, rt, cap, W, H, glyphs=None, refit=True):
                           glyphs, refit=False)
     return text, conf, keep, tcol, rs, comps, (cx, cy, rt)
 
-
-def _cells(keep, capS):
-    """The strip's letters, one cell each: components, with fused pairs split
-    at their ink valleys. [(x, y, w, h, mask)] in reading order."""
-    nl, lab, st, cen = cv2.connectedComponentsWithStats(keep, 8)
-    out = []
-    for i in range(1, nl):
-        x, y, w, h, area = st[i]
-        if area < 12:
-            continue
-        mm = lab[y:y + h, x:x + w] == i
-        if w <= 1.35 * capS:
-            out.append((x, y, w, h, mm))
-            continue
-        k = max(2, int(round(w / (0.95 * capS))))
-        prof = mm.sum(axis=0).astype(float)
-        cuts = [0]
-        for j in range(1, k):
-            lo = int(w * (j - 0.25) / k)
-            hi = int(w * (j + 0.25) / k)
-            cuts.append(lo + int(np.argmin(prof[lo:max(lo + 1, hi)])))
-        cuts.append(w)
-        for a, b in zip(cuts, cuts[1:]):
-            if b - a < 3:
-                continue
-            piece = np.zeros_like(mm)
-            piece[:, a:b] = mm[:, a:b]
-            if piece.sum() >= 12:
-                out.append((x + a, y, b - a, h, piece[:, a:b]))
-    out.sort(key=lambda c: c[0])
-    return out
-
-
-def _verify(glyphs, text, cells):
-    """How much of the reader's word the strip's shapes vouch for: the chars
-    aligned to the cells in order, each checked against the cell's chart."""
-    chars = [ch for ch in text.upper() if not ch.isspace()]
-    letters = [c for c in cells if not (c[3] < 0.5 * c[2] and c[2] < 18)]
-    if not chars or not letters:
-        return 0.0, 0.0
-    n = min(len(chars), len(letters))
-    hits, scores = 0, []
-    for ch, cell in zip(chars[:n], letters[:n]):
-        if not ch.isalnum() and ch not in "@&":
-            hits += 1          # punctuation: the reader's call stands
-            continue
-        chart = glyphs.chart(cell[4], range(-24, 25, 8), top=4)
-        for sc, a, c2 in chart:
-            if c2 == ch and sc >= 0.58:
-                hits += 1
-                scores.append(100.0 * sc)
-                break
-    agree = hits / max(len(chars), len(letters))
-    return agree, (float(np.mean(scores)) if scores else 0.0)
 
 
 def _assemble(glyphs, cells, capS):

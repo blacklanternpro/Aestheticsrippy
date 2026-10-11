@@ -16,6 +16,7 @@ import cv2
 import numpy as np
 
 from .art import Region, ink_map
+from .letters import cells, verify
 from .ocr import GOOD, read_lines
 
 
@@ -201,7 +202,7 @@ def _adiff(a: float, b: float) -> float:
     return min(d, 180 - d)
 
 
-def split_angles(ink: np.ndarray, angles: Sequence[float], tol: float = 12) -> dict:
+def split_angles(ink: np.ndarray, angles: Sequence[float], tol: float = 12, glyphs=None) -> dict:
     """
     Share a mark's ink out among the angles its lines run at, so each family can
     be levelled and read without the other's ink crossing its rows (the arms of
@@ -243,7 +244,10 @@ def split_angles(ink: np.ndarray, angles: Sequence[float], tol: float = 12) -> d
     for i, (a, length, width) in shapes.items():
         best = min(angles, key=lambda t: _adiff(t, a))
         # Long pieces (a word whose letters run together) know their baseline.
-        if length > 1.8 * width and length > 1.5 * h:
+        # A lone crisp letter is elongated too - along its own stem, which runs
+        # ACROSS the baseline - so only word-length pieces get the sure vote;
+        # letter-length ones ask their neighbours below.
+        if length > 1.8 * width and length > 2.4 * h:
             if _adiff(best, a) < tol:
                 pick[i] = float(best)
             elif min(_adiff(t, a) for t in angles) > 20:
@@ -253,9 +257,33 @@ def split_angles(ink: np.ndarray, angles: Sequence[float], tol: float = 12) -> d
     if not all(len(p) for p in pts.values()):
         everything = np.stack(np.nonzero(ink)[::-1], 1).astype(np.float64)
         pts = {t: everything for t in pts}
+    med_area = float(np.median([st[i, cv2.CC_STAT_AREA] for i in shapes])) if shapes else 0.0
+    # When word-runs carried the sure votes (soft print fuses letters into
+    # words), geometry knows best and the cabinet stays out of it: fuzzy
+    # fragments read just well enough to mislead. The cabinet speaks where
+    # crisp, separate letters starve the geometry of word-runs to lean on.
+    sure_px = sum(int(st[i, cv2.CC_STAT_AREA]) for i, t in pick.items() if t is not None)
+    all_px = sum(int(st[i, cv2.CC_STAT_AREA]) for i in shapes)
+    use_atlas = glyphs is not None and sure_px < 0.35 * max(1, all_px)
     for i in shapes:
         if i in pick:
             continue
+        # A letter's own shape can name its family: an E turned with the -45
+        # baseline reads as an E at -45 and as noise at +45 - and stacked
+        # words whose initial letters align into a perpendicular column fool
+        # any neighbour count. Only a clean single letter testifies: a fused
+        # pair reads poorly everywhere and leaves the call to its neighbours.
+        if use_atlas and 40 <= st[i, cv2.CC_STAT_AREA] <= 1.6 * med_area:
+            bx, by, bw, bh = st[i, 0], st[i, 1], st[i, 2], st[i, 3]
+            mm = lab[by:by + bh, bx:bx + bw] == i
+            sc = {}
+            for t in angles:
+                got = glyphs.classify(mm, [t - 8, t, t + 8, t + 172, t + 180, t + 188], top=1)
+                sc[float(t)] = got[0][0] if got else 0.0
+            ranked = sorted(sc.values(), reverse=True)
+            if ranked[0] >= 0.66 and (len(ranked) < 2 or ranked[0] - ranked[1] >= 0.05):
+                pick[i] = max(sc, key=sc.get)
+                continue
         c = cen[i]
         score = {}
         for t, p in pts.items():
@@ -283,9 +311,9 @@ def split_angles(ink: np.ndarray, angles: Sequence[float], tol: float = 12) -> d
     return out
 
 
-def _families(reg_mask: np.ndarray, ink: np.ndarray, angles: Sequence[float]) -> dict:
+def _families(reg_mask: np.ndarray, ink: np.ndarray, angles: Sequence[float], glyphs=None) -> dict:
     """split_angles on the ink, then every pixel of the region mask goes with its nearest ink."""
-    fams = split_angles(ink & reg_mask, angles)
+    fams = split_angles(ink & reg_mask, angles, glyphs=glyphs)
     if len(fams) < 2:
         return fams
     keys = list(fams)
@@ -358,7 +386,7 @@ def _grow(img, bg, reg: Region, boxes) -> List[np.ndarray]:
     return out
 
 
-def _real_families(img, bg, reg: Region, angles: Sequence[float]) -> dict:
+def _real_families(img, bg, reg: Region, angles: Sequence[float], glyphs=None) -> dict:
     """
     The mark's ink shared out by angle, keeping only families that are lines in
     their own right: a fair share of the ink whose own skew comes back at the
@@ -372,7 +400,7 @@ def _real_families(img, bg, reg: Region, angles: Sequence[float]) -> dict:
     if not inside.size:
         return {}
     ink = dist > 0.5 * float(np.median(inside))
-    fams = _families(reg.mask, ink, angles)
+    fams = _families(reg.mask, ink, angles, glyphs=glyphs)
     total = max(1, int(reg.mask.sum()))
     real = {}
     for a, m in fams.items():
@@ -390,8 +418,8 @@ def _near(box, reg_box, gap: float) -> bool:
 
 
 def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: float = 80,
-         loose: Sequence[Tuple[int, Tuple[float, float, float, float]]] = ()
-         ) -> Tuple[List[RotText], List[Region], List[int]]:
+         loose: Sequence[Tuple[int, Tuple[float, float, float, float]]] = (),
+         glyphs=None) -> Tuple[List[RotText], List[Region], List[int]]:
     """
     Rotated text in the marks, the regions with that text taken out, and which
     of the `loose` level readings (id, box) turned out to be part of it.
@@ -405,10 +433,11 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: f
     found: List[RotText] = []
     kept: List[Region] = []
     absorbed: List[int] = []
-    for reg in regions:
+    for reg, members in _grouped(regions, glyphs):
         if reg.kind != "mark" or reg.mask is None or reg.mask.sum() < 60:
             kept.append(reg)
             continue
+        before = len(found)
         # The mark's own angles, found before any level ink is lent to it.
         x0, y0, x1, y1 = reg.box
         dist = ink_map(img[y0:y1, x0:x1], bg[y0:y1, x0:x1])
@@ -426,7 +455,7 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: f
 
         def read(deg, mask):
             nonlocal remaining
-            got = _read_at(img, bg, reg, mask, deg, min_conf) if mask.sum() >= 40 else None
+            got = _read_at(img, bg, reg, mask, deg, min_conf, glyphs) if mask.sum() >= 40 else None
             if got:
                 found.extend(got[0])
                 remaining = remaining & ~got[1]
@@ -435,7 +464,7 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: f
         # ink out by angle and read each family on its own first, so the other
         # family's ink no longer crosses its rows.
         if len(angles) > 1:
-            for deg, fam in _real_families(img, bg, reg, angles).items():
+            for deg, fam in _real_families(img, bg, reg, angles, glyphs=glyphs).items():
                 read(deg, remaining & fam)
         # Then each angle against whatever is left: the whole mark when it holds
         # one family of lines, and anything the families missed.
@@ -456,11 +485,87 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: f
             ox0, oy0, ox1, oy1 = orig_box
             remaining = remaining[oy0 - gy0:oy1 - gy0, ox0 - gx0:ox1 - gx0] & orig_mask
             reg.box, reg.mask = orig_box, orig_mask
+        if members is not None:
+            if len(found) == before:
+                # The group read nothing: the letters were not a line after
+                # all, and the art keeps its own pieces.
+                kept.extend(members)
+                continue
+            # Reads consumed; whatever remains goes back as the members'
+            # own leftovers, so the art keeps its grain.
+            gx0, gy0 = reg.box[0], reg.box[1]
+            for m in members:
+                mx0, my0, mx1, my1 = m.box
+                m.mask = m.mask & remaining[my0 - gy0:my1 - gy0, mx0 - gx0:mx1 - gx0]
+                if m.mask.sum() > 40:
+                    kept.append(m)
+            continue
         remaining = _leftover(reg.mask, remaining)
         if remaining.sum() > 40:
             reg.mask = remaining
             kept.append(reg)
     return found, kept, absorbed
+
+
+def _grouped(regions, glyphs=None) -> List[Tuple[Region, Optional[List[Region]]]]:
+    """
+    Spaced-out angled lettering shatters into one mark per letter, and no
+    single letter can be read: neighbouring letter-sized marks are folded
+    into one region for reading, remembering their members so a group that
+    reads nothing is handed back exactly as it was.
+    """
+    out: List[Tuple[Region, Optional[List[Region]]]] = []
+    small = []
+    for reg in regions:
+        x0, y0, x1, y1 = reg.box
+        if reg.kind == "mark" and reg.mask is not None and reg.mask.sum() >= 40                 and max(x1 - x0, y1 - y0) <= 110:
+            small.append(reg)
+        else:
+            out.append((reg, None))
+    if len(small) < 4:
+        return out + [(r, None) for r in small]
+    med = float(np.median([max(r.box[2] - r.box[0], r.box[3] - r.box[1]) for r in small]))
+    g = max(3, int(round(0.55 * med)))
+    X1 = max(r.box[2] for r in small) + g + 2
+    Y1 = max(r.box[3] for r in small) + g + 2
+    canvas = np.zeros((Y1, X1), np.uint8)
+    for k, r in enumerate(small):
+        x0, y0, x1, y1 = r.box
+        canvas[y0:y1, x0:x1] |= r.mask.astype(np.uint8)
+    grown = cv2.dilate(canvas, np.ones((g, g), np.uint8))
+    n, lab = cv2.connectedComponents(grown, 8)
+    groups: dict = {}
+    for r in small:
+        x0, y0, x1, y1 = r.box
+        ys, xs = np.nonzero(r.mask)
+        lid = int(lab[y0 + ys[0], x0 + xs[0]])
+        groups.setdefault(lid, []).append(r)
+    for members in groups.values():
+        if len(members) < 4:
+            out.extend((r, None) for r in members)
+            continue
+        if glyphs is not None:
+            # Letters regroup; logo fragments and ornaments do not. Most of
+            # the members must read as some character at some turn.
+            lettered = 0
+            for r in members[:10]:
+                got = glyphs.classify(r.mask, range(-180, 180, 15), top=1)
+                if got and got[0][0] >= 0.62:
+                    lettered += 1
+            if lettered < 0.6 * min(10, len(members)):
+                out.extend((r, None) for r in members)
+                continue
+        x0 = min(r.box[0] for r in members)
+        y0 = min(r.box[1] for r in members)
+        x1 = max(r.box[2] for r in members)
+        y1 = max(r.box[3] for r in members)
+        m = np.zeros((y1 - y0, x1 - x0), bool)
+        for r in members:
+            rx0, ry0, rx1, ry1 = r.box
+            m[ry0 - y0:ry1 - y0, rx0 - x0:rx1 - x0] |= r.mask
+        merged = Region("mark", (x0, y0, x1, y1), members[0].colour, mask=m)
+        out.append((merged, members))
+    return out
 
 
 def _leftover(mask: np.ndarray, remaining: np.ndarray) -> np.ndarray:
@@ -511,7 +616,7 @@ def _snap_ends(band: np.ndarray, x0: float, x1: float, h: float) -> Tuple[float,
     return a, b
 
 
-def _read_at(img, bg, reg, mask, deg, min_conf):
+def _read_at(img, bg, reg, mask, deg, min_conf, glyphs=None):
     """Read the lines of `mask` at angle `deg`; returns (texts, mask of what was read) or None."""
     found = []
     if True:
@@ -525,7 +630,13 @@ def _read_at(img, bg, reg, mask, deg, min_conf):
         inv = cv2.invertAffineTransform(m)
         lmask = level < 150
         taken = np.zeros(level.shape, np.uint8)
-        for bx0, by0, bx1, by1 in _bands(lmask):
+        queue = list(_bands(lmask))
+        seen = 0
+        while queue:
+            seen += 1
+            if seen > 60:
+                break
+            bx0, by0, bx1, by1 = queue.pop(0)
             h = by1 - by0
             p = max(4, h // 2)
             top = max(0, by0 - p)
@@ -537,22 +648,51 @@ def _read_at(img, bg, reg, mask, deg, min_conf):
             left = max(0, bx0 - p)
             cw = crop.shape[1]
             best = None
-            for flip in (False, True):
-                c = cv2.rotate(crop, cv2.ROTATE_180) if flip else crop
-                try:
-                    lines = read_lines(cv2.cvtColor(c, cv2.COLOR_GRAY2BGR), psm=7)
-                except Exception:
-                    continue
-                words = [w for l in lines for w in l.words if GOOD.search(w.text)]
-                letters = sum(ch.isalnum() for w in words for ch in w.text)
-                if letters < 4:
-                    continue
-                conf = float(np.mean([w.conf for w in words]))
-                if best is None or conf > best[0]:
-                    best = (conf, flip, sorted(words, key=lambda w: w.box[0]))
-            if not best or best[0] < min_conf:
+            # Small rotated lines read flakily, and the reader's moods swing
+            # with scale (one band here reads at 1x and 3x, and not at all at
+            # 2x): climb a short ladder of greyscale upscales - never
+            # binarised - and keep the best of both flips.
+            guess = max(1, min(3, int(round(34.0 / max(8, h)))))
+            ups = [guess] + [u for u in (1, 2, 3) if u != guess]
+            for up in ups:
+                for flip in (False, True):
+                    c = cv2.rotate(crop, cv2.ROTATE_180) if flip else crop
+                    if up > 1:
+                        c = cv2.resize(c, None, fx=up, fy=up, interpolation=cv2.INTER_CUBIC)
+                    try:
+                        lines = read_lines(cv2.cvtColor(c, cv2.COLOR_GRAY2BGR), psm=7)
+                    except Exception:
+                        continue
+                    words = [w for l in lines for w in l.words if GOOD.search(w.text)]
+                    letters = sum(ch.isalnum() for w in words for ch in w.text)
+                    if letters < 4:
+                        continue
+                    conf = float(np.mean([w.conf for w in words]))
+                    if best is None or conf > best[0]:
+                        best = (conf, flip, sorted(words, key=lambda w: w.box[0]), up)
+                if best is not None and best[0] >= min_conf + 5:
+                    break
+            if not best:
                 continue
-            _, flip, words = best
+            _, flip, words, up = best
+            if up > 1:
+                for w in words:
+                    w.box = tuple(v / up for v in w.box)
+            # The reader can settle on one phrase and ignore a neighbour in the
+            # same band (two columns of lines sharing a row). Any stretch of
+            # the band's ink its words did not cover goes back on the queue.
+            h = by1 - by0
+            wx0 = min(w.box[0] for w in words) + left
+            wx1 = max(w.box[2] for w in words) + left
+            if flip:
+                wx0, wx1 = left + cw - (max(w.box[2] for w in words)), left + cw - (min(w.box[0] for w in words))
+            cols_on = np.nonzero(lmask[by0:by1, bx0:bx1].any(axis=0))[0] + bx0
+            missed = cols_on[(cols_on < wx0 - 0.8 * h) | (cols_on > wx1 + 0.8 * h)]
+            if len(missed) >= 1.2 * h:
+                runs = np.split(missed, np.nonzero(np.diff(missed) > max(6, int(0.8 * h)))[0] + 1)
+                for run in runs:
+                    if len(run) >= 1.2 * h:
+                        queue.append((int(run[0]), by0, int(run[-1]) + 1, by1))
             ch_ = crop.shape[0]
             # One band can hold several lines (the arms of a V, or two staggered
             # blocks whose baselines nearly meet): a gap much wider than a space,
@@ -565,10 +705,28 @@ def _read_at(img, bg, reg, mask, deg, min_conf):
                     groups.append([w])
                 else:
                     groups[-1].append(w)
+            base = cv2.rotate(crop, cv2.ROTATE_180) if flip else crop
             for g in groups:
                 gtext = " ".join(w.text for w in g)
                 gconf = float(np.mean([w.conf for w in g]))
-                if sum(ch.isalnum() for ch in gtext) < 3 or gconf < min_conf:
+                if sum(ch.isalnum() for ch in gtext) < 3:
+                    continue
+                vouched = False
+                if gconf < min_conf and glyphs is not None:
+                    # The reader often returns the right words at absurdly low
+                    # confidence (mixed digits and dashes, two phrases in one
+                    # band). The cabinet checks the reading letter by letter
+                    # against the row's own shapes, and vouches for it: a
+                    # vouched reading stands on that evidence, not on the
+                    # reader's mood.
+                    sx0 = max(0, int(min(w.box[0] for w in g)) - 2)
+                    sx1 = min(base.shape[1], int(np.ceil(max(w.box[2] for w in g))) + 2)
+                    span = (base[:, sx0:sx1] < 150).astype(np.uint8)
+                    agree, score = verify(glyphs, gtext, cells(span, 0.8 * (by1 - by0)))
+                    if agree >= 0.7 and score >= 72:
+                        gconf = max(gconf, score)
+                        vouched = True
+                if gconf < min_conf and not vouched:
                     continue
                 letters = [ch for ch in gtext if ch.isalpha()]
                 caps = bool(letters) and sum(ch.isupper() for ch in letters) / len(letters) > 0.7

@@ -477,6 +477,90 @@ def _ransom_page() -> str:
             "</style>" + "".join(spans))
 
 
+def _vee_page() -> str:
+    """Crisp angled words, stacked so their initial letters align into a
+    perpendicular column - the geometry that fools neighbour counts, where
+    each letter's own shape must name its family."""
+    rows = []
+    for k, word in enumerate(("EXPEDITE", "ELEGANT", "EASTWARD")):
+        x, y = 390 + k * 34, 310 + k * 34
+        rows.append(f'<div style="position:absolute;left:{x}px;top:{y}px;'
+                    f'transform:rotate(-45deg);transform-origin:left top;'
+                    f'letter-spacing:0.30em">{word}</div>')
+    for k, word in enumerate(("SATURDAY", "SIDEWAYS", "SOLSTICE")):
+        x, y = 310 - k * 34, 310 + k * 34
+        rows.append(f'<div style="position:absolute;left:{x}px;top:{y}px;'
+                    f'transform:rotate(45deg);transform-origin:right top;'
+                    f'text-align:right;width:0;white-space:nowrap;direction:rtl;'
+                    f'letter-spacing:0.30em">{word}</div>')
+    font = (ROOT / "fonts" / "Inter-var.woff2").resolve()
+    para = ('<div style="position:absolute;left:60px;top:580px;width:560px;'
+            'font-weight:400;font-size:15px;letter-spacing:0">'
+            'The six words above are set on two opposing diagonals, spaced far '
+            'enough apart that every letter prints alone. A body paragraph sits '
+            'below them so the sheet has an ordinary text size of its own, as '
+            'any real specimen would.</div>')
+    return ("<!doctype html><meta charset=\"utf-8\"><style>"
+            f"@font-face {{ font-family:'Inter'; src: url('file://{font}'); }}"
+            "body { background:#fff; margin:0; width:700px; height:700px; position:relative;"
+            " font-family:Inter; font-weight:700; font-size:26px; color:#151515; }"
+            "</style>" + "".join(rows) + para)
+
+
+def test_shattered_angled_marks_regroup_for_reading(tmp_path):
+    # One region per letter, by construction: no per-region read can touch a
+    # single letter, so neighbouring letter marks must regroup into lines.
+    import cv2
+    import numpy as np
+    from engine.harvest import art as A, rotated as R
+    from engine.harvest.sheet import find_sheet
+    from engine.render import Renderer
+
+    page = tmp_path / "vee.html"
+    page.write_text(_vee_page(), encoding="utf-8")
+    with Renderer() as r:
+        (tmp_path / "vee.png").write_bytes(r.render_file(page, pdf=False).png)
+    img = cv2.imread(str(tmp_path / "vee.png"))
+    sheet = find_sheet(img)
+    paper = A.paper_colour(sheet.image)
+    bg = A.background(sheet.image, paper, [])
+    ink = (A.ink_map(sheet.image, bg) > 30).astype(np.uint8)
+    ink[int(0.70 * ink.shape[0]):] = 0          # the body paragraph is not the subject
+    n, lab, st, cen = cv2.connectedComponentsWithStats(ink, 8)
+    regions = []
+    for i in range(1, n):
+        x, y, w, h, area = st[i]
+        if area < 40:
+            continue
+        regions.append(A.Region("mark", (int(x), int(y), int(x + w), int(y + h)), (20, 20, 20),
+                                mask=lab[y:y + h, x:x + w] == i))
+    assert len(regions) >= 30, len(regions)     # genuinely shattered
+    found, kept, absorbed = R.find(sheet.image, regions, bg)
+    texts = " ".join(t.text for t in found).upper()
+    hits = sum(w in texts for w in ("EXPEDITE", "ELEGANT", "EASTWARD", "SATURDAY", "SIDEWAYS", "SOLSTICE"))
+    assert hits >= 4, (hits, sorted(t.text for t in found))
+
+
+def test_stacked_angled_words_keep_their_letters(tmp_path):
+    # Spaced angled lettering shatters into one mark per letter, which no
+    # per-region read can touch: neighbouring letter marks regroup for
+    # reading. Crisp separate letters also starve the family split of
+    # word-runs; the glyph atlas names each letter's family, and correct
+    # rows the reader doubts are vouched for letter by letter.
+    from engine.harvest.pipeline import harvest
+    from engine.render import Renderer
+
+    page = tmp_path / "vee.html"
+    page.write_text(_vee_page(), encoding="utf-8")
+    with Renderer() as r:
+        (tmp_path / "vee.png").write_bytes(r.render_file(page, pdf=False).png)
+        res = harvest(tmp_path / "vee.png", "Vee", out_dir=tmp_path / "pack",
+                      renderer=r, refine_rounds=0)
+    texts = " ".join(str(v) for v in res.data.values()).upper()
+    hits = sum(w in texts for w in ("EXPEDITE", "ELEGANT", "EASTWARD", "SATURDAY", "SIDEWAYS", "SOLSTICE"))
+    assert hits >= 5, (hits, res.data)
+
+
 RING_JITTER = [8, -14, 10, -6, 12]
 
 

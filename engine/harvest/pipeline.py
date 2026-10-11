@@ -109,13 +109,14 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
         regions = art_mod.regions(sheet.image, text_lines, rule_mask, paper, pans, body_px)
         say("Looking for type set at an angle")
         from .rotated import find as find_rotated
+        from .letters import atlas as _atlas
         import os
         # A letter or two read level beside angled ink may be the start of a tilted
         # word: lend it to the angled reader, and drop it if an angled line takes it.
         loose = [(bi, b.runs[0].box) for bi, b in enumerate(blocks)
                  if len(b.runs) == 1 and sum(c.isalnum() for c in b.text()) <= 3]
         rotated, regions, absorbed = ([], regions, []) if os.environ.get("RIP_NO_ROTATED") else \
-            find_rotated(sheet.image, regions, bg, loose=loose)
+            find_rotated(sheet.image, regions, bg, loose=loose, glyphs=_atlas(r._browser))
         if absorbed:
             keep = [i for i in range(len(blocks)) if i not in absorbed]
             matches = {k: matches[i] for k, i in enumerate(keep) if i in matches}

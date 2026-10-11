@@ -950,6 +950,8 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: f
             continue
         if got is None or got.conf < min_conf:
             continue
+        if not _lexical(got.text) and _wordness(got.text) < -0.2 and got.conf < min_conf + 8:
+            continue    # confidently-shaped gibberish: marginal conf does not ship anti-language
         found.append(got)
         for p in sel:
             kind, idx = p.src
