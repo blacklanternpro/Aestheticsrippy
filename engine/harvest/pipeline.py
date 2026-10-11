@@ -81,6 +81,13 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
     if own:
         r.__enter__()
     try:
+        # Proofread degraded display rows against the glyph atlas before any
+        # matching: a letter OCR got wrong ('Unicago', 'MB/20') poisons the
+        # face bench and the print-finish fit alike.
+        from .letters import atlas
+        from .proof import amend_blocks
+        amend_blocks(clean, blocks, atlas(r._browser, full=True), say)
+
         say(f"Matching type for {len(blocks)} text blocks")
         bench = Bench(r._browser)
         try:

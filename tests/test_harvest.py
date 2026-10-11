@@ -673,6 +673,81 @@ def test_wordness_hears_words_not_digit_dodges():
     assert not _lexical("D4ZOE") and not _lexical("ADENO")
 
 
+# ------------------------------------------------ proofreading display type
+
+def _word_row(tmp_path, r, word, px=56, weight=700):
+    """One word rendered with the local Inter, returned as a bool ink mask."""
+    import cv2
+    font = (ROOT / "fonts" / "Inter-var.woff2").resolve()
+    page = tmp_path / f"row-{''.join(c for c in word if c.isalnum())}.html"
+    page.write_text(
+        "<!doctype html><meta charset=\"utf-8\"><style>"
+        f"@font-face {{ font-family:'Inter'; src: url('file://{font}'); }}"
+        "body { background:#fff; margin:0; width:700px; height:160px; }"
+        f"div {{ font-family:Inter; font-weight:{weight}; font-size:{px}px;"
+        " color:#111; margin:30px 0 0 30px }"
+        f"</style><div>{word}</div>", encoding="utf-8")
+    png = r.render_file(page, pdf=False).png
+    img = cv2.imdecode(np.frombuffer(png, np.uint8), cv2.IMREAD_GRAYSCALE)
+    return img < 128
+
+
+def test_the_atlas_keeps_its_uppercase_eye(tmp_path):
+    # The angled, curved and stamp stages chart against capitals; lowercase
+    # twins must not eat their chart slots.
+    from engine.harvest.letters import atlas
+    from engine.render import Renderer
+    with Renderer() as r:
+        glyphs = atlas(r._browser)
+        full = atlas(r._browser, full=True)
+    assert not any(c.islower() for c in glyphs.chars)
+    assert any(c.islower() for c in full.chars)
+
+
+def test_the_atlas_reads_lowercase(tmp_path):
+    from engine.harvest.letters import atlas
+    from engine.harvest.proof import fold, letter_cells
+    from engine.render import Renderer
+    with Renderer() as r:
+        ink = _word_row(tmp_path, r, "Chicago")
+        full = atlas(r._browser, full=True)
+    cells_ = letter_cells(ink.astype(np.uint8))
+    assert len(cells_) == 7, len(cells_)
+    got = []
+    for c in cells_:
+        chart = full.chart(c[4], (-6, 0, 6), top=3)
+        got.append(fold(chart[0][2]) if chart else "?")
+    hits = sum(a == b for a, b in zip(got, "chicago"))
+    assert hits >= 5, (got, hits)
+
+
+def test_degraded_display_reads_are_amended(tmp_path):
+    # Over-inked print misreads at the OCR ('Unicago', 'MB/20'): the atlas
+    # looks at each letter cell and overrules only on strong shape evidence.
+    import cv2
+    from engine.harvest.letters import atlas
+    from engine.harvest.proof import amend
+    from engine.render import Renderer
+    with Renderer() as r:
+        chicago = _word_row(tmp_path, r, "Chicago")
+        item = _word_row(tmp_path, r, "MB720")
+        full = atlas(r._browser, full=True)
+    k = np.ones((3, 3), np.uint8)
+    fat = cv2.dilate(chicago.astype(np.uint8), k)
+    assert amend(full, fat, "Unicago") == "Chicago"
+    assert amend(full, cv2.dilate(item.astype(np.uint8), k), "MB/20") == "MB720"
+
+
+def test_sound_reads_are_left_alone(tmp_path):
+    from engine.harvest.letters import atlas
+    from engine.harvest.proof import amend
+    from engine.render import Renderer
+    with Renderer() as r:
+        ink = _word_row(tmp_path, r, "Chicago")
+        full = atlas(r._browser, full=True)
+    assert amend(full, ink.astype(np.uint8), "Chicago") is None
+
+
 def _stamp_page() -> str:
     """A rubber stamp: ring text round a lined globe, crossing a rule."""
     import math

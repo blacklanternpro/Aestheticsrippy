@@ -22,6 +22,7 @@ import cv2
 import numpy as np
 
 CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@&"
+LOWER = "abcdefghijklmnopqrstuvwxyz"
 # Shape coverage, not taste: a grotesque, a condensed, a wide geometric,
 # a serif and a mono between them bracket most letterforms.
 FACE_WISHES = [("Inter", 600), ("Archivo Narrow", 500), ("Krona One", 400),
@@ -108,6 +109,11 @@ class Glyphs:
         """The best character for this letter at one fixed turn."""
         got = self.classify(mask, [angle], top=1)
         return (got[0][0], got[0][2]) if got else (0.0, "")
+
+    def sub(self, keep: str) -> "Glyphs":
+        """A view holding only the templates whose characters are in `keep`."""
+        idx = [j for j, ch in enumerate(self.chars) if ch in keep]
+        return Glyphs(self.templates[idx], [self.chars[j] for j in idx], self.ars[idx])
 
 
 def _adiff(a: float, b: float) -> float:
@@ -201,11 +207,16 @@ def verify(glyphs, text, letter_cells) -> Tuple[float, float]:
 
 
 
-def atlas(browser) -> Glyphs:
-    """The process-wide atlas, rendered once from the cabinet."""
+def atlas(browser, full: bool = False) -> Glyphs:
+    """The process-wide atlas, rendered once from the cabinet.
+
+    The default view holds capitals, digits and @& - what the angled, curved
+    and stamp stages chart against (lowercase twins must not eat their chart
+    slots). `full=True` adds the lowercase letters, for readers that face
+    mixed-case display type (engine/harvest/proof.py)."""
     global _ATLAS
     if _ATLAS is not None:
-        return _ATLAS
+        return _ATLAS if full else _ATLAS.sub(CHARS)
     from ..typecase import matcher_data
     from .typeface import Bench
     insts = matcher_data()["instances"]
@@ -221,7 +232,7 @@ def atlas(browser) -> Glyphs:
         items = [{"text": ch, "family": f["family"], "weight": int(f["weight"]), "stretch": None,
                   "size": S, "sx": 1.0, "italic": False, "ls": 0.0,
                   "w": int(S * 2.0), "h": int(S * 1.8), "base": int(S * 1.3), "ox": int(S * 0.4)}
-                 for f in faces for ch in CHARS]
+                 for f in faces for ch in CHARS + LOWER]
         tiles = bench.render(items)
     finally:
         bench.close()
@@ -234,4 +245,4 @@ def atlas(browser) -> Glyphs:
         chars.append(it["text"])
         ars.append(ar)
     _ATLAS = Glyphs(np.stack(templates), chars, np.array(ars, np.float32))
-    return _ATLAS
+    return _ATLAS if full else _ATLAS.sub(CHARS)
