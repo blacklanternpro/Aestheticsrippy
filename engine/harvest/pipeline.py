@@ -89,6 +89,11 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
             # family scored, so a bold label is not forced regular for want of a score.
             from .build import _harmonise_family
             fill_weights(bench, clean, blocks, matches, _harmonise_family(matches, blocks, 0.02))
+            # The look of the press: where no clean weight explains the ink,
+            # try a lighter weight under ink gain and softness. Runs before the
+            # trust filter so over-inked type it explains stays live.
+            from .finish import measure as measure_finish
+            measure_finish(bench, clean, blocks, matches, say)
         finally:
             bench.close()
 

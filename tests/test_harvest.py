@@ -394,6 +394,66 @@ def test_bold_labels_stay_bold_on_small_type(ripped5):
     assert all(weight[t] <= 500 for t in values), {t: weight[t] for t in values}
 
 
+# ------------------------------------------------------------ print finish
+
+KNOWN6 = {
+    "rip": 1, "id": "known6", "name": "Known 6", "page": {"width_mm": 148, "height_mm": 105, "paper": "paper", "ink": "ink"},
+    "tokens": {"paper": "#ffffff", "ink": "#111111"},
+    "styles": {
+        # The letterform is Regular; the design's character is the press: heavy
+        # ink gain and a soft edge. Read clean, this look passes for a Bold.
+        "display": {"font": "Inter", "weight": 400, "size": 23, "leading": 1.15, "color": "ink", "case": "upper",
+                    "finish": {"gain": 0.035, "blur": 0.02}},
+        "body": {"font": "Inter", "weight": 400, "size": 9, "leading": 1.4, "color": "ink"},
+    },
+    "frames": [
+        {"id": "h1", "type": "text", "style": "display", "bind": "h1", "x": 12, "y": 14},
+        {"id": "h2", "type": "text", "style": "display", "bind": "h2", "x": 12, "y": 26},
+        {"id": "p1", "type": "text", "style": "body", "bind": "p1", "x": 12, "y": 52, "w": 120},
+    ],
+}
+DATA6 = {"h1": "OVERPRINT SEASON", "h2": "HEAVY INK DEPARTMENT",
+         "p1": ("The proofs came back from the press darker than the comp, strokes swollen "
+                "and corners gone round. Nobody minded. The smith reckoned the sheet finally "
+                "looked like it had been made by a machine with opinions of its own.")}
+
+
+@pytest.fixture(scope="module")
+def ripped6(tmp_path_factory):
+    from engine.harvest.pipeline import harvest
+    from engine.render import Renderer
+    from engine.rip import loader_html
+
+    work = tmp_path_factory.mktemp("known6")
+    page = work / "known6.html"
+    page.write_text(loader_html(KNOWN6, DATA6, work, [work]), encoding="utf-8")
+    with Renderer() as r:
+        (work / "known6.png").write_bytes(r.render_file(page, pdf=False).png)
+        return harvest(work / "known6.png", "Known 6", out_dir=work / "pack", renderer=r, refine_rounds=0)
+
+
+def _style_of(res, text):
+    for f in res.rip["frames"]:
+        if f.get("type") == "text" and str(res.data.get(f.get("bind", ""), "")).startswith(text[:12]):
+            return res.rip["styles"][f["style"]]
+    raise AssertionError((text, [str(res.data.get(f.get("bind", "")))[:30] for f in res.rip["frames"] if f.get("type") == "text"]))
+
+
+def test_overinked_type_stays_live_and_regular(ripped6):
+    # The headline must come back as live type at the weight underneath the
+    # ink, with the gain measured as a finish - not as a Bold, not as art.
+    st = _style_of(ripped6, DATA6["h1"])
+    assert st["weight"] < 500, st
+    fin = st.get("finish")
+    assert fin, st
+    assert 0.015 <= fin["gain"] <= 0.06, fin
+
+
+def test_clean_type_earns_no_finish(ripped6):
+    st = _style_of(ripped6, DATA6["p1"])
+    assert "finish" not in st, st
+
+
 # ------------------------------------------------------------ curved text
 
 def _circle(cx, cy, r, a0=180, a1=540, step=6):

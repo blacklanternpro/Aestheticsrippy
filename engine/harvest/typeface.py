@@ -68,6 +68,7 @@ class Match:
     score: float
     scores: Dict[str, float] = field(default_factory=dict)   # face key -> block score
     scale_x: float = 1.0
+    finish: Optional[Dict] = None   # measured print finish (engine/harvest/finish.py)
 
 
 def faces() -> List[Face]:

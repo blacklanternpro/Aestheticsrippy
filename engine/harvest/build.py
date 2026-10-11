@@ -267,6 +267,7 @@ class StyleSpec:
     members: List[int] = field(default_factory=list)
     chars: int = 0
     sx: float = 1.0
+    fin: Optional[Dict] = None   # measured print finish, shared by the group
 
 
 def _round(v: float, step: float) -> float:
@@ -292,7 +293,8 @@ def _consolidate(specs: List[StyleSpec], style_of: Dict[int, int]) -> Tuple[List
         for j, b in enumerate(specs):
             if j == i or target[j] != j or b.chars <= a.chars:
                 continue
-            if b.face.family != a.face.family or b.colour != a.colour or b.upper != a.upper:
+            if b.face.family != a.face.family or b.colour != a.colour or b.upper != a.upper \
+                    or b.fin != a.fin:
                 continue
             if abs(b.face.weight - a.face.weight) > weight_tol or abs(b.size_pt / a.size_pt - 1) > size_tol \
                     or abs(b.sx - a.sx) > 0.06:
@@ -736,13 +738,14 @@ def build_rip(h: Harvest, pack_id: str, name: str, asset_names: Dict[int, str],
             track = 0.0
         block_track[bi] = track
         sx = m.scale_x if face.family == m.face.family else 1.0
+        fin = m.finish
         # Sizes come from heights measured in whole pixels: a pixel of x-height is ~2 px of size.
         tol = max(0.07 * size_pt, mm(2.2) * PT_PER_MM)
         for si, sp in enumerate(specs):
             if (sp.face == face and abs(sp.size_pt - size_pt) <= tol
                     and (abs(sp.tracking - track) <= 0.025 or len(b.runs) == 1 and b.align != "left")
                     and sp.colour == colour_of[bi] and sp.upper == upper
-                    and abs(sp.sx - sx) <= 0.04):
+                    and abs(sp.sx - sx) <= 0.04 and sp.fin == fin):
                 n = sp.chars
                 c = len(b.text())
                 sp.size_pt = (sp.size_pt * n + size_pt * c) / (n + c)
@@ -754,7 +757,7 @@ def build_rip(h: Harvest, pack_id: str, name: str, asset_names: Dict[int, str],
                 style_of[bi] = si
                 break
         else:
-            specs.append(StyleSpec(face, size_pt, track, leading, colour_of[bi], upper, [bi], len(b.text()), sx))
+            specs.append(StyleSpec(face, size_pt, track, leading, colour_of[bi], upper, [bi], len(b.text()), sx, fin))
             style_of[bi] = len(specs) - 1
 
     specs, style_of = _consolidate(specs, style_of)
@@ -772,6 +775,8 @@ def build_rip(h: Harvest, pack_id: str, name: str, asset_names: Dict[int, str],
             st["case"] = "upper"
         if abs(sp.sx - 1) > 0.03:
             st["scale_x"] = round(sp.sx, 3)
+        if sp.fin:
+            st["finish"] = sp.fin
         if st["tracking"] == 0:
             del st["tracking"]
         styles[n] = st
