@@ -738,6 +738,36 @@ def test_degraded_display_reads_are_amended(tmp_path):
     assert amend(full, cv2.dilate(item.astype(np.uint8), k), "MB/20") == "MB720"
 
 
+def test_amend_aligns_through_spatter_and_breaks(tmp_path):
+    # A photocopy adds toner specks and snaps thin strokes, so the row's
+    # cells stop lining up 1:1 with the reader's characters. The alignment
+    # must step over the spatter and rejoin the broken letter, and still
+    # correct the misread underneath.
+    import cv2
+    from engine.harvest.letters import atlas
+    from engine.harvest.proof import amend
+    from engine.render import Renderer
+    with Renderer() as r:
+        ink = _word_row(tmp_path, r, "AA-Cells")
+        full = atlas(r._browser, full=True)
+    fat = cv2.dilate(ink.astype(np.uint8), np.ones((3, 3), np.uint8))
+    ys, xs = np.nonzero(fat)
+    # a toner speck between the words, clear of every letter
+    fat[ys.min() + 2:ys.min() + 8, xs.max() + 12:xs.max() + 17] = 1
+    assert amend(full, fat, "AA-Ceiis") == "AA-Cells"
+    # snap the first 'l' in half: one character, two cells
+    broken = fat.copy()
+    cols = np.nonzero(broken.any(axis=0))[0]
+    # find the first stem after 'Ce': cut a 2px horizontal slice mid-letter
+    from engine.harvest.proof import letter_cells
+    cs = letter_cells(fat)
+    tallest = max(c[3] for c in cs)
+    stem = [c for c in cs if c[2] < 0.4 * tallest and c[3] > 0.8 * tallest][0]
+    y_mid = stem[1] + stem[3] // 2
+    broken[y_mid:y_mid + 2, stem[0]:stem[0] + stem[2]] = 0
+    assert amend(full, broken.astype(np.uint8), "AA-Ceiis") == "AA-Cells"
+
+
 def test_sound_reads_are_left_alone(tmp_path):
     from engine.harvest.letters import atlas
     from engine.harvest.proof import amend

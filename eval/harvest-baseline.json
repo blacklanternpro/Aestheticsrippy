@@ -8,16 +8,16 @@
       "styles": 5,
       "text_frames": 8,
       "frames": 48,
-      "seconds": 152.2
+      "seconds": 146.6
     },
     "drumaq-tour-poster": {
-      "score": 79.7,
+      "score": 79.9,
       "live": 0.281,
-      "type": 0.69,
+      "type": 0.688,
       "styles": 5,
       "text_frames": 15,
       "frames": 21,
-      "seconds": 163.3
+      "seconds": 159.3
     },
     "dupont-letter": {
       "score": 92.8,
@@ -26,7 +26,7 @@
       "styles": 4,
       "text_frames": 24,
       "frames": 32,
-      "seconds": 67.1
+      "seconds": 65.3
     },
     "fidele-invoice-0123": {
       "score": 94.3,
@@ -35,7 +35,7 @@
       "styles": 6,
       "text_frames": 23,
       "frames": 39,
-      "seconds": 70.9
+      "seconds": 67.1
     },
     "fidele-invoice-0123-1": {
       "score": 96.4,
@@ -44,7 +44,7 @@
       "styles": 6,
       "text_frames": 23,
       "frames": 42,
-      "seconds": 71.7
+      "seconds": 70.6
     },
     "fidele-invoice-template": {
       "score": 95.3,
@@ -53,7 +53,7 @@
       "styles": 6,
       "text_frames": 20,
       "frames": 40,
-      "seconds": 77.1
+      "seconds": 71.6
     },
     "fidele-order-invoice": {
       "score": 95.3,
@@ -62,7 +62,7 @@
       "styles": 6,
       "text_frames": 20,
       "frames": 40,
-      "seconds": 78.7
+      "seconds": 75.8
     },
     "forecaster-prototype-card": {
       "score": 95.2,
@@ -71,7 +71,7 @@
       "styles": 2,
       "text_frames": 19,
       "frames": 22,
-      "seconds": 59.8
+      "seconds": 54.1
     },
     "handshake-receipt-card": {
       "score": 92.5,
@@ -80,16 +80,16 @@
       "styles": 8,
       "text_frames": 24,
       "frames": 51,
-      "seconds": 116.8
+      "seconds": 108.4
     },
     "handshake-receipt-ledger": {
-      "score": 89.7,
+      "score": 89.5,
       "live": 0.486,
-      "type": 0.732,
+      "type": 0.734,
       "styles": 11,
       "text_frames": 18,
       "frames": 52,
-      "seconds": 106.0
+      "seconds": 96.1
     },
     "lsd-event-poster": {
       "score": 85.5,
@@ -98,16 +98,16 @@
       "styles": 13,
       "text_frames": 17,
       "frames": 28,
-      "seconds": 102.1
+      "seconds": 97.5
     },
     "lsd-magick-city-poster": {
-      "score": 87.1,
+      "score": 86.7,
       "live": 0.496,
-      "type": 0.796,
+      "type": 0.787,
       "styles": 9,
       "text_frames": 17,
       "frames": 37,
-      "seconds": 208.7
+      "seconds": 210.5
     },
     "minimalist-corporate-invoice": {
       "score": 94.3,
@@ -116,25 +116,25 @@
       "styles": 7,
       "text_frames": 19,
       "frames": 41,
-      "seconds": 69.2
+      "seconds": 69.6
     },
     "pangpang-receipt-poster": {
-      "score": 91.7,
+      "score": 91.6,
       "live": 0.224,
-      "type": 0.626,
+      "type": 0.624,
       "styles": 8,
       "text_frames": 27,
       "frames": 44,
-      "seconds": 171.2
+      "seconds": 173.5
     },
     "pangpang-receipt-repro": {
-      "score": 94.9,
+      "score": 94.8,
       "live": 0.223,
-      "type": 0.653,
-      "styles": 12,
+      "type": 0.647,
+      "styles": 11,
       "text_frames": 32,
       "frames": 44,
-      "seconds": 230.9
+      "seconds": 227.9
     },
     "public-records-event-ledger": {
       "score": 82.4,
@@ -143,7 +143,7 @@
       "styles": 10,
       "text_frames": 19,
       "frames": 51,
-      "seconds": 151.5
+      "seconds": 151.9
     },
     "saraiva-resume": {
       "score": 85.8,
@@ -152,25 +152,25 @@
       "styles": 6,
       "text_frames": 16,
       "frames": 58,
-      "seconds": 144.2
+      "seconds": 147.5
     },
     "mr-beams-photocopy-label": {
-      "score": 92.1,
+      "score": 92.0,
       "live": 0.621,
-      "type": 0.786,
+      "type": 0.778,
       "styles": 2,
       "text_frames": 2,
       "frames": 6,
-      "seconds": 38.1
+      "seconds": 40.8
     },
     "nikelab-chicago-mono": {
-      "score": 97.1,
+      "score": 96.3,
       "live": 0.675,
-      "type": 0.792,
+      "type": 0.79,
       "styles": 3,
       "text_frames": 6,
       "frames": 11,
-      "seconds": 38.8
+      "seconds": 39.9
     }
   }
 }

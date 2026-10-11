@@ -156,6 +156,114 @@ def _spell(fold_ch: str, variants: List[Tuple[float, str]], h: float, tall: floa
     return fold_ch
 
 
+def _chart_folds(glyphs: Glyphs, mask: np.ndarray):
+    """One chart per cell, kept whole: ([(score, angle, char)], {fold: best})."""
+    chart = glyphs.chart(mask, ANGLES, top=60)
+    folded: Dict[str, float] = {}
+    for s, _a, c in chart:
+        f = fold(c)
+        folded[f] = max(folded.get(f, -1.0), s)
+    return chart, folded
+
+
+def _join(a: Tuple, b: Tuple) -> Tuple:
+    """Two cells as one (a letter the print snapped in half)."""
+    x2, y2 = min(a[0], b[0]), min(a[1], b[1])
+    x3 = max(a[0] + a[2], b[0] + b[2]); y3 = max(a[1] + a[3], b[1] + b[3])
+    mm = np.zeros((y3 - y2, x3 - x2), bool)
+    for x, y, w, h, m, *rest in (a, b):
+        mm[y - y2:y - y2 + h, x - x2:x - x2 + w] |= m.astype(bool)
+    dotted = any(len(c) > 5 and c[5] for c in (a, b))
+    return (x2, y2, x3 - x2, y3 - y2, mm, dotted)
+
+
+def _align(glyphs: Glyphs, chars: List[str], row: List[Tuple], tall: float,
+           unit: float) -> Optional[List[Optional[Tuple]]]:
+    """Each character's cell, aligned by dynamic programming: a speck of
+    spatter is stepped over, a letter the print broke is rejoined, and a pair
+    the ink fused is matched to its one cell (and left unamended there).
+    Returns per-char (cell, chart) - None where no clean cell owns the char -
+    or None when even the best alignment reads badly."""
+    n, m = len(chars), len(row)
+    if n == 0 or m == 0 or abs(n - m) > max(3, n // 3):
+        return None
+    charts = [_chart_folds(glyphs, c[4]) for c in row]
+    joined: Dict[int, Tuple] = {}
+
+    def tiny(j: int) -> bool:
+        return row[j][3] < 0.45 * tall
+
+    def match(i: int, j: int) -> float:
+        ch = chars[i]
+        if not ch.isalnum():
+            return 0.2 if tiny(j) else 0.55
+        if tiny(j):
+            return 0.8
+        return 1.0 - charts[j][1].get(fold(ch), 0.0)
+
+    def split(i: int, j: int) -> float:
+        a, b = row[j], row[j + 1]
+        gap = b[0] - (a[0] + a[2])
+        if gap > 0.4 * unit or a[2] + b[2] > 1.8 * unit or not chars[i].isalnum():
+            return 9.0
+        if j not in joined:
+            joined[j] = _join(a, b)
+        _c, folds = _chart_folds(glyphs, joined[j][4])
+        return 1.0 - folds.get(fold(chars[i]), 0.0) + 0.12
+
+    BIG = 1e9
+    D = np.full((n + 1, m + 1), BIG)
+    OP = np.zeros((n + 1, m + 1), np.int8)
+    D[0][0] = 0.0
+    skip_char = 0.7
+    for j in range(1, m + 1):
+        D[0][j] = D[0][j - 1] + (0.22 if tiny(j - 1) else 0.6)
+        OP[0][j] = 3
+    for i in range(1, n + 1):
+        D[i][0] = D[i - 1][0] + skip_char
+        OP[i][0] = 4
+        for j in range(1, m + 1):
+            best, op = D[i - 1][j - 1] + match(i - 1, j - 1), 1
+            if j >= 2:
+                v = D[i - 1][j - 2] + split(i - 1, j - 2)
+                if v < best:
+                    best, op = v, 2
+            v = D[i][j - 1] + (0.22 if tiny(j - 1) else 0.6)
+            if v < best:
+                best, op = v, 3
+            v = D[i - 1][j] + skip_char
+            if v < best:
+                best, op = v, 4
+            if i >= 2:
+                v = D[i - 2][j - 1] + (0.45 if row[j - 1][2] > 1.25 * unit else 0.75)
+                if v < best:
+                    best, op = v, 5
+            D[i][j] = best
+            OP[i][j] = op
+    if D[n][m] / max(1, n) > 0.55:
+        return None   # even the best alignment reads badly: not our row to fix
+    out: List[Optional[Tuple]] = [None] * n
+    i, j = n, m
+    while i > 0 or j > 0:
+        op = OP[i][j]
+        if op == 1:
+            out[i - 1] = (row[j - 1], charts[j - 1])
+            i, j = i - 1, j - 1
+        elif op == 2:
+            cell = joined[j - 2]
+            out[i - 1] = (cell, _chart_folds(glyphs, cell[4]))
+            i, j = i - 1, j - 2
+        elif op == 3:
+            j -= 1
+        elif op == 4:
+            i -= 1
+        elif op == 5:
+            i, j = i - 2, j - 1   # fused pair: both chars stand as read
+        else:
+            break
+    return out
+
+
 def amend(glyphs: Glyphs, ink: np.ndarray, text: str,
           base: Optional[float] = None) -> Optional[str]:
     """The row's text with shape-overruled letters corrected, or None when the
@@ -164,16 +272,23 @@ def amend(glyphs: Glyphs, ink: np.ndarray, text: str,
 
     chars = [ch for ch in text if not ch.isspace()]
     row = letter_cells(ink, base)
-    if not chars or len(chars) != len(row):
+    if not chars or not row:
         return None
     tall = float(np.percentile([c[3] for c in row], 85))
     units = [c[2] for c in row if c[3] >= 0.5 * tall]
     unit = float(np.median(units)) if units else 1.0
+    aligned = _align(glyphs, chars, row, tall, unit)
+    if aligned is None:
+        return None
     company = _context_case(chars)
     strong_sw: Dict[int, str] = {}
     fair_sw: Dict[int, str] = {}
     stem_alt: Dict[int, List[str]] = {}
-    for i, (ch, cell) in enumerate(zip(chars, row)):
+    agree, judged = 0, 0
+    for i, ch in enumerate(chars):
+        if aligned[i] is None:
+            continue
+        cell, (chart, folded0) = aligned[i]
         dotted = bool(cell[5]) if len(cell) > 5 else False
         # A shard of a mangled segmentation charts as nonsense with
         # conviction: only a letter-shaped cell may overrule the reader.
@@ -182,19 +297,20 @@ def amend(glyphs: Glyphs, ink: np.ndarray, text: str,
             continue
         if cell[2] < 0.3 * unit and fold(ch) not in ("i", "l", "1"):
             continue
-        chart = glyphs.chart(cell[4], ANGLES, top=10)
         if not chart:
             continue
-        folded: Dict[str, float] = {}
+        folded: Dict[str, float] = dict(folded0)
         variants: Dict[str, List[Tuple[float, str]]] = {}
         for s, _a, c in chart:
-            f = fold(c)
-            folded[f] = max(folded.get(f, -1.0), s)
-            variants.setdefault(f, []).append((s, c))
+            variants.setdefault(fold(c), []).append((s, c))
         top_f = max(folded, key=folded.get)
         top_s = folded[top_f]
         own_f = fold(ch)
         own_s = folded.get(own_f, 0.0)
+        if ch.isalnum():
+            judged += 1
+            if own_s >= 0.55:
+                agree += 1
         # Bare stems: i, l, I and 1 are the same drawing to the atlas, and the
         # dot above a stem may be toner spatter as easily as an i's tittle.
         # Offer the structural spellings and let the word's ear pick below.
@@ -222,6 +338,14 @@ def amend(glyphs: Glyphs, ink: np.ndarray, text: str,
             if top_s >= PUNCT_OVERRULE and cell[3] >= 0.55 * tall:
                 strong_sw[i] = got
     if not strong_sw and not fair_sw and not stem_alt:
+        return None
+    # Proofreading fixes a letter or two in a reading that is broadly RIGHT.
+    # When the cells disagree with most of the text, the row is mis-cut or
+    # mis-read wholesale, and swapping letters inside it only makes new noise.
+    if judged and agree / judged < 0.65:
+        return None
+    budget = max(2, judged // 4)
+    if len(strong_sw) + len(fair_sw) > budget:
         return None
 
     def spelled(swaps: Dict[int, str]) -> str:
@@ -275,6 +399,9 @@ def amend_blocks(img: np.ndarray, blocks: Sequence, glyphs: Glyphs,
         if b.size < 24:
             continue
         for run in b.runs:
+            # A short row has no word around the letter to protect it.
+            if sum(c.isalnum() for c in run.text) < 6:
+                continue
             s = make_sample(img, run, inks.get(bi))
             if s is None:
                 if debug:
