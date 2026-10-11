@@ -1,0 +1,16 @@
+{
+  "id": "mr-beams-photocopy-label",
+  "name": "Mr Beams Photocopy Label",
+  "category": "Harvested",
+  "description": "Ripped from a reference by the harvester. 2 type styles, 2 text frames, 3 art frames.",
+  "format": "rip",
+  "variants": [],
+  "target": {
+    "dimensions": {
+      "format": "Square",
+      "width_mm": 210.0,
+      "height_mm": 210.0,
+      "orientation": "portrait"
+    }
+  }
+}

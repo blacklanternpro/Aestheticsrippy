@@ -2,13 +2,13 @@
   "recorded": "2026-10-11",
   "packs": {
     "creative-studio-office-card": {
-      "score": 97.3,
+      "score": 96.7,
       "live": 0.194,
-      "type": 0.877,
-      "styles": 4,
+      "type": 0.875,
+      "styles": 5,
       "text_frames": 8,
       "frames": 48,
-      "seconds": 90.6
+      "seconds": 96.9
     },
     "drumaq-tour-poster": {
       "score": 79.7,
@@ -17,7 +17,7 @@
       "styles": 5,
       "text_frames": 15,
       "frames": 21,
-      "seconds": 88.8
+      "seconds": 107.2
     },
     "dupont-letter": {
       "score": 92.8,
@@ -26,7 +26,7 @@
       "styles": 4,
       "text_frames": 24,
       "frames": 32,
-      "seconds": 46.3
+      "seconds": 47.0
     },
     "fidele-invoice-0123": {
       "score": 94.3,
@@ -35,34 +35,34 @@
       "styles": 6,
       "text_frames": 23,
       "frames": 39,
-      "seconds": 41.2
+      "seconds": 47.1
     },
     "fidele-invoice-0123-1": {
-      "score": 96.2,
+      "score": 96.4,
       "live": 0.932,
-      "type": 0.792,
-      "styles": 4,
+      "type": 0.793,
+      "styles": 6,
       "text_frames": 23,
       "frames": 42,
-      "seconds": 41.7
+      "seconds": 51.1
     },
     "fidele-invoice-template": {
-      "score": 95.1,
+      "score": 95.3,
       "live": 0.931,
       "type": 0.797,
-      "styles": 5,
+      "styles": 6,
       "text_frames": 20,
       "frames": 40,
-      "seconds": 42.2
+      "seconds": 51.3
     },
     "fidele-order-invoice": {
-      "score": 95.1,
+      "score": 95.3,
       "live": 0.931,
       "type": 0.797,
-      "styles": 5,
+      "styles": 6,
       "text_frames": 20,
       "frames": 40,
-      "seconds": 41.5
+      "seconds": 50.6
     },
     "forecaster-prototype-card": {
       "score": 95.2,
@@ -71,7 +71,7 @@
       "styles": 2,
       "text_frames": 19,
       "frames": 22,
-      "seconds": 33.9
+      "seconds": 38.8
     },
     "handshake-receipt-card": {
       "score": 92.6,
@@ -80,34 +80,34 @@
       "styles": 8,
       "text_frames": 24,
       "frames": 51,
-      "seconds": 67.5
+      "seconds": 77.9
     },
     "handshake-receipt-ledger": {
-      "score": 89.7,
+      "score": 89.9,
       "live": 0.486,
       "type": 0.732,
       "styles": 11,
       "text_frames": 18,
       "frames": 52,
-      "seconds": 60.9
+      "seconds": 68.7
     },
     "lsd-event-poster": {
       "score": 85.5,
       "live": 0.494,
-      "type": 0.777,
-      "styles": 12,
+      "type": 0.779,
+      "styles": 13,
       "text_frames": 17,
       "frames": 28,
-      "seconds": 57.9
+      "seconds": 71.0
     },
     "lsd-magick-city-poster": {
-      "score": 86.7,
+      "score": 87.1,
       "live": 0.496,
-      "type": 0.787,
+      "type": 0.796,
       "styles": 9,
       "text_frames": 17,
       "frames": 37,
-      "seconds": 116.6
+      "seconds": 160.6
     },
     "minimalist-corporate-invoice": {
       "score": 94.3,
@@ -116,7 +116,7 @@
       "styles": 7,
       "text_frames": 19,
       "frames": 41,
-      "seconds": 43.8
+      "seconds": 49.2
     },
     "pangpang-receipt-poster": {
       "score": 92.0,
@@ -125,7 +125,7 @@
       "styles": 8,
       "text_frames": 28,
       "frames": 45,
-      "seconds": 93.3
+      "seconds": 125.2
     },
     "pangpang-receipt-repro": {
       "score": 94.9,
@@ -134,7 +134,7 @@
       "styles": 11,
       "text_frames": 32,
       "frames": 44,
-      "seconds": 105.9
+      "seconds": 163.8
     },
     "public-records-event-ledger": {
       "score": 82.4,
@@ -143,7 +143,7 @@
       "styles": 10,
       "text_frames": 19,
       "frames": 51,
-      "seconds": 92.5
+      "seconds": 109.7
     },
     "saraiva-resume": {
       "score": 85.8,
@@ -152,7 +152,25 @@
       "styles": 6,
       "text_frames": 16,
       "frames": 58,
-      "seconds": 116.4
+      "seconds": 122.1
+    },
+    "mr-beams-photocopy-label": {
+      "score": 92.2,
+      "live": 0.621,
+      "type": 0.786,
+      "styles": 2,
+      "text_frames": 2,
+      "frames": 6,
+      "seconds": 29.9
+    },
+    "nikelab-chicago-mono": {
+      "score": 96.8,
+      "live": 0.675,
+      "type": 0.797,
+      "styles": 3,
+      "text_frames": 6,
+      "frames": 11,
+      "seconds": 29.1
     }
   }
 }

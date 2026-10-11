@@ -1,50 +1,40 @@
-# Print finish: over-inked, blurred and overprinted type (planned phase)
+# Print finish: over-inked, blurred and overprinted type (phase shipped)
 
-Three references for a later phase, kept OUT of `design-packs/` so the eval
-stays honest until the phase begins. The theme: the letterform underneath is a
-real typeface, but the design's character is the *finish* — ink gain, blur,
-photocopy erosion, overprint. Today the engine either mistakes the finish for
-a heavier weight, or the trust filter keeps the whole block as pasted art.
-The goal is live, editable type that *renders* with the measured finish.
+The theme: the letterform underneath is a real typeface, but the design's
+character is the *finish* - ink gain, blur, photocopy erosion, overprint.
 
-- `obby-jappari-office-card.jpg` — soft over-inked display type with a red
-  bespoke script logotype overprinted across it (multiply, slight blur).
-- `nikelab-chicago-mono.jpg` — mono type with heavy ink gain: strokes swollen,
-  counters part-filled, corners rounded, a few strokes merging.
-- `mr-beams-photocopy-label.jpg` — photocopy degradation: gain plus ragged,
-  eroded edges and re-thresholded (hard) contours.
+What shipped (see the three "Print finish" commits on `rebuild`):
+1. Rip format + renderer: per-style `finish` {gain, blur, rough, threshold,
+   ink} rendered as one generated SVG filter per (finish, size), em-relative;
+   `blend` on any frame for overprint. `spike.html` (kept here) is the
+   original rendering proof.
+2. Measurement: `engine/harvest/finish.py` re-fits each size-group with the
+   finish applied to candidate tiles in cv2 (dilate, blur, re-threshold),
+   covering lighter weights of the group's own family, its clean runners-up
+   and the faces a gain-peeled shortlist points at. Emission gates learned
+   from the misfires: best >= 0.86 (0.80 for a positively-identified copy:
+   thresholded fit wins AND the ref's edge band has no mid-tones), margin
+   over clean, gain <= 0.055em. KNOWN6 closes the loop (render 400 + finish,
+   recover 400 + finish, clean body earns none).
+3. The references were promoted into design-packs/ as eval packs:
+   - mr-beams-photocopy-label: the finish FIRES live (Arimo 400, gain +
+     blur + threshold on the body group; the xerox look renders from live
+     type). 92.2 at promotion.
+   - nikelab-chicago-mono: 96.8 at promotion, but the display dodges to
+     condensed faces and the finish cannot out-explain them yet (below).
+   - obby-jappari-office-card was found to BE the existing
+     creative-studio-office-card eval ref (same design), so no new pack.
 
-`spike.html` (this folder) proves the rendering half: open it in the engine's
-Chromium (`engine.render.Renderer.render_file`) and all four finishes come out
-of ONE SVG filter chain applied to live text —
-`feMorphology dilate` (gain) → `feGaussianBlur` (softness) →
-`feTurbulence + feDisplacementMap` (ragged photocopy edges) →
-`feComponentTransfer` (alpha gamma for ink darkness, or a discrete table for
-the re-thresholded xerox look) — plus `mix-blend-mode: multiply` for
-overprint. Both renderer paths are Chromium, so studio and headless agree.
-
-## Plan
-1. Rip format: a per-style `finish` block — `{gain, blur, rough: {freq, scale,
-   seed}, threshold}` in em-relative units so one finish serves all sizes —
-   rendered by `rip-renderer.js` as a generated SVG filter per distinct
-   finish; and `blend: "multiply"` on frames (text AND image/mark frames, so
-   a bespoke overlay like the red "office" script composites correctly even
-   while it stays art).
-2. Measurement (the hard half; build test-first against known-answer sheets
-   rendered WITH finishes): the type bench must solve face, weight, gain and
-   blur jointly — today blur is solved globally (`bench.blur`) and gain
-   masquerades as weight. Apply dilate+blur to candidate tiles in cv2 (no
-   re-render), and prefer the lighter weight + gain when both explain the ink,
-   since weights are discrete and gain fills the gaps between them. Fit the
-   finish per size-group, not per block. Roughness = the residual edge
-   raggedness after gain+blur fit; the photocopy's hard edges (bimodal edge
-   profile after erosion) set `threshold`.
-3. Trust filter: finish-aware match scores mean over-inked type that
-   previously failed `match.score` stays live instead of becoming art.
-4. Known-answer sheet (KNOWN6): render text at weight 400 with a known finish,
-   rip it, assert the recovered weight is 400 (not 700), the finish parameters
-   come back within tolerance, and the text is live.
-5. Only then: move these three references into `design-packs/` as eval packs.
-6. This phase merges naturally with the planned print-textures work (riso
-   grain, halftone, misregistration): misregistration = per-colour-pass
-   offsets on multiply layers, measurable from colour-fringe offsets.
+Known limits, for the next round here:
+- OCR misreads on degraded display type poison the samples ('Unicago',
+  'MB/20', 'AA-Ceiis'): no candidate can fit a wrong text. The glyph atlas
+  (engine/harvest/letters.py) could verify/correct level display reads the
+  way rotated.py does for angled ones - but the atlas is uppercase-only and
+  these are mixed case.
+- The office card's big soft "Office" never becomes a text block at all
+  (the red overprint breaks OCR), so live stays 19% there.
+- The pixel score mildly prefers a clean soft render over a truthful
+  textured one (mr-beams clean would score ~96); texture-aware scoring or
+  the planned print-textures phase would close that.
+- Severe gain (nikelab display, ~0.08em+, strokes merging) sits beyond
+  GAIN_CAP and beyond what grayscale dilation of a clean render explains.

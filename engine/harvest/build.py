@@ -37,7 +37,13 @@ def _lab(bgr) -> np.ndarray:
 
 def harmonise(matches: Dict[int, Match], blocks: Sequence[Block], margin: float = 0.02) -> Dict[int, Face]:
     chosen = _harmonise_family(matches, blocks, margin)
-    return _harmonise_weights(matches, chosen)
+    chosen = _harmonise_weights(matches, chosen)
+    # A finished face was measured jointly with its print finish: moving it to
+    # the document's popular weight would paste the finish on the wrong face.
+    for bi, m in matches.items():
+        if m.finish and bi in chosen:
+            chosen[bi] = m.face
+    return chosen
 
 
 def _margin(block: Block, base: float) -> float:
