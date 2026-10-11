@@ -15,6 +15,14 @@
  *
  * opts: { assets: {ref: url}, assetBase: "url/prefix/", packBase: "url/prefix/" (for frame
  *         src art), hyphenation: patterns, editable: bool }   editable adds data-path / data-item hooks for the studio.
+ *
+ * Print finish: a style may carry `finish` — { gain, blur, rough: {freq, scale,
+ * seed}, threshold, ink } — the look of the press, not of the typeface: ink
+ * gain (dilate), softness (blur), photocopy raggedness (turbulent displacement)
+ * and either re-thresholded edges (`threshold`, the xerox look) or ink darkness
+ * (`ink`, a gamma). All lengths are in em so a finish is one idea at any size;
+ * `rough.freq` is cycles per em (≈8 reads as toner grit). Any frame may carry
+ * `blend` (e.g. "multiply") to overprint onto what lies beneath it.
  */
 (function (root, factory) {
   const Rip = factory();
@@ -50,7 +58,7 @@
   const STYLE_KEYS = new Set([
     "font", "size", "weight", "stretch", "italic", "leading", "tracking", "case",
     "align", "align_last", "color", "hyphenate", "wrap", "word_spacing", "numeric",
-    "scale_x", "scale_y", "extends", "indent", "opacity",
+    "scale_x", "scale_y", "extends", "indent", "opacity", "finish",
   ]);
   const NBSP = " ", WJ = "⁠", SHY = "­";
 
@@ -134,7 +142,51 @@
     return Number.isInteger(v) ? String(v) : String(v);
   }
 
-  function styleCss(s, tokens) {
+  /** One SVG filter per distinct (finish, size): the print finish - ink gain,
+   *  softness, photocopy raggedness, re-thresholded edges - applied to live
+   *  type. Parameters are em-relative so a finish is one idea at any size. */
+  function finishFilter(fin, sizePt, id) {
+    const px = (v) => Math.round(v * sizePt * (96 / 72) * 100) / 100;
+    const parts = [];
+    let src = "SourceGraphic";
+    if (fin.gain) {
+      parts.push(`<feMorphology operator="dilate" radius="${px(fin.gain)}" in="${src}" result="f1"/>`);
+      src = "f1";
+    }
+    if (fin.rough && fin.rough.scale) {
+      const freq = Math.round(((fin.rough.freq || 8) / (sizePt * (96 / 72))) * 10000) / 10000;
+      parts.push(`<feTurbulence type="fractalNoise" baseFrequency="${freq}" numOctaves="2" ` +
+        `seed="${fin.rough.seed || 7}" result="n"/>`);
+      parts.push(`<feDisplacementMap in="${src}" in2="n" scale="${px(fin.rough.scale)}" result="f2"/>`);
+      src = "f2";
+    }
+    if (fin.blur) {
+      parts.push(`<feGaussianBlur stdDeviation="${px(fin.blur)}" in="${src}" result="f3"/>`);
+      src = "f3";
+    }
+    if (fin.threshold != null) {
+      const t = fin.threshold, K = 6, vals = [];
+      for (let i = 0; i < K; i++) {
+        const u = i / (K - 1);
+        vals.push(u < t - 0.15 ? 0 : u < t ? 0.25 : u < t + 0.2 ? 0.8 : 1);
+      }
+      parts.push(`<feComponentTransfer in="${src}"><feFuncA type="discrete" ` +
+        `tableValues="${vals.join(" ")}"/></feComponentTransfer>`);
+    } else if (fin.ink && fin.ink !== 1) {
+      parts.push(`<feComponentTransfer in="${src}"><feFuncA type="gamma" amplitude="1" ` +
+        `exponent="${num(fin.ink)}" offset="0"/></feComponentTransfer>`);
+    }
+    return `<filter id="${id}" x="-25%" y="-25%" width="150%" height="150%">${parts.join("")}</filter>`;
+  }
+
+  function finishId(fin, sizePt) {
+    const key = JSON.stringify([fin, sizePt]);
+    let h = 5381;
+    for (let i = 0; i < key.length; i++) h = ((h * 33) ^ key.charCodeAt(i)) >>> 0;
+    return `fin-${h.toString(36)}`;
+  }
+
+  function styleCss(s, tokens, finishes) {
     const css = [];
     if ("font" in s) css.push(`font-family: '${s.font}', ${GENERIC[s.font] || "sans-serif"}`);
     if ("size" in s) css.push(`font-size: calc(${num(s.size)}pt * var(--fit, 1))`);
@@ -155,6 +207,11 @@
     if ("opacity" in s) css.push(`opacity: ${num(s.opacity)}`);
     const col = colorValue(s.color, tokens);
     if (col) css.push(`color: ${col}`);
+    if (s.finish && "size" in s) {
+      const id = finishId(s.finish, s.size);
+      if (finishes) finishes.set(id, finishFilter(s.finish, s.size, id));
+      css.push(`filter: url(#${id})`);
+    }
     return css;
   }
 
@@ -225,6 +282,7 @@
     this.styles = rip.styles || {};
     this.tokens = rip.tokens || {};
     this.autoId = 0;
+    this.finishes = new Map();
     this.hyphenate = this.opts.hyphenator ||
       createHyphenator(this.opts.hyphenation || null);
   }
@@ -250,6 +308,7 @@
     if ("mb" in f) css.push(`margin-bottom: ${mm(f.mb)}`);
     if ("pad" in f) css.push(`padding: ${mm(f.pad)}`);
     if ("rotate" in f) css.push(`transform: rotate(${num(f.rotate)}deg)`);
+    if ("blend" in f) css.push(`mix-blend-mode: ${f.blend}`);
     return css;
   };
 
@@ -288,7 +347,7 @@
     if (f.suffix && text) text = text + f.suffix;
 
     const s = resolveStyle(this.styles, f.style, f.with);
-    const css = this.placeCss(f, absolute).concat(styleCss(s, this.tokens));
+    const css = this.placeCss(f, absolute).concat(styleCss(s, this.tokens, this.finishes));
     if (f.typeset !== false) text = typeset(text);
     if (s.hyphenate) text = this.hyphenate(text);
     let body = text.split("\n").map(escapeHtml).join("<br>");
@@ -351,7 +410,7 @@
     if (s.case === "upper") text = text.toUpperCase();
     else if (s.case === "lower") text = text.toLowerCase();
     const keep = (c) => !/^(line-height|text-align|text-align-last|text-wrap|text-indent|hyphens|text-transform)/.test(c);
-    const css = this.placeCss(f, absolute).concat(styleCss(s, this.tokens).filter(keep));
+    const css = this.placeCss(f, absolute).concat(styleCss(s, this.tokens, this.finishes).filter(keep));
     const fid = f.id || this.nextId("path");
     const pid = `rip-path-${escapeHtml(fid)}-${this.nextId("p")}`;
     const pts = f.points || [];
@@ -413,7 +472,6 @@
     if (!src) throw new RipError(`image asset not found: ${ref}`);
     const css = this.placeCss(f, absolute);
     if (f.opacity !== undefined) css.push(`opacity: ${num(f.opacity)}`);
-    if (f.blend) css.push(`mix-blend-mode: ${f.blend}`);
     const img = [`object-fit: ${f.fit || "cover"}`, `object-position: ${f.position || "center"}`,
       "width: 100%", "height: 100%", "display: block"];
     if (f.filter === "grayscale") img.push("filter: grayscale(1)");
@@ -448,7 +506,6 @@
     if (f.radius === "ellipse") css.push("border-radius: 50%");
     else if (f.radius !== undefined) css.push(`border-radius: ${mm(f.radius)}`);
     if (f.opacity !== undefined) css.push(`opacity: ${num(f.opacity)}`);
-    if (f.blend) css.push(`mix-blend-mode: ${f.blend}`);
     css.push("box-sizing: border-box");
     return `<div ${this.attrs(f, "box", css, "", ctx)}></div>`;
   };
@@ -469,7 +526,7 @@
   };
 
   Builder.prototype.containerStyle = function (f) {
-    return (f.style || f.with) ? styleCss(resolveStyle(this.styles, f.style, f.with), this.tokens) : [];
+    return (f.style || f.with) ? styleCss(resolveStyle(this.styles, f.style, f.with), this.tokens, this.finishes) : [];
   };
 
   Builder.prototype.r_stack = function (f, ctx, absolute) {
@@ -603,7 +660,11 @@ ${sc}.page-sheet .rip-image img { user-select: none; }`;
   function renderSheet(rip, data, opts) {
     const b = new Builder(rip, data, opts);
     const frames = (rip.frames || []).map((f) => b.render(f, { item: undefined, itemPath: "" }, true)).join("\n");
-    return `<main class="page-sheet" data-rip="${escapeHtml(rip.id || "")}">\n${frames}\n</main>`;
+    const defs = b.finishes.size
+      ? `<svg width="0" height="0" style="position: absolute" aria-hidden="true"><defs>` +
+        [...b.finishes.values()].join("") + `</defs></svg>\n`
+      : "";
+    return `<main class="page-sheet" data-rip="${escapeHtml(rip.id || "")}">\n${defs}${frames}\n</main>`;
   }
 
   // ------------------------------------------------------------------- fit

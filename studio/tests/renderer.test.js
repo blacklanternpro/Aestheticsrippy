@@ -167,6 +167,48 @@ test("stops place each letter at its own distance along the path, pitch carries 
   assert.equal([...end.matchAll(/<text x="([\d.]+)"/g)].length, 2);
 });
 
+test("print finishes become one SVG filter per style, scaled to the em", () => {
+  const rip = { id: "fin", page: { width_mm: 100, height_mm: 60 }, styles: {
+      big: { font: "Inter", size: 36, finish: { gain: 0.03, blur: 0.02, ink: 0.6 } },
+      small: { font: "Inter", size: 12, finish: { gain: 0.03, blur: 0.02, ink: 0.6 } },
+      copy: { font: "Inter", size: 18, finish: { gain: 0.025, rough: { freq: 8, scale: 0.06, seed: 3 }, threshold: 0.45 } },
+      plain: { font: "Inter", size: 12 } },
+    frames: [
+      { id: "a", type: "text", style: "big", text: "OVERINKED", x: 5, y: 5 },
+      { id: "b", type: "text", style: "small", text: "overinked", x: 5, y: 25 },
+      { id: "b2", type: "text", style: "small", text: "again", x: 5, y: 30 },
+      { id: "c", type: "text", style: "copy", text: "PHOTOCOPY", x: 5, y: 40 },
+      { id: "d", type: "text", style: "plain", text: "clean", x: 5, y: 50 },
+    ] };
+  const html = Rip.renderSheet(rip, {}, {});
+  const filters = [...html.matchAll(/<filter id="(fin-[^"]+)"/g)].map((m) => m[1]);
+  assert.equal(new Set(filters).size, filters.length);       // one def per distinct finish+size
+  assert.equal(filters.length, 3);                           // big, small (shared by b and b2), copy
+  // The same finish at 3x the size dilates 3x the pixels: em-relative.
+  const radii = [...html.matchAll(/feMorphology operator="dilate" radius="([\d.]+)"/g)].map((m) => +m[1]);
+  const rBig = Math.max(...radii), rSmall = Math.min(...radii);
+  assert.ok(Math.abs(rBig / rSmall - 3) < 0.05, radii);
+  // Gain chain carries the ink gamma; the photocopy carries the discrete table.
+  assert.match(html, /feFuncA type="gamma" amplitude="1" exponent="0.6"/);
+  assert.match(html, /feTurbulence type="fractalNoise"/);
+  assert.match(html, /feFuncA type="discrete" tableValues="0 0 0.25 0.8 1 1"/);
+  // Every finished frame points at its filter; the plain one does not.
+  for (const id of filters) assert.ok(html.includes(`filter: url(#${id})`), id);
+  assert.doesNotMatch(html.split('data-frame="d"')[1].split(">")[0], /filter: url/);
+});
+
+test("frames can multiply onto what lies beneath them", () => {
+  const rip = { id: "bl", page: { width_mm: 60, height_mm: 40 }, styles: { s: { font: "Inter", size: 14 } },
+    frames: [
+      { id: "under", type: "text", style: "s", text: "Office", x: 5, y: 5 },
+      { id: "over", type: "text", style: "s", text: "office", x: 8, y: 7, blend: "multiply" },
+      { id: "stamp", type: "image", src: "stamp.png", x: 20, y: 10, w: 20, h: 20, blend: "multiply" },
+    ] };
+  const html = Rip.renderSheet(rip, {}, { assetBase: "assets/" });
+  assert.equal((html.match(/mix-blend-mode: multiply/g) || []).length, 2);
+  assert.doesNotMatch(html.split('data-frame="under"')[1].split(">")[0], /mix-blend-mode/);
+});
+
 test("box frames draw fills, outlines and ellipses", () => {
   const rip = { id: "b", page: { width_mm: 50, height_mm: 50 }, tokens: { accent: "#ff0066" }, styles: {},
     frames: [
