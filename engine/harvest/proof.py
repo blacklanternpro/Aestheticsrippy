@@ -264,6 +264,137 @@ def _align(glyphs: Glyphs, chars: List[str], row: List[Tuple], tall: float,
     return out
 
 
+_ADV: Optional[Dict[str, float]] = None
+
+
+def _advances() -> Dict[str, float]:
+    """Per-character advance widths from the cabinet (a neutral grotesque):
+    the real proportions of a C against an i, for the elastic grid."""
+    global _ADV
+    if _ADV is None:
+        from ..typecase import matcher_data
+        insts = matcher_data()["instances"]
+        pick = min((m for m in insts if m["family"] == "Inter" and not m.get("stretch")),
+                   key=lambda m: abs(int(m["weight"]) - 600), default=None)
+        _ADV = dict(pick["adv"]) if pick else {}
+    return _ADV
+
+
+def _blob_cells(ink: np.ndarray, chars: List[str], base: Optional[float]) -> Optional[List[Tuple]]:
+    """A row fused into one lump of ink, recut into the reader's own letters
+    at the ink valleys. The reader's characters set an elastic grid - an 'i'
+    earns half a slot, an 'm' one and a half, even when the letter itself was
+    misread, since width class survives most misreadings (U for C, n for h).
+    Returns [(x, y, w, h, mask, False)] or None."""
+    n = len(chars)
+    keep = (ink > 0).astype(np.uint8)
+    if base is not None:
+        nl, lab, st, _ = cv2.connectedComponentsWithStats(keep, 8)
+        comps = [tuple(st[i][:4]) + (i,) for i in range(1, nl) if st[i][4] >= 12]
+        if comps:
+            cap = float(np.percentile([c[3] for c in comps], 85))
+            lo, hi = base - 1.4 * cap, base + 0.04 * cap
+            for x, y, w, h, i in comps:
+                if not (y < hi and y + h > lo):
+                    keep[lab == i] = 0
+    ys, xs = np.nonzero(keep)
+    if len(xs) < 50 or n < 2:
+        return None
+    x0, x1 = int(xs.min()), int(xs.max()) + 1
+    span = x1 - x0
+    slot = span / n
+    prof = cv2.GaussianBlur(keep[:, x0:x1].sum(axis=0).astype(np.float32).reshape(1, -1),
+                            (0, 0), max(0.8, 0.08 * slot)).ravel()
+    adv = _advances()
+    units = [adv.get(c, adv.get(c.swapcase(), 0.55)) for c in chars]
+    edges = np.cumsum([0.0] + units) / sum(units) * span
+    cuts: List[int] = []
+    for j in range(1, n):
+        half = 0.3 * min(units[j - 1], units[j]) / np.mean(units) * slot + 1
+        lo2 = max(1, int(edges[j] - half))
+        hi2 = min(span - 1, int(edges[j] + half))
+        cuts.append(lo2 + int(np.argmin(prof[lo2:max(lo2 + 1, hi2)])))
+    if sorted(set(cuts)) != sorted(cuts):
+        return None
+    bounds = [0] + cuts + [span]
+    out: List[Tuple] = []
+    for a, b in zip(bounds, bounds[1:]):
+        piece = keep[:, x0 + a:x0 + b]
+        pys, pxs = np.nonzero(piece)
+        if len(pxs) < 12:
+            return None
+        out.append((x0 + a + int(pxs.min()), int(pys.min()),
+                    int(pxs.max() - pxs.min() + 1), int(pys.max() - pys.min() + 1),
+                    piece[pys.min():pys.max() + 1, pxs.min():pxs.max() + 1].astype(bool),
+                    False))
+    return out
+
+
+def _blob_read(glyphs: Glyphs, ink: np.ndarray, text: str, chars: List[str],
+               base: Optional[float]) -> Optional[str]:
+    """Read a fused row as a WORD: recut by the reader's count, then pick the
+    spelling that the shapes and the language ear agree on jointly. In a blob
+    every cell is noisy (neighbours bleed in), so no single cell may overrule
+    the reader alone - only a whole word that reads better may."""
+    from itertools import product
+
+    from .curved import _wordness
+
+    row = _blob_cells(ink, chars, base)
+    if row is None:
+        return None
+    tall = float(np.percentile([c[3] for c in row], 85))
+    if tall < 40:
+        return None   # too few pixels per letter: blob reading would be guessing
+    company = _context_case(chars)
+    cands: List[List[Tuple[str, float, List[Tuple[float, str]]]]] = []
+    for ch, cell in zip(chars, row):
+        chart, folds = _chart_folds(glyphs, cell[4].astype(np.float32))
+        own_f = fold(ch)
+        own_s = folds.get(own_f, 0.0)
+        opts = [(own_f, own_s)]
+        if ch.isalnum() and folds:
+            top_s = max(folds.values())
+            opts += [(f, s) for f, s in sorted(folds.items(), key=lambda kv: -kv[1])[:8]
+                     if s >= top_s - 0.10 and f != own_f
+                     and f.isalpha() == ch.isalpha() and f.isdigit() == ch.isdigit()]
+        variants: Dict[str, List[Tuple[float, str]]] = {}
+        for s, _a, c in chart:
+            variants.setdefault(fold(c), []).append((s, c))
+        cands.append([(f, s, sorted(variants.get(f, []), reverse=True)) for f, s in opts[:6]])
+    loose = [c for c in cands if len(c) > 1]
+    if len(loose) > 9:
+        return None   # too uncertain everywhere: this is not reading, it is guessing
+
+    def spell(pick) -> str:
+        out = []
+        for (f, _s, vs), cell, ch in zip(pick, row, chars):
+            if f == fold(ch):
+                out.append(ch)
+            else:
+                out.append(_spell(f, vs or [(0.0, f)], cell[3], tall, company))
+        it = iter(out)
+        return "".join(c if c.isspace() else next(it) for c in text)
+
+    def total(pick) -> float:
+        swaps = sum(f != fold(ch) for (f, _s, _v), ch in zip(pick, chars))
+        return float(np.mean([s for _f, s, _v in pick])) + 0.5 * _wordness(spell(pick)) \
+            - 0.025 * swaps
+
+    own_pick = tuple(c[0] for c in cands)
+    best_pick, best_v = own_pick, total(own_pick)
+    for combo in product(*cands):
+        v = total(combo)
+        if v > best_v:
+            best_pick, best_v = combo, v
+    got = spell(best_pick)
+    if got == text or best_v < total(own_pick) + 0.18:
+        return None
+    if float(np.mean([s for _f, s, _v in best_pick])) < 0.60:
+        return None   # the pieces do not genuinely read as these letters
+    return got
+
+
 def amend(glyphs: Glyphs, ink: np.ndarray, text: str,
           base: Optional[float] = None) -> Optional[str]:
     """The row's text with shape-overruled letters corrected, or None when the
@@ -278,8 +409,14 @@ def amend(glyphs: Glyphs, ink: np.ndarray, text: str,
     units = [c[2] for c in row if c[3] >= 0.5 * tall]
     unit = float(np.median(units)) if units else 1.0
     aligned = _align(glyphs, chars, row, tall, unit)
-    if aligned is None:
-        return None
+    # A word fused into a lump defeats alignment outright, or "survives" it
+    # only by fusing most characters into unexaminable cells. Either way the
+    # reader DID count the letters: recut the blob into that many pieces and
+    # read it as a WORD, since single fused cells are too noisy to trust.
+    if aligned is None or sum(a is not None for a in aligned) < 0.6 * len(chars):
+        got = _blob_read(glyphs, ink, text, chars, base)
+        if got is not None or aligned is None:
+            return got
     company = _context_case(chars)
     strong_sw: Dict[int, str] = {}
     fair_sw: Dict[int, str] = {}

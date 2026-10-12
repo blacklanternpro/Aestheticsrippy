@@ -1,5 +1,5 @@
 {
-  "recorded": "2026-10-11",
+  "recorded": "2026-10-12",
   "packs": {
     "creative-studio-office-card": {
       "score": 96.7,
@@ -8,7 +8,7 @@
       "styles": 5,
       "text_frames": 8,
       "frames": 48,
-      "seconds": 146.6
+      "seconds": 127.6
     },
     "drumaq-tour-poster": {
       "score": 79.9,
@@ -17,7 +17,7 @@
       "styles": 5,
       "text_frames": 15,
       "frames": 21,
-      "seconds": 159.3
+      "seconds": 154.6
     },
     "dupont-letter": {
       "score": 92.8,
@@ -26,7 +26,7 @@
       "styles": 4,
       "text_frames": 24,
       "frames": 32,
-      "seconds": 65.3
+      "seconds": 64.4
     },
     "fidele-invoice-0123": {
       "score": 94.3,
@@ -35,7 +35,7 @@
       "styles": 6,
       "text_frames": 23,
       "frames": 39,
-      "seconds": 67.1
+      "seconds": 66.5
     },
     "fidele-invoice-0123-1": {
       "score": 96.4,
@@ -44,7 +44,7 @@
       "styles": 6,
       "text_frames": 23,
       "frames": 42,
-      "seconds": 70.6
+      "seconds": 71.9
     },
     "fidele-invoice-template": {
       "score": 95.3,
@@ -53,7 +53,7 @@
       "styles": 6,
       "text_frames": 20,
       "frames": 40,
-      "seconds": 71.6
+      "seconds": 70.2
     },
     "fidele-order-invoice": {
       "score": 95.3,
@@ -62,7 +62,7 @@
       "styles": 6,
       "text_frames": 20,
       "frames": 40,
-      "seconds": 75.8
+      "seconds": 70.3
     },
     "forecaster-prototype-card": {
       "score": 95.2,
@@ -71,25 +71,25 @@
       "styles": 2,
       "text_frames": 19,
       "frames": 22,
-      "seconds": 54.1
+      "seconds": 47.8
     },
     "handshake-receipt-card": {
-      "score": 92.5,
+      "score": 92.8,
       "live": 0.451,
-      "type": 0.713,
+      "type": 0.714,
       "styles": 8,
       "text_frames": 24,
       "frames": 51,
-      "seconds": 108.4
+      "seconds": 103.8
     },
     "handshake-receipt-ledger": {
-      "score": 89.5,
+      "score": 89.4,
       "live": 0.486,
-      "type": 0.734,
-      "styles": 11,
+      "type": 0.732,
+      "styles": 12,
       "text_frames": 18,
       "frames": 52,
-      "seconds": 96.1
+      "seconds": 92.7
     },
     "lsd-event-poster": {
       "score": 85.5,
@@ -98,16 +98,16 @@
       "styles": 13,
       "text_frames": 17,
       "frames": 28,
-      "seconds": 97.5
+      "seconds": 95.1
     },
     "lsd-magick-city-poster": {
-      "score": 86.7,
+      "score": 87.6,
       "live": 0.496,
-      "type": 0.787,
-      "styles": 9,
+      "type": 0.792,
+      "styles": 10,
       "text_frames": 17,
       "frames": 37,
-      "seconds": 210.5
+      "seconds": 192.5
     },
     "minimalist-corporate-invoice": {
       "score": 94.3,
@@ -116,7 +116,7 @@
       "styles": 7,
       "text_frames": 19,
       "frames": 41,
-      "seconds": 69.6
+      "seconds": 66.5
     },
     "pangpang-receipt-poster": {
       "score": 91.6,
@@ -125,7 +125,7 @@
       "styles": 8,
       "text_frames": 27,
       "frames": 44,
-      "seconds": 173.5
+      "seconds": 164.5
     },
     "pangpang-receipt-repro": {
       "score": 94.8,
@@ -134,7 +134,7 @@
       "styles": 11,
       "text_frames": 32,
       "frames": 44,
-      "seconds": 227.9
+      "seconds": 216.2
     },
     "public-records-event-ledger": {
       "score": 82.4,
@@ -143,7 +143,7 @@
       "styles": 10,
       "text_frames": 19,
       "frames": 51,
-      "seconds": 151.9
+      "seconds": 148.0
     },
     "saraiva-resume": {
       "score": 85.8,
@@ -152,7 +152,7 @@
       "styles": 6,
       "text_frames": 16,
       "frames": 58,
-      "seconds": 147.5
+      "seconds": 142.1
     },
     "mr-beams-photocopy-label": {
       "score": 92.0,
@@ -161,16 +161,16 @@
       "styles": 2,
       "text_frames": 2,
       "frames": 6,
-      "seconds": 40.8
+      "seconds": 40.0
     },
     "nikelab-chicago-mono": {
-      "score": 96.3,
+      "score": 97.3,
       "live": 0.675,
-      "type": 0.79,
+      "type": 0.795,
       "styles": 3,
       "text_frames": 6,
       "frames": 11,
-      "seconds": 39.9
+      "seconds": 37.1
     }
   }
 }

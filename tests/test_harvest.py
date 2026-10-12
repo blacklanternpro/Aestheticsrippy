@@ -768,6 +768,25 @@ def test_amend_aligns_through_spatter_and_breaks(tmp_path):
     assert amend(full, broken.astype(np.uint8), "AA-Ceiis") == "AA-Cells"
 
 
+def test_a_fused_blob_is_recut_by_the_readers_count(tmp_path):
+    # Ink gain so severe the word is one connected component: no cell cutting
+    # survives it, but the reader DID count the letters - recut the blob into
+    # that many pieces at the ink valleys and chart each one.
+    import cv2
+    from engine.harvest.letters import atlas
+    from engine.harvest.proof import amend
+    from engine.render import Renderer
+    with Renderer() as r:
+        ink = _word_row(tmp_path, r, "Chicago")
+        full = atlas(r._browser, full=True)
+    blob = cv2.dilate(ink.astype(np.uint8), np.ones((11, 11), np.uint8))
+    n = cv2.connectedComponentsWithStats(blob, 8)[0] - 1
+    assert n <= 2, n   # the premise: the letters have truly fused
+    assert amend(full, blob, "Unicago") == "Chicago"
+    # and a fused word the reader got RIGHT is left alone
+    assert amend(full, blob, "Chicago") is None
+
+
 def test_sound_reads_are_left_alone(tmp_path):
     from engine.harvest.letters import atlas
     from engine.harvest.proof import amend
