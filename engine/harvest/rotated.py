@@ -204,7 +204,11 @@ def _skew(mask: np.ndarray, min_angle: float = 6) -> List[float]:
             peaks.append((v, d))
     out: List[float] = []
     for v, d in sorted(peaks, reverse=True):
-        if all(abs(d - o) > 10 for o in out):
+        # Dedup by line DIRECTION, not raw degrees: the scan ends -89 and 90
+        # are 1 degree apart as directions, and a near-vertical line peaks at
+        # both. Shipping both hands split_angles two names for one family,
+        # and it deals the line's letters between them like a coin flip.
+        if all(_adiff(d, o) > 10 for o in out):
             out.append(float(d))
         if len(out) >= 3:
             break
@@ -556,6 +560,9 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: f
         dist = ink_map(img[y0:y1, x0:x1], bg[y0:y1, x0:x1])
         inside = dist[reg.mask]
         angles = _angles(reg.mask, dist > 0.5 * float(np.median(inside)) if inside.size else None)
+        import os as _os2
+        if _os2.environ.get("RIP_DEBUG_READ"):
+            print(f"    angles? reg={reg.box} angles={[round(a, 1) for a in angles]}")
         lent: List[Tuple[int, np.ndarray]] = []
         orig_box, orig_mask = reg.box, reg.mask
         if loose and angles:
@@ -581,6 +588,8 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: f
         # family's ink no longer crosses its rows.
         if len(angles) > 1:
             for deg, fam in _real_families(img, bg, reg, angles, glyphs=glyphs).items():
+                if _os2.environ.get("RIP_DEBUG_READ"):
+                    print(f"    family? reg={reg.box} deg={deg:.1f} px={int(fam.sum())}")
                 read(deg, remaining & fam)
         # Then each angle against whatever is left: the whole mark when it holds
         # one family of lines, and anything the families missed.
@@ -753,6 +762,9 @@ def _read_at(img, bg, reg, mask, deg, min_conf, glyphs=None, lexicon=None):
         lmask = level < 150
         taken = np.zeros(level.shape, np.uint8)
         queue = list(_bands(lmask))
+        tried = set(queue)      # each extent is read once: a junk read must not ping-pong
+        import os as _os
+        _rd = _os.environ.get("RIP_DEBUG_READ")
         seen = 0
         while queue:
             seen += 1
@@ -794,28 +806,22 @@ def _read_at(img, bg, reg, mask, deg, min_conf, glyphs=None, lexicon=None):
                         best = (conf, flip, sorted(words, key=lambda w: w.box[0]), up)
                 if best is not None and best[0] >= min_conf + 5:
                     break
+            if _rd:
+                _cv = f"{_rd}/band-{reg.box[0]}x{reg.box[1]}-{seen}-({bx0},{by0},{bx1},{by1}).png"
+                cv2.imwrite(_cv, crop)
+                if best:
+                    print(f"    read? band#{seen} ({bx0},{by0},{bx1},{by1}) h={h} -> conf={best[0]:.0f} "
+                          f"flip={best[1]} up={best[3]} words={[(w.text, tuple(round(v) for v in w.box)) for w in best[2]]}")
+                else:
+                    print(f"    read? band#{seen} ({bx0},{by0},{bx1},{by1}) h={h} -> no read")
             if not best:
                 continue
             _, flip, words, up = best
             if up > 1:
                 for w in words:
                     w.box = tuple(v / up for v in w.box)
-            # The reader can settle on one phrase and ignore a neighbour in the
-            # same band (two columns of lines sharing a row). Any stretch of
-            # the band's ink its words did not cover goes back on the queue.
-            h = by1 - by0
-            wx0 = min(w.box[0] for w in words) + left
-            wx1 = max(w.box[2] for w in words) + left
-            if flip:
-                wx0, wx1 = left + cw - (max(w.box[2] for w in words)), left + cw - (min(w.box[0] for w in words))
-            cols_on = np.nonzero(lmask[by0:by1, bx0:bx1].any(axis=0))[0] + bx0
-            missed = cols_on[(cols_on < wx0 - 0.8 * h) | (cols_on > wx1 + 0.8 * h)]
-            if len(missed) >= 1.2 * h:
-                runs = np.split(missed, np.nonzero(np.diff(missed) > max(6, int(0.8 * h)))[0] + 1)
-                for run in runs:
-                    if len(run) >= 1.2 * h:
-                        queue.append((int(run[0]), by0, int(run[-1]) + 1, by1))
             ch_ = crop.shape[0]
+            kept_spans: List[Tuple[float, float]] = []
             # One band can hold several lines (the arms of a V, or two staggered
             # blocks whose baselines nearly meet): a gap much wider than a space,
             # or a jump in the baseline, starts a new line.
@@ -890,6 +896,12 @@ def _read_at(img, bg, reg, mask, deg, min_conf, glyphs=None, lexicon=None):
                     _dbg = bool(_os.environ.get("RIP_DEBUG_LEX"))
                     span2 = lmask[int(ly0):int(np.ceil(ly1)),
                                   max(0, int(lx0)):int(np.ceil(lx1))].astype(np.uint8)
+                    if flip:
+                        # The reading came from the 180-flipped crop; the span is
+                        # cut from the unflipped mask. Upside-down cells verify at
+                        # 0.0 against every upright glyph, which blinds the
+                        # referee on exactly the flipped edge that needs it.
+                        span2 = span2[::-1, ::-1]
                     cells2 = cells(span2, 0.85 * cap)
                     pick = lexicon_pick(glyphs, gtext, cells2, lexicon)
                     if _dbg:
@@ -914,7 +926,26 @@ def _read_at(img, bg, reg, mask, deg, min_conf, glyphs=None, lexicon=None):
                 angle = angle - 360 if angle > 180 else angle
                 found.append(RotText(gtext, float(angle), x0 + px - pad, y0 + py - pad, float(cap),
                                      float(lx1 - lx0), reg.colour, gconf))
+                kept_spans.append((float(lx0), float(lx1)))
                 cv2.rectangle(taken, (int(lx0) - 2, int(ly0) - 2), (int(np.ceil(lx1)) + 2, int(np.ceil(ly1)) + 2), 1, -1)
+            # The reader can settle on one phrase and ignore a neighbour in the
+            # same band, and a junk group ('  :SA') gets dropped above: any
+            # stretch of the band's ink no KEPT reading covers goes back on
+            # the queue for a read of its own - counting the whole read as
+            # coverage would bury the dropped group's ink unread.
+            h2 = by1 - by0
+            cols_on = np.nonzero(lmask[by0:by1, bx0:bx1].any(axis=0))[0] + bx0
+            covered = np.zeros(len(cols_on), bool)
+            for s0, s1 in kept_spans:
+                covered |= (cols_on >= s0 - 0.8 * h2) & (cols_on <= s1 + 0.8 * h2)
+            missed = cols_on[~covered]
+            if len(missed) >= 1.2 * h2:
+                runs = np.split(missed, np.nonzero(np.diff(missed) > max(6, int(0.8 * h2)))[0] + 1)
+                for run in runs:
+                    band2 = (int(run[0]), by0, int(run[-1]) + 1, by1)
+                    if len(run) >= 1.2 * h2 and band2 not in tried:
+                        tried.add(band2)
+                        queue.append(band2)
         back = cv2.warpAffine(taken, inv, (gray.shape[1], gray.shape[0]), flags=cv2.INTER_NEAREST)
         back = back[pad:pad + (y1 - y0), pad:pad + (x1 - x0)] > 0
         if not found:

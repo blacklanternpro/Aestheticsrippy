@@ -127,6 +127,22 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
         # word: lend it to the angled reader, and drop it if an angled line takes it.
         loose = [(bi, b.runs[0].box) for bi, b in enumerate(blocks)
                  if len(b.runs) == 1 and sum(c.isalnum() for c in b.text()) <= 3]
+        # A short junk token stranded at a row's edge ('w MEDGES ALE') is
+        # usually a letter of an edge-running column the page reader swallowed
+        # into the row: too close for the column-gap split to cut, but the
+        # angled reader knows its ribbons. Lend the WORD; if an angled line
+        # takes its ink, the word leaves its row and the row heals.
+        for bi, b in enumerate(blocks):
+            for ri, run in enumerate(b.runs):
+                if len(run.words) < 2:
+                    continue
+                for wi in (0, len(run.words) - 1):
+                    w = run.words[wi]
+                    nb = run.words[wi + 1] if wi == 0 else run.words[wi - 1]
+                    wh = max(4.0, w.box[3] - w.box[1])
+                    gap = nb.box[0] - w.box[2] if wi == 0 else w.box[0] - nb.box[2]
+                    if sum(c.isalnum() for c in w.text) <= 2 and gap > 0.45 * wh:
+                        loose.append((("w", bi, ri, wi), w.box))
         # The sheet's own vocabulary: words the body reads with full trust
         # referee the edge-running brand text the rotated reader mangles.
         lexicon = set()
@@ -142,9 +158,38 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
             find_rotated(sheet.image, regions, bg, loose=loose, glyphs=_atlas(r._browser),
                          lexicon=lexicon)
         if absorbed:
-            keep = [i for i in range(len(blocks)) if i not in absorbed]
-            matches = {k: matches[i] for k, i in enumerate(keep) if i in matches}
-            blocks = [blocks[i] for i in keep]
+            # Absorbed WORD strays leave their rows (and their lines, so the
+            # art keeps the shed ink); absorbed whole blocks are dropped.
+            by_run = {}
+            for a in absorbed:
+                if isinstance(a, tuple):
+                    _t, bi, ri, wi = a
+                    by_run.setdefault((bi, ri), []).append(wi)
+            from .layout import measure as _measure_ink
+            for (bi, ri), wis in by_run.items():
+                run = blocks[bi].runs[ri]
+                if len(wis) >= len(run.words):   # never empty a run from under its block
+                    wis = sorted(wis)[:-1]
+                if not wis:
+                    continue
+                objs = [run.words[wi] for wi in wis]
+                for wi in sorted(wis, reverse=True):
+                    del run.words[wi]
+                for o in objs:
+                    for j, lw in enumerate(run.line.words):
+                        if lw is o:
+                            del run.line.words[j]
+                            break
+                if run.line.words:
+                    lws = run.line.words
+                    run.line.box = (min(x.box[0] for x in lws), min(x.box[1] for x in lws),
+                                    max(x.box[2] for x in lws), max(x.box[3] for x in lws))
+                run.ink = _measure_ink(clean, run.words, run.text)
+            gone = {a for a in absorbed if isinstance(a, int)}
+            if gone:
+                keep = [i for i in range(len(blocks)) if i not in gone]
+                matches = {k: matches[i] for k, i in enumerate(keep) if i in matches}
+                blocks = [blocks[i] for i in keep]
             text_lines = [r.line for b in blocks for r in b.runs]
         if rotated:
             notes.append(f"Read {len(rotated)} {'line' if len(rotated) == 1 else 'lines'} of type set at an angle.")

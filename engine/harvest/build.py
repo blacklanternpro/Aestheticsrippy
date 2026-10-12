@@ -712,8 +712,18 @@ def build_rip(h: Harvest, pack_id: str, name: str, asset_names: Dict[int, str],
 
     from .typeface import true_inks
     inks = true_inks(h.blocks)
-    tokens, ink_names = colour_tokens(h.paper_bgr, [inks.get(bi, _block_colour(b)) for bi, b in blocks],
-                                      [b.size < 22 for _, b in blocks])
+    # The palette must know every ink on the sheet, not just the level blocks':
+    # an edge column can absorb the last level claim of its colour, and a
+    # colour carried only by rotated or curved text then loses its token -
+    # those texts snap to the nearest SURVIVING token, which can be the paper
+    # itself, and the whole edge renders invisibly white-on-white.
+    # They join as SMALL inks: a region-median colour is antialiasing-lightened,
+    # so it must not mint a lighter twin of an ink the blocks measured true -
+    # it only has to keep its own family alive in the palette.
+    extra = [rt.colour for rt in h.rotated] + [pt.colour for pt in h.curved]
+    tokens, ink_names = colour_tokens(h.paper_bgr,
+                                      [inks.get(bi, _block_colour(b)) for bi, b in blocks] + extra,
+                                      [b.size < 22 for _, b in blocks] + [True] * len(extra))
     colour_of = {bi: ink_names[k] for k, (bi, _) in enumerate(blocks)}
 
     # Group blocks into styles. Display lines that differ only in tracking share a style

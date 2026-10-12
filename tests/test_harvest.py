@@ -700,6 +700,25 @@ def test_collinear_slivers_read_as_one_ribbon():
     assert r.mask.shape == (400, 46)
 
 
+def test_a_vertical_column_is_one_direction_not_two():
+    # Projection skew scans -89..90 and peaks at BOTH ends for a near-vertical
+    # line: 90 and -89 are the same direction 1 degree apart, but the dedup
+    # compared raw degrees (179 apart) and shipped both. split_angles then
+    # deals the column's letters between the twins like a coin flip, and every
+    # family read yields Swiss cheese ('MED E A' here, 'GESA' there).
+    import cv2
+    from engine.harvest.rotated import _adiff, _skew
+    img = np.zeros((60, 420), np.uint8)
+    for i, w in enumerate(["MEDGES", "ALE", "PANGPANG"]):
+        cv2.putText(img, w, (10 + i * 140, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.9, 255, 2)
+    col = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE) > 0
+    out = _skew(col)
+    assert out, "the column's direction was found at all"
+    for i, a in enumerate(out):
+        for b in out[i + 1:]:
+            assert _adiff(a, b) > 10, f"one direction reported twice: {out}"
+
+
 def test_the_sheet_lexicon_completes_edge_partials(tmp_path):
     # Brand text running along the sheet's edge reads as partials ('IGPANG'),
     # while the SAME word sits perfectly read in the body. A lexicon word
