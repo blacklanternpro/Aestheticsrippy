@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass
-from typing import List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 import cv2
 import numpy as np
@@ -49,6 +49,7 @@ class PathText:
     #                               its centre when pitched)
     length: float = 0.0           # px from the first letter's start to the last letter's end
     light: bool = False           # letters painted over in the art (holes, or a tint on a shape)
+    finish: Optional[Dict] = None  # measured print finish for this line's style (ghost words)
 
 
 # ------------------------------------------------------------------ pieces

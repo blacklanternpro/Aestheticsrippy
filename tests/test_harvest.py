@@ -675,6 +675,61 @@ def test_wordness_hears_words_not_digit_dodges():
 
 # ------------------------------------------------ proofreading display type
 
+def test_a_ghost_word_is_read_with_no_ocr_anchor(tmp_path):
+    # A big display word OCR never turned into a text block: read it cold
+    # from its ink alone - cells, segmentation options, and the ear - and
+    # refuse to hallucinate one out of a scribble.
+    import cv2
+    from engine.harvest.letters import atlas
+    from engine.harvest.proof import ghost_word
+    from engine.render import Renderer
+    with Renderer() as r:
+        ink = _word_row(tmp_path, r, "Garden", px=64)
+        full = atlas(r._browser, full=True)
+    soft = cv2.dilate(ink.astype(np.uint8), np.ones((3, 3), np.uint8))
+    got = ghost_word(soft, full)
+    assert got is not None and got[0] == "Garden", got
+    # a scribble is not a word
+    noise = np.zeros_like(soft)
+    cv2.ellipse(noise, (300, 70), (250, 50), 10, 0, 360, 1, 12)
+    cv2.line(noise, (60, 100), (520, 40), 1, 9)
+    assert ghost_word(noise, full) is None
+
+
+def test_the_ghost_keeps_the_overprint_as_art(tmp_path):
+    # The office-card shape: a grey display word with a red logotype struck
+    # through it. The word comes back live from its own colour layer, and the
+    # red ink - and ONLY the red ink - stays behind as art.
+    import cv2
+    from engine.harvest.art import Region
+    from engine.harvest.ghost import find as find_ghosts
+    from engine.harvest.letters import atlas
+    from engine.render import Renderer
+    with Renderer() as r:
+        ink = _word_row(tmp_path, r, "Garden", px=64)
+        full = atlas(r._browser, full=True)
+    h, w = ink.shape
+    band = np.full((h, w, 3), 245, np.uint8)
+    band[ink > 0] = (40, 40, 40)
+    red = np.zeros((h, w), np.uint8)
+    cv2.ellipse(red, (w // 2, h // 2), (int(w * 0.3), int(h * 0.25)), -8, 0, 360, 1, 10)
+    band[red > 0] = (30, 30, 200)   # BGR red, struck through the word
+    ys, xs = np.nonzero((ink > 0) | (red > 0))
+    box = (int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1)
+    mask = ((ink > 0) | (red > 0))[box[1]:box[3], box[0]:box[2]]
+    reg = Region("mark", box, (40, 40, 40), mask=mask)
+    bg = np.full_like(band, 245)
+    ghosts, regions = find_ghosts(band, [reg], bg, full, body_px=12.0)
+    assert len(ghosts) == 1 and ghosts[0].text == "Garden", [g.text for g in ghosts]
+    # the region that remains is the red ink, not the word
+    assert len(regions) == 1
+    rm = regions[0].mask
+    red_in_box = red[box[1]:box[3], box[0]:box[2]] > 0
+    word_in_box = ink[box[1]:box[3], box[0]:box[2]] > 0
+    assert (rm & red_in_box).sum() > 0.6 * red_in_box.sum()
+    assert (rm & word_in_box & ~red_in_box).sum() < 0.2 * word_in_box.sum()
+
+
 def test_twin_artwork_vouches_for_the_better_reading(tmp_path):
     # The same design printed twice on a sheet, read two ways: the inks are
     # near-identical artwork, so the reading that is more of a word stands

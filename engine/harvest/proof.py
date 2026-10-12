@@ -43,7 +43,7 @@ def fold(ch: str) -> str:
 
 def _valley_split(cell: Tuple, unit: float) -> List[Tuple]:
     """A cell holding several fused letters, cut at its ink valleys."""
-    x, y, w, h, m = cell
+    x, y, w, h, m = cell[:5]
     k = max(2, int(round(w / unit)))
     prof = m.sum(axis=0).astype(float)
     cuts = [0]
@@ -517,6 +517,97 @@ def amend(glyphs: Glyphs, ink: np.ndarray, text: str,
     if _wordness(base) < _wordness(text) - 0.2:
         return None   # even strong shape evidence should not UNmake a word
     return base
+
+
+def ghost_word(ink: np.ndarray, glyphs: Glyphs) -> Optional[Tuple[str, float, List[Tuple]]]:
+    """Read a display word COLD - no OCR text to anchor on. The row's cells
+    offer segmentation options (a fused pair may split in two or three), each
+    piece offers its best few characters, and the spelling that shapes and
+    the language ear agree on wins. Returns (text, mean shape score, pieces)
+    only for a reading good enough to stand on its own; a scribble reads as
+    nothing and stays art."""
+    from itertools import product
+
+    from .curved import _lexical, _wordness
+
+    cells_ = letter_cells((ink > 0).astype(np.uint8))
+    if not 2 <= len(cells_) <= 14:
+        return None
+    tall = float(np.percentile([c[3] for c in cells_], 85))
+    if tall < 40:
+        return None
+    letters = [c for c in cells_ if c[3] >= 0.45 * tall]
+    if len(letters) < 3:
+        return None
+    unit = float(np.median([c[2] for c in letters]))
+    # Each cell's segmentation options: itself; a wide cell may really be two
+    # or three letters the overprint bridged.
+    seg_opts: List[List[List[Tuple]]] = []
+    for c in cells_:
+        if c[3] < 0.45 * tall:
+            continue   # specks and crumbs do not take part
+        opts = [[c]]
+        if c[2] > 1.3 * unit:
+            opts.append(_valley_split(c, c[2] / 2 - 1)[:2] or [c])
+            if c[2] > 2.0 * unit:
+                opts.append(_valley_split(c, c[2] / 3 - 1)[:3] or [c])
+        seg_opts.append(opts)
+    best: Optional[Tuple[float, str, float, List[Tuple]]] = None
+    for seg in product(*seg_opts):
+        pieces = [p for group in seg for p in group]
+        if not 3 <= len(pieces) <= 12:
+            continue
+        cand: List[List[Tuple[str, float, List]]] = []
+        ok = True
+        for p in pieces:
+            chart, folds = _chart_folds(glyphs, p[4].astype(np.float32))
+            if not folds:
+                ok = False
+                break
+            variants: Dict[str, List[Tuple[float, str]]] = {}
+            for s, _a, c2 in chart:
+                variants.setdefault(fold(c2), []).append((s, c2))
+            top = sorted(folds.items(), key=lambda kv: -kv[1])[:4]
+            cand.append([(f, s, sorted(variants.get(f, []), reverse=True)) for f, s in top])
+        if not ok:
+            continue
+        combos = 1
+        for c in cand:
+            combos *= len(c)
+        if combos > 200_000:
+            continue
+        def gspell(f, vs, h):
+            # With no reader to anchor on, a bare stem stays the character
+            # the atlas offered (i OR l OR 1) and the ear chooses the word.
+            if f in ("i", "l", "1"):
+                return f
+            return _spell(f, vs or [(0.0, f)], h, tall, "lower")
+
+        for pick in product(*cand):
+            shape = float(np.mean([s for _f, s, _v in pick]))
+            if best is not None and shape + 1.0 < best[0]:
+                continue
+            word = "".join(gspell(f, vs, p[3]) for (f, _s, vs), p in zip(pick, pieces))
+            v = shape + 0.6 * _wordness(word)
+            if best is None or v > best[0]:
+                best = (v, word, shape, list(pieces))
+    if best is None:
+        return None
+    _v, word, shape, pieces = best
+    letters_only = sum(c.isalnum() for c in word)
+    if shape < 0.65 or letters_only < 4:
+        return None
+    if letters_only < 5 and shape < 0.78:
+        return None   # a short dictionary word is cheap to luck into
+    # The reading must account for the ink it was offered: a word read off a
+    # FRAGMENT of a logotype is a hallucination, not a ghost.
+    total = sum(int(c[4].sum()) for c in cells_)
+    used = sum(int(p[4].sum()) for p in pieces)
+    if used < 0.72 * max(1, total):
+        return None
+    if not (_lexical(word) or _wordness(word) >= 1.0):
+        return None   # with no anchor, only a real word may stand
+    return word, shape, pieces
 
 
 TWIN = 0.72        # ink overlap above which two rows are the same artwork

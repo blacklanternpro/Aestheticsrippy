@@ -159,9 +159,25 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
             if stamped:
                 notes.append(f"Read {len(stamped)} rubber-stamp ring{'' if len(stamped) == 1 else 's'}.")
                 curved += stamped
+        ghosts = []
+        if not os.environ.get("RIP_NO_GHOST"):
+            # Ghost words: big display type OCR never saw (the office card's
+            # soft "Office" under its red overprint). Read cold from its own
+            # colour layer; the overprint keeps its pixels and stays art.
+            from .ghost import find as find_ghosts
+            ghosts, regions = find_ghosts(sheet.image, regions, bg, atlas(r._browser, full=True),
+                                          body_px=body_px)
+            if ghosts:
+                notes.append(f"Read {len(ghosts)} ghost word{'' if len(ghosts) == 1 else 's'} "
+                             "OCR had missed entirely.")
+                say(f"Ghost words: {', '.join(g.text for g in ghosts)}")
+                curved += ghosts
         if curved:
             notes.append(f"Read {len(curved)} {'line' if len(curved) == 1 else 'lines'} of type set along a curve.")
             match_path_faces(r, curved, {m.face.family for m in matches.values()})
+            if ghosts:
+                from .ghost import fit_sizes
+                fit_sizes(ghosts)
         covered = art_mod.text_mask(sheet.image.shape, text_lines) | (rule_mask > 0)
         for reg in regions:
             x0, y0, x1, y1 = reg.box

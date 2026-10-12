@@ -644,6 +644,8 @@ def _path_frames(h: "Harvest", styles: Dict[str, Dict], specs, names, data, labe
                 made[sname]["stretch"] = face.stretch
             if face.italic:
                 made[sname]["italic"] = True
+            if getattr(pt, "finish", None):
+                made[sname]["finish"] = dict(pt.finish)
         st = made.get(sname) or styles[sname]
         size_px = st["size"] / PT_PER_MM * sheet.px_per_mm
         x0, y0 = float(pt.points[:, 0].min()), float(pt.points[:, 1].min())
