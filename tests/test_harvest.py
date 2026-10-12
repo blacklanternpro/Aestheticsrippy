@@ -675,6 +675,31 @@ def test_wordness_hears_words_not_digit_dodges():
 
 # ------------------------------------------------ proofreading display type
 
+def test_collinear_slivers_read_as_one_ribbon():
+    # Edge-running text gets chopped into overlapping art fragments by the
+    # level readers' stray claims; collinear slim marks must be read as ONE
+    # ribbon or every fragment yields its own partial.
+    from engine.harvest.art import Region
+    from engine.harvest.rotated import _ribbons
+
+    def reg(x0, y0, x1, y1):
+        m = np.ones((y1 - y0, x1 - x0), bool)
+        return Region("mark", (x0, y0, x1, y1), (0, 0, 0), mask=m)
+
+    a, b, c = reg(767, 0, 811, 59), reg(767, 21, 811, 160), reg(766, 240, 812, 400)
+    photo = Region("photo", (760, 500, 812, 700), (0, 0, 0),
+                   mask=np.ones((200, 52), bool))
+    wide = reg(100, 0, 700, 60)   # not slim: a banner, not a ribbon
+    out = _ribbons([(a, None), (b, None), (c, None), (photo, None), (wide, None)])
+    merged = [r for r, mem in out if mem is not None]
+    singles = [r for r, mem in out if mem is None]
+    assert len(merged) == 1 and len(singles) == 2, [(r.box, mem is None) for r, mem in out]
+    r, mem = [(r, mem) for r, mem in out if mem is not None][0]
+    assert r.box == (766, 0, 812, 400)
+    assert len(mem) == 3
+    assert r.mask.shape == (400, 46)
+
+
 def test_the_sheet_lexicon_completes_edge_partials(tmp_path):
     # Brand text running along the sheet's edge reads as partials ('IGPANG'),
     # while the SAME word sits perfectly read in the body. A lexicon word

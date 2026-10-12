@@ -32,6 +32,84 @@ class RotText:
     conf: float
 
 
+def _ribbons(pairs):
+    """Collinear slim marks merged into one ribbon before reading: the level
+    readers' stray claims chop edge-running text into overlapping fragments,
+    and every fragment read alone yields its own partial. Operates on
+    (region, members) pairs and keeps the members contract, so a ribbon that
+    reads nothing falls back to its pieces untouched."""
+    SLIM = 90          # a text-scale ribbon, not a banner or a photo
+    pairs = list(pairs)
+    import os as _os
+    if _os.environ.get("RIP_DEBUG_RIBBON"):
+        for r, mem in pairs:
+            print(f"    ribbon-in: {r.kind} {r.box} mask={'y' if r.mask is not None else 'n'} mem={mem is not None}")
+    n = len(pairs)
+    parent = list(range(n))
+
+    def root(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    def slim(r):
+        x0, y0, x1, y1 = r.box
+        return r.kind == "mark" and r.mask is not None and min(x1 - x0, y1 - y0) <= SLIM
+
+    def joins(ra, rb):
+        ax0, ay0, ax1, ay1 = ra.box
+        bx0, by0, bx1, by1 = rb.box
+        aw, ah = ax1 - ax0, ay1 - ay0
+        bw, bh = bx1 - bx0, by1 - by0
+        # A piece joins a ribbon only along the axis it is slim IN: a long
+        # banner is slim vertically but is already a whole thing, and must
+        # not chain to an edge column it happens to end near.
+        v_a, v_b = aw <= SLIM and ah >= 0.8 * aw, bw <= SLIM and bh >= 0.8 * bw
+        h_a, h_b = ah <= SLIM and aw >= 0.8 * ah, bh <= SLIM and bw >= 0.8 * bh
+        if v_a and v_b:
+            over = min(ax1, bx1) - max(ax0, bx0)
+            gap = max(ay0, by0) - min(ay1, by1)
+            if over >= 0.6 * min(aw, bw) and gap <= 2.6 * max(aw, bw):
+                return True
+        if h_a and h_b:
+            over = min(ay1, by1) - max(ay0, by0)
+            gap = max(ax0, bx0) - min(ax1, bx1)
+            if over >= 0.6 * min(ah, bh) and gap <= 2.6 * max(ah, bh):
+                return True
+        return False
+
+    for i in range(n):
+        if not slim(pairs[i][0]):
+            continue
+        for j in range(i + 1, n):
+            if not slim(pairs[j][0]):
+                continue
+            if root(i) != root(j) and joins(pairs[i][0], pairs[j][0]):
+                parent[root(j)] = root(i)
+    groups = {}
+    for i in range(n):
+        groups.setdefault(root(i), []).append(i)
+    out = []
+    for idxs in groups.values():
+        if len(idxs) == 1:
+            out.append(pairs[idxs[0]])
+            continue
+        regs = [pairs[i][0] for i in idxs]
+        members = []
+        for i in idxs:
+            members.extend(pairs[i][1] if pairs[i][1] is not None else [pairs[i][0]])
+        x0 = min(r.box[0] for r in regs); y0 = min(r.box[1] for r in regs)
+        x1 = max(r.box[2] for r in regs); y1 = max(r.box[3] for r in regs)
+        mm = np.zeros((y1 - y0, x1 - x0), bool)
+        for r in regs:
+            rx0, ry0, rx1, ry1 = r.box
+            mm[ry0 - y0:ry1 - y0, rx0 - x0:rx1 - x0] |= r.mask.astype(bool)
+        big = max(regs, key=lambda r: int(r.mask.sum()))
+        out.append((Region("mark", (x0, y0, x1, y1), big.colour, mask=mm), members))
+    return out
+
+
 def lexicon_pick(glyphs, gtext: str, letter_cells, lexicon) -> Optional[str]:
     """The sheet's own vocabulary refereeing an edge reading: brand text that
     runs along the margin usually also sits perfectly read in the body. A
@@ -468,7 +546,7 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: f
     found: List[RotText] = []
     kept: List[Region] = []
     absorbed: List[int] = []
-    for reg, members in _grouped(regions, glyphs):
+    for reg, members in _ribbons(_grouped(regions, glyphs)):
         if reg.kind != "mark" or reg.mask is None or reg.mask.sum() < 60:
             kept.append(reg)
             continue
@@ -485,6 +563,9 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: f
             near = [(i, b) for i, b in loose if i not in absorbed and _near(b, reg.box, gap)]
             if near:
                 lent = list(zip([i for i, _ in near], _grow(img, bg, reg, [b for _, b in near])))
+            import os as _os
+            if _os.environ.get("RIP_DEBUG_LEX"):
+                print(f"    lend? reg={reg.box} loose_near={[b for _i, b in near]} lent={len(lent)}")
         x0, y0, x1, y1 = reg.box
         remaining = reg.mask.copy()
 
@@ -814,6 +895,11 @@ def _read_at(img, bg, reg, mask, deg, min_conf, glyphs=None, lexicon=None):
                     if _dbg:
                         _oa, _osc = verify(glyphs, gtext, cells2)
                         print(f"    lex? {gtext!r} cells={len(cells2)} own={_oa:.2f} -> {pick!r}")
+                        _dump = _os.environ.get("RIP_DEBUG_LEX_DUMP")
+                        if _dump:
+                            _safe = "".join(c if c.isalnum() else "_" for c in gtext[:12])
+                            cv2.imwrite(f"{_dump}/span-{_safe}-{int(lx0)}.png",
+                                        255 - span2 * 255)
                     if pick is not None:
                         gtext = pick
                         gconf = max(gconf, float(min_conf))
