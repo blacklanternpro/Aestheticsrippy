@@ -127,8 +127,20 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
         # word: lend it to the angled reader, and drop it if an angled line takes it.
         loose = [(bi, b.runs[0].box) for bi, b in enumerate(blocks)
                  if len(b.runs) == 1 and sum(c.isalnum() for c in b.text()) <= 3]
+        # The sheet's own vocabulary: words the body reads with full trust
+        # referee the edge-running brand text the rotated reader mangles.
+        lexicon = set()
+        for b in blocks:
+            for run in b.runs:
+                for w in run.words:
+                    t = "".join(ch for ch in w.text if ch.isalnum())
+                    if len(t) >= 4 and w.conf >= 85:
+                        lexicon.add(t.upper())
+                if len(run.words) > 1 and all(w.conf >= 85 for w in run.words):
+                    lexicon.add(" ".join(w.text for w in run.words).upper())
         rotated, regions, absorbed = ([], regions, []) if os.environ.get("RIP_NO_ROTATED") else \
-            find_rotated(sheet.image, regions, bg, loose=loose, glyphs=_atlas(r._browser))
+            find_rotated(sheet.image, regions, bg, loose=loose, glyphs=_atlas(r._browser),
+                         lexicon=lexicon)
         if absorbed:
             keep = [i for i in range(len(blocks)) if i not in absorbed]
             matches = {k: matches[i] for k, i in enumerate(keep) if i in matches}

@@ -675,6 +675,31 @@ def test_wordness_hears_words_not_digit_dodges():
 
 # ------------------------------------------------ proofreading display type
 
+def test_the_sheet_lexicon_completes_edge_partials(tmp_path):
+    # Brand text running along the sheet's edge reads as partials ('IGPANG'),
+    # while the SAME word sits perfectly read in the body. A lexicon word
+    # that explains the band's letter cells decisively better stands in -
+    # but a band the DESIGN truly crops keeps its honest partial.
+    import cv2
+    from engine.harvest.letters import atlas, cells
+    from engine.harvest.rotated import lexicon_pick
+    from engine.render import Renderer
+    with Renderer() as r:
+        full_row = _word_row(tmp_path, r, "PANGPANG", px=48)
+        glyphs = atlas(r._browser)
+    ink = full_row.astype(np.uint8)
+    ys, xs = np.nonzero(ink)
+    h = int(ys.max() - ys.min() + 1)
+    row_cells = cells(ink, 0.9 * h)
+    lex = {"PANGPANG", "MEDGES", "FESTAURANG"}
+    assert lexicon_pick(glyphs, "IGPANG", row_cells, lex) == "PANGPANG"
+    # correct reads and honest crops stand
+    assert lexicon_pick(glyphs, "PANGPANG", row_cells, lex) is None
+    cropped = ink[:, int(xs.min() + (xs.max() - xs.min()) * 0.3):]
+    crop_cells = cells(cropped, 0.9 * h)
+    assert lexicon_pick(glyphs, "GPANG", crop_cells, lex) is None
+
+
 def test_a_ghost_word_is_read_with_no_ocr_anchor(tmp_path):
     # A big display word OCR never turned into a text block: read it cold
     # from its ink alone - cells, segmentation options, and the ear - and

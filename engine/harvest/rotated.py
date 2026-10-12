@@ -32,6 +32,41 @@ class RotText:
     conf: float
 
 
+def lexicon_pick(glyphs, gtext: str, letter_cells, lexicon) -> Optional[str]:
+    """The sheet's own vocabulary refereeing an edge reading: brand text that
+    runs along the margin usually also sits perfectly read in the body. A
+    lexicon word whose letter count matches the band's cells and whose shapes
+    verify decisively better than the reader's text stands in for it; a band
+    the design truly crops keeps its honest partial (the counts disagree)."""
+    if glyphs is None or not lexicon:
+        return None
+    n = len([c for c in letter_cells if not (c[3] < 0.5 * c[2] and c[2] < 18)])
+    own_letters = sum(ch.isalnum() for ch in gtext)
+    own_agree, own_score = verify(glyphs, gtext, letter_cells)
+    best: Optional[Tuple[float, float, str]] = None
+    for cand in lexicon:
+        letters = sum(ch.isalnum() for ch in cand)
+        if cand.upper() == gtext.upper() or letters < 4 or abs(letters - n) > 1:
+            continue
+        agree, score = verify(glyphs, cand, letter_cells)
+        if best is None or (agree, score) > best[:2]:
+            best = (agree, score, cand)
+    import os as _os
+    if _os.environ.get("RIP_DEBUG_LEX") and best is not None:
+        print(f"      pick-cand: n={n} own={own_agree:.2f} best={best[2]!r} agree={best[0]:.2f} score={best[1]:.0f}")
+    if best is None:
+        return None
+    agree, score, cand = best
+    # Decisive: the candidate must explain the cells well in absolute terms
+    # AND clearly better than the reading - or the reading cannot even match
+    # the cell count while the candidate does.
+    counts_say = abs(own_letters - n) > 1 and abs(sum(c.isalnum() for c in cand) - n) <= 1
+    if agree >= 0.75 and score >= 70 and (agree - own_agree >= 0.15 or
+                                          (counts_say and agree - own_agree >= 0.0)):
+        return cand
+    return None
+
+
 def _direction(points: np.ndarray) -> Optional[float]:
     """Main direction of a point cloud, degrees in (-90, 90], or None if it is round."""
     pts = points.astype(np.float64)
@@ -419,7 +454,7 @@ def _near(box, reg_box, gap: float) -> bool:
 
 def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: float = 80,
          loose: Sequence[Tuple[int, Tuple[float, float, float, float]]] = (),
-         glyphs=None) -> Tuple[List[RotText], List[Region], List[int]]:
+         glyphs=None, lexicon=None) -> Tuple[List[RotText], List[Region], List[int]]:
     """
     Rotated text in the marks, the regions with that text taken out, and which
     of the `loose` level readings (id, box) turned out to be part of it.
@@ -455,7 +490,7 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: f
 
         def read(deg, mask):
             nonlocal remaining
-            got = _read_at(img, bg, reg, mask, deg, min_conf, glyphs) if mask.sum() >= 40 else None
+            got = _read_at(img, bg, reg, mask, deg, min_conf, glyphs, lexicon) if mask.sum() >= 40 else None
             if got:
                 found.extend(got[0])
                 remaining = remaining & ~got[1]
@@ -616,8 +651,14 @@ def _snap_ends(band: np.ndarray, x0: float, x1: float, h: float) -> Tuple[float,
     return a, b
 
 
-def _read_at(img, bg, reg, mask, deg, min_conf, glyphs=None):
+def _read_at(img, bg, reg, mask, deg, min_conf, glyphs=None, lexicon=None):
     """Read the lines of `mask` at angle `deg`; returns (texts, mask of what was read) or None."""
+    # Near-cardinal angles snap TO the cardinal: a warp at exactly 90 degrees
+    # degenerates to a lossless pixel permutation, where a warp at the
+    # measured 93 smears every glyph - and edge-running type lives at 90.
+    card = round(deg / 90.0) * 90.0
+    if abs(deg - card) <= 2.5:
+        deg = card
     found = []
     if True:
         x0, y0, x1, y1 = reg.box
@@ -760,6 +801,22 @@ def _read_at(img, bg, reg, mask, deg, min_conf, glyphs=None):
                         # Place by the same band: an outer row may be a neighbour's stray ink.
                         ly0, ly1 = by0 + mt, by0 + mb + 1
                 cap = gh if caps else gh * 0.72
+                if glyphs is not None and lexicon:
+                    # The sheet's own vocabulary referees the edge, with cells
+                    # cut at GLYPH height (band-height units under-split the
+                    # fused pairs and the zip misaligns everything after).
+                    import os as _os
+                    _dbg = bool(_os.environ.get("RIP_DEBUG_LEX"))
+                    span2 = lmask[int(ly0):int(np.ceil(ly1)),
+                                  max(0, int(lx0)):int(np.ceil(lx1))].astype(np.uint8)
+                    cells2 = cells(span2, 0.85 * cap)
+                    pick = lexicon_pick(glyphs, gtext, cells2, lexicon)
+                    if _dbg:
+                        _oa, _osc = verify(glyphs, gtext, cells2)
+                        print(f"    lex? {gtext!r} cells={len(cells2)} own={_oa:.2f} -> {pick!r}")
+                    if pick is not None:
+                        gtext = pick
+                        gconf = max(gconf, float(min_conf))
                 per_char = (lx1 - lx0) / max(1, len(gtext)) / max(1.0, cap)
                 if not 0.45 <= per_char <= 1.5:
                     continue
