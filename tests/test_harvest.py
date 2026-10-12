@@ -675,6 +675,41 @@ def test_wordness_hears_words_not_digit_dodges():
 
 # ------------------------------------------------ proofreading display type
 
+def test_twin_artwork_vouches_for_the_better_reading(tmp_path):
+    # The same design printed twice on a sheet, read two ways: the inks are
+    # near-identical artwork, so the reading that is more of a word stands
+    # for both. Different words are NOT twins and vouch for nothing.
+    import cv2
+    from engine.harvest.proof import referee, twin_score
+    from engine.render import Renderer
+    with Renderer() as r:
+        a = _word_row(tmp_path, r, "Chicago").astype(np.float32)
+        b = _word_row(tmp_path, r, "Wireless").astype(np.float32)
+    fat = cv2.dilate(a.astype(np.uint8), np.ones((5, 5), np.uint8)).astype(np.float32)
+    assert twin_score(a, fat) >= 0.72, twin_score(a, fat)
+    assert twin_score(a, b) < 0.72, twin_score(a, b)
+
+    class W:
+        def __init__(self, t, c):
+            self.text, self.conf = t, c
+
+    class R:
+        def __init__(self, t, c):
+            self.words = [W(p, c) for p in t.split(" ")]
+
+        @property
+        def text(self):
+            return " ".join(w.text for w in self.words)
+
+    class S:
+        def __init__(self, ref):
+            self.ref = ref
+
+    good, bad, other = R("Chicago", 96), R("Unicago", 91), R("Wireless", 90)
+    n = referee([(bad, S(fat), 56.0), (good, S(a), 56.0), (other, S(b), 56.0)])
+    assert n == 1 and bad.text == "Chicago", (n, bad.text)
+    assert other.text == "Wireless"
+
 def _word_row(tmp_path, r, word, px=56, weight=700):
     """One word rendered with the local Inter, returned as a bool ink mask."""
     import cv2

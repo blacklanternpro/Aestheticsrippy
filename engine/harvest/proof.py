@@ -519,6 +519,79 @@ def amend(glyphs: Glyphs, ink: np.ndarray, text: str,
     return base
 
 
+TWIN = 0.72        # ink overlap above which two rows are the same artwork
+REFEREE_GAP = 0.25  # the adopted reading must be this much more of a word
+
+
+def twin_score(a: np.ndarray, b: np.ndarray) -> float:
+    """How alike two row crops are as ARTWORK (height-normalised soft overlap):
+    the same design printed twice scores high however it was read."""
+    ha = a.shape[0]
+    sc = ha / max(1, b.shape[0])
+    b2 = cv2.resize(b, (max(1, int(b.shape[1] * sc)), ha))
+    a1 = cv2.GaussianBlur(a.astype(np.float32), (0, 0), 1.2)
+    b1 = cv2.GaussianBlur(b2.astype(np.float32), (0, 0), 1.2)
+    w = max(a1.shape[1], b1.shape[1]) + 8
+    A = np.zeros((ha, w), np.float32)
+    A[:, :a1.shape[1]] = a1
+    B = np.zeros((ha + 8, w + 8), np.float32)
+    B[4:4 + ha, 4:4 + b1.shape[1]] = b1
+    res = cv2.matchTemplate(B, A, cv2.TM_SQDIFF)
+    _, _, (x, y), _ = cv2.minMaxLoc(res)
+    win = B[y:y + ha, x:x + w]
+    inter = float(np.minimum(A, win).sum())
+    den = float(A.sum() + win.sum())
+    return 2 * inter / den if den else 0.0
+
+
+def _rewrite(run, text: str, conf: float) -> bool:
+    """Adopt `text` into the run word for word (word counts must match)."""
+    words = text.split(" ")
+    if len(words) != len(run.words):
+        return False
+    for w, t in zip(run.words, words):
+        w.text = t
+        w.conf = max(w.conf, conf)
+    return True
+
+
+def referee(entries: List[Tuple], say=lambda m: None) -> int:
+    """The same artwork repeated on the sheet, read two ways ('Unicago' in one
+    column, 'Chicago' in the other): the inks vouch for each other, and the
+    reading that is more of a word stands for both."""
+    from .curved import _wordness
+
+    changed = 0
+    for i in range(len(entries)):
+        for j in range(i + 1, len(entries)):
+            ra, sa, ha = entries[i]
+            rb, sb, hb = entries[j]
+            if ra.text == rb.text or not (0.85 <= ha / max(1.0, hb) <= 1.18):
+                continue
+            if len(ra.text.split(" ")) != len(rb.text.split(" ")):
+                continue
+            if twin_score(sa.ref, sb.ref) < TWIN:
+                continue
+
+            def junk(t: str) -> int:
+                # Non-alnum characters INSIDE a word ('Nikel_ab') are their
+                # own tell of a misread; ordinary word punctuation is not.
+                return sum(1 for w in t.split(" ") for c in w.strip(".,;:!?()\"'")
+                           if not c.isalnum() and c not in ".-'&@/")
+
+            wa = _wordness(ra.text) - 0.3 * junk(ra.text)
+            wb = _wordness(rb.text) - 0.3 * junk(rb.text)
+            win, lose = (ra, rb) if wa > wb else (rb, ra)
+            if abs(wa - wb) < REFEREE_GAP:
+                continue
+            old = lose.text
+            conf = float(np.mean([w.conf for w in win.words]))
+            if _rewrite(lose, win.text, min(conf, 88.0)):
+                changed += 1
+                say(f"Twin vouches: {old!r} -> {lose.text!r}")
+    return changed
+
+
 def amend_blocks(img: np.ndarray, blocks: Sequence, glyphs: Glyphs,
                  say=lambda m: None) -> int:
     """Proofread the degraded display rows in place. Returns rows changed."""
@@ -528,6 +601,7 @@ def amend_blocks(img: np.ndarray, blocks: Sequence, glyphs: Glyphs,
     debug = bool(os.environ.get("RIP_DEBUG_PROOF"))
     inks = true_inks(blocks)
     changed = 0
+    twins: List[Tuple] = []
     for bi, b in enumerate(blocks):
         conf = float(np.mean([r.conf for r in b.runs]))
         # Display rows only - and no confidence gate: tesseract reports 91+
@@ -536,13 +610,15 @@ def amend_blocks(img: np.ndarray, blocks: Sequence, glyphs: Glyphs,
         if b.size < 24:
             continue
         for run in b.runs:
-            # A short row has no word around the letter to protect it.
-            if sum(c.isalnum() for c in run.text) < 6:
-                continue
             s = make_sample(img, run, inks.get(bi))
             if s is None:
                 if debug:
                     print(f"    proof! {run.text[:24]!r} no sample")
+                continue
+            if sum(c.isalnum() for c in run.text) >= 4:
+                twins.append((run, s, float(b.size)))
+            # A short row has no word around the letter to protect it.
+            if sum(c.isalnum() for c in run.text) < 6:
                 continue
             new = amend(glyphs, (s.ref > 0.45).astype(np.uint8), run.text, base=s.base)
             if debug:
@@ -557,7 +633,7 @@ def amend_blocks(img: np.ndarray, blocks: Sequence, glyphs: Glyphs,
                         pickle.dump({"ref": s.ref, "text": run.text, "base": s.base,
                                      "size": b.size}, f)
                     vis = cv2.cvtColor((255 * (1 - s.ref)).astype(np.uint8), cv2.COLOR_GRAY2BGR)
-                    for x, y, w, h, _m in row:
+                    for x, y, w, h, *_r in row:
                         cv2.rectangle(vis, (x, y), (x + w, y + h), (0, 0, 255), 1)
                     cv2.imwrite(f"{dump}/row-{safe}.png", vis)
             if new is None:
@@ -571,4 +647,5 @@ def amend_blocks(img: np.ndarray, blocks: Sequence, glyphs: Glyphs,
                 pos += n + 1                 # the joining space
             changed += 1
             say(f"Proofread {old!r} -> {run.text!r}")
+    changed += referee(twins, say)
     return changed
