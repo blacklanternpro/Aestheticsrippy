@@ -45,6 +45,20 @@ class Result:
     live: float = 0.0   # share of the reference's ink rebuilt as live type and shapes (not pasted images)
 
 
+def _junk_block(b) -> bool:
+    """A block the angled reader may borrow whole: a letter or two read level
+    (the start of a tilted word), or a STACK of tiny nonsense words - the head
+    of an edge column reads level as 'SA' over 'Lu', a multi-run block that the
+    single-run gate misses. Every word tiny and little total ink; real text,
+    however short its rows, is not lendable."""
+    n = sum(c.isalnum() for c in b.text())
+    if len(b.runs) == 1 and n <= 3:
+        return True
+    words = [w for run in b.runs for w in run.words]
+    return bool(words) and n <= 8 and \
+        all(sum(c.isalnum() for c in w.text) <= 2 for w in words)
+
+
 def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id: Optional[str] = None,
             crop: Optional[Sequence[int]] = None, renderer=None, refine_rounds: int = 3,
             progress: Optional[Progress] = None) -> Result:
@@ -126,8 +140,8 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
         import os
         # A letter or two read level beside angled ink may be the start of a tilted
         # word: lend it to the angled reader, and drop it if an angled line takes it.
-        loose = [(bi, b.runs[0].box) for bi, b in enumerate(blocks)
-                 if len(b.runs) == 1 and sum(c.isalnum() for c in b.text()) <= 3]
+        loose = [(bi, b.runs[0].box if len(b.runs) == 1 else (b.left, b.top, b.right, b.bottom))
+                 for bi, b in enumerate(blocks) if _junk_block(b)]
         # A short junk token stranded at a row's edge ('w MEDGES ALE') is
         # usually a letter of an edge-running column the page reader swallowed
         # into the row: too close for the column-gap split to cut, but the

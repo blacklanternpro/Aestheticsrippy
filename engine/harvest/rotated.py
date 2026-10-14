@@ -567,12 +567,38 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, min_conf: f
         orig_box, orig_mask = reg.box, reg.mask
         if loose and angles:
             gap = 0.5 * float(np.median([b[3] - b[1] for _, b in loose]))
-            near = [(i, b) for i, b in loose if i not in absorbed and _near(b, reg.box, gap)]
-            if near:
-                lent = list(zip([i for i, _ in near], _grow(img, bg, reg, [b for _, b in near])))
+            # Lending GROWS the region, which can bring the next stray claim
+            # within reach - an edge column's head is often carved into a
+            # STACK of junk claims, each hiding behind the one below. Chase
+            # the chain to a fixpoint instead of looking only once.
+            lent_ids = set()
+            lent_raw = []    # (id, mask, region box at grow time)
+            for _ in range(4):
+                # A tall stacked claim reaches further than a lone letter: its
+                # neighbour in the stack sits about a block-height away.
+                near = [(i, b) for i, b in loose
+                        if i not in absorbed and i not in lent_ids
+                        and _near(b, reg.box, max(gap, 0.6 * (b[3] - b[1])))]
+                if not near:
+                    break
+                lent_ids |= {i for i, _ in near}
+                grown = _grow(img, bg, reg, [b for _, b in near])
+                lent_raw += [(i, m, reg.box) for (i, _), m in zip(near, grown)]
+            # Each round's masks live in that round's region frame; a later
+            # grow enlarges the frame, so remap them all into the final one.
+            fx0, fy0 = reg.box[0], reg.box[1]
+            fh, fw = reg.box[3] - fy0, reg.box[2] - fx0
+            for i, m, bx in lent_raw:
+                if bx == reg.box:
+                    lent.append((i, m))
+                    continue
+                big = np.zeros((fh, fw), bool)
+                oy, ox = bx[1] - fy0, bx[0] - fx0
+                big[oy:oy + m.shape[0], ox:ox + m.shape[1]] = m.astype(bool)
+                lent.append((i, big))
             import os as _os
             if _os.environ.get("RIP_DEBUG_LEX"):
-                print(f"    lend? reg={reg.box} loose_near={[b for _i, b in near]} lent={len(lent)}")
+                print(f"    lend? reg={reg.box} lent={len(lent)}")
         x0, y0, x1, y1 = reg.box
         remaining = reg.mask.copy()
 
@@ -738,7 +764,17 @@ def _snap_ends(band: np.ndarray, x0: float, x1: float, h: float) -> Tuple[float,
     # Only tighten or nudge: a snap that moves an end by more than a letter is a wrong join.
     if abs(a - x0) > h or abs(b - x1) > h:
         return x0, x1
-    return a, b
+    # Trim whiskers: lent ink is grown by dilation, and a thin smear hanging
+    # off the word's end stretches the measured span (the type then sets
+    # wide-tracked to fill it). An end column must hold a real share of ink.
+    dens = band.sum(axis=0)
+    floor = max(1.0, 0.15 * float(dens.max()))
+    a2, b2 = int(a), int(min(b, len(dens)))
+    while a2 < b2 - 1 and dens[a2] < floor:
+        a2 += 1
+    while b2 - 1 > a2 and dens[b2 - 1] < floor:
+        b2 -= 1
+    return float(a2), float(b2)
 
 
 def _read_at(img, bg, reg, mask, deg, min_conf, glyphs=None, lexicon=None):

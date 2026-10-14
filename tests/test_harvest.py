@@ -846,6 +846,31 @@ def test_a_soft_ghost_takes_its_fringe_and_spares_the_overprint():
     assert (t2 & fringe).sum() > 0.8 * fringe.sum()
 
 
+def test_stacked_junk_blocks_are_lendable_to_the_angled_reader():
+    # The repro's corner: the head of an edge-running column reads level as a
+    # stack of two-letter nonsense ('SA' over 'Lu') - a TWO-RUN block, so the
+    # single-run loose gate misses it, and one word per run, so the stray-word
+    # gate misses it too. A block made entirely of tiny junk words is lendable
+    # whole, however the words are stacked; real text is not.
+    from engine.harvest.layout import Block, Run
+    from engine.harvest.ocr import Line, Word
+    from engine.harvest.pipeline import _junk_block
+
+    def block(rows):
+        runs = []
+        for words in rows:
+            ws = [Word(t, (10, 10, 30, 30), 70.0) for t in words]
+            runs.append(Run(ws, Line(ws, (10, 10, 30, 30), 30.0, 0.0, 20.0, 8.0, 4.0)))
+        return Block(runs, hard=[True] * len(runs))
+
+    assert _junk_block(block([["SA"], ["Lu"]]))          # the corner junk
+    assert _junk_block(block([["22"]]))                  # the old single-run gate
+    assert _junk_block(block([["w"]]))
+    assert not _junk_block(block([["Pale", "Ale"]]))     # real words stay
+    assert not _junk_block(block([["MB720"]]))           # one real token
+    assert not _junk_block(block([["It", "is", "so", "on", "we", "go"]]))  # too much total ink
+
+
 def test_twin_artwork_vouches_for_the_better_reading(tmp_path):
     # The same design printed twice on a sheet, read two ways: the inks are
     # near-identical artwork, so the reading that is more of a word stands
