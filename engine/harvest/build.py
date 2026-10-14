@@ -890,7 +890,15 @@ def build_rip(h: Harvest, pack_id: str, name: str, asset_names: Dict[int, str],
                                "stroke_weight": round(max(0.25, mm(2) * PT_PER_MM), 2),
                                **({"radius": reg.radius} if reg.radius else {})})
         elif i in asset_names:
-            art_frames.append({**base, "type": "image", "src": asset_names[i], "fit": "fill"})
+            f = {**base, "type": "image", "src": asset_names[i], "fit": "fill"}
+            if any("ghost word" in n for n in reg.notes):
+                # What stayed behind is the OVERPRINT: in the reference it
+                # strikes THROUGH the word, so it composites back ON TOP of
+                # the live ghost text. Normal blend, not multiply - the
+                # asset's pixels already carry the reference's own mix where
+                # the inks crossed, and multiplying would darken them twice.
+                f["z"] = 3
+            art_frames.append(f)
     for j, r in enumerate(h.rules):
         weight_pt = round(max(0.25, mm(r.thickness) * PT_PER_MM), 2)
         col = hexcolour(r.colour)

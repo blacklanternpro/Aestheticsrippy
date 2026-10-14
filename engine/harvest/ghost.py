@@ -53,6 +53,45 @@ def fit_sizes(ghosts: Sequence[PathText]) -> None:
             pt.size_px = cap
 
 
+def _claim(crop: np.ndarray, mask: np.ndarray, layer: np.ndarray, cap: float,
+           rivals: Sequence[Tuple[int, int, int]] = ()) -> np.ndarray:
+    """
+    The ink a read ghost takes with it. The k-means layer is an accident of
+    clustering: a soft word's light fringe falls in the OTHER cluster (and
+    would stay behind as a letter-shaped shell pasted over the live word),
+    while the overprint's multiply-darkened overlap falls in the word's own
+    (and would be carved out of the logotype the region keeps). So the claim
+    goes by COLOUR, not cluster: every masked pixel near the word whose ink
+    does not lean a rival's hue. `rivals` are the other layers' BGR colours.
+    """
+    grow = max(6.0, 0.25 * cap)
+    near = cv2.distanceTransform((~layer).astype(np.uint8), cv2.DIST_L2, 3) <= grow
+    cand = near & mask.astype(bool)
+    pulls = []
+    for rb in rivals:
+        lab_r = cv2.cvtColor(np.uint8([[rb]]), cv2.COLOR_BGR2Lab)[0, 0].astype(np.float32)
+        r = lab_r[1:] - 128.0
+        rn = float(np.hypot(*r))
+        if rn < 12.0:          # a neutral rival's hue decides nothing
+            continue
+        pulls.append((r / rn, 0.45 * rn))
+    if not pulls:
+        return cand
+    lab = cv2.cvtColor(crop, cv2.COLOR_BGR2Lab).astype(np.float32)
+    v = lab[:, :, 1:] - 128.0
+    leaning = np.zeros(crop.shape[:2], bool)
+    for rhat, floor in pulls:
+        leaning |= (v @ rhat) > floor
+    # Where the overprint crosses the word's DARK core, multiply lands near
+    # black and hue says nothing. But no ink prints darker than itself alone:
+    # a pixel clearly darker than the word's own full ink carries another ink
+    # on top, and belongs to the overprint that composites back over the word.
+    if layer.any():
+        own = cv2.cvtColor(np.uint8([[np.median(crop[layer], axis=0)]]), cv2.COLOR_BGR2Lab)[0, 0, 0]
+        leaning |= lab[:, :, 0] < 0.55 * float(own)
+    return cand & ~leaning
+
+
 def _layers(crop: np.ndarray, mask: np.ndarray) -> List[np.ndarray]:
     """The region's ink split by colour (Lab k-means): the word's own ink and
     the overprint's. A one-colour region comes back whole."""
@@ -97,7 +136,8 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, glyphs: Gly
             continue
         crop = img[y0:y1, x0:x1]
         taken = np.zeros(reg.mask.shape, bool)
-        for li, layer in enumerate(_layers(crop, reg.mask.astype(bool))):
+        lays = _layers(crop, reg.mask.astype(bool))
+        for li, layer in enumerate(lays):
             got = ghost_word(layer.astype(np.uint8), glyphs)
             if debug:
                 print(f"    ghost? {reg.kind} {w}x{h} layer{li} px={int(layer.sum())} -> "
@@ -139,7 +179,9 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, glyphs: Gly
                 points=np.array([[x0 + lx0 - 2, y0 + base], [x0 + lx1 + 2, y0 + base]], np.float64),
                 cap=cap, colour=colour, conf=MIN_CONF + 25 * (shape - 0.65) / 0.35,
                 row=row, length=float(lx1 - lx0), finish=fin))
-            taken |= cv2.dilate(layer.astype(np.uint8), np.ones((3, 3), np.uint8)) > 0
+            rivals = [tuple(int(v) for v in np.median(crop[lays[k]], axis=0))
+                      for k in range(1, len(lays)) if k != li and lays[k].sum() >= 50] if li else []
+            taken |= _claim(crop, reg.mask.astype(bool), layer, cap, rivals)
         if not taken.any():
             kept.append(reg)
             continue

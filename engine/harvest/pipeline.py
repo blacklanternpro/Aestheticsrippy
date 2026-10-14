@@ -9,7 +9,7 @@ import shutil
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable, Dict, List, Optional, Sequence
+from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
 import cv2
 import numpy as np
@@ -40,6 +40,7 @@ class Result:
     notes: List[str] = field(default_factory=list)
     seconds: float = 0.0
     frame_blocks: Dict[str, int] = field(default_factory=dict)
+    frame_paths: Dict[str, Tuple[float, float, float, float]] = field(default_factory=dict)
     type_match: float = 0.0  # how alike the chosen faces' letters are to the reference's (0-1)
     live: float = 0.0   # share of the reference's ink rebuilt as live type and shapes (not pasted images)
 
@@ -275,8 +276,16 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
         rip, data = build_rip(h, pack_id, name, asset_names, paper_image="paper.jpg" if plate is not None else None)
         _write(pack_dir, rip, data)
 
+        # Straight path lines (ghost words, flat paths) carry their measured
+        # ink box so refine can nudge them onto it - they have no Block.
+        frame_paths = {}
+        for k, pt in enumerate(h.curved):
+            if float(np.ptp(pt.points[:, 1])) <= 0.1 * pt.cap:
+                base = float(np.median(pt.points[:, 1]))
+                frame_paths[f"c{k + 1:02d}"] = (float(pt.points[:, 0].min()), base - 1.05 * pt.cap,
+                                                float(pt.points[:, 0].max()), base + 0.12 * pt.cap)
         result = Result(pack_dir, rip, data, notes=notes, frame_blocks=dict(h.frame_blocks), live=live,
-                        type_match=h.type_match)
+                        frame_paths=frame_paths, type_match=h.type_match)
         if refine_rounds:
             from .refine import refine
             say("Rendering and comparing")

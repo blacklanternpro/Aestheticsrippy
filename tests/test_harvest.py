@@ -799,6 +799,53 @@ def test_the_ghost_keeps_the_overprint_as_art(tmp_path):
     assert (rm & word_in_box & ~red_in_box).sum() < 0.2 * word_in_box.sum()
 
 
+def test_a_soft_ghost_takes_its_fringe_and_spares_the_overprint():
+    # The office card proper: the display word is SOFT (airbrushed), so colour
+    # k-means splits it into a dark core and a light fringe, and the overprint
+    # multiplies into dark maroon that clusters WITH the core. Subtracting the
+    # raw layer then (a) leaves a letter-shaped fringe shell as art and (b)
+    # carves the maroon out of the logotype the region is keeping. The claim
+    # must go by COLOUR: neutral ink near the word leaves with the ghost,
+    # ink leaning a rival's hue stays, however the clusters fell.
+    import cv2
+    from engine.harvest.ghost import _claim
+    h, w = 120, 420
+    core = np.zeros((h, w), bool)
+    for i in range(6):                       # six fat letter-ish stems
+        core[30:90, 30 + i * 62:62 + i * 62] = True
+    soft = cv2.GaussianBlur(core.astype(np.float32), (0, 0), 4.0)
+    soft = soft / soft.max()
+    word = soft > 0.08
+    fringe = word & ~core
+    crop = np.full((h, w, 3), 245, np.uint8)
+    g = (245 - soft * 205).astype(np.uint8)
+    for c in range(3):
+        crop[:, :, c] = g
+    red8 = np.zeros((h, w), np.uint8)
+    cv2.ellipse(red8, (w // 2, 60), (170, 34), -8, 0, 360, 1, 12)
+    red = red8 > 0
+    crop[red] = (crop[red].astype(np.int32) * np.array([28, 28, 180]) // 245).astype(np.uint8)
+    mask = word | red
+    # the k-means accident: the "layer" holds the dark core AND the maroon
+    # overlap, but not the fringe - exactly the office split
+    layer = (core | (red & word)) & mask
+    taken = _claim(crop, mask, layer, cap=60.0, rivals=[(28, 28, 180)])
+    clear_fringe = fringe & ~red    # fringe under the overprint stays with it
+    assert (taken & clear_fringe).sum() > 0.8 * clear_fringe.sum(), \
+        f"fringe left behind: took {(taken & clear_fringe).sum()} of {clear_fringe.sum()}"
+    assert (taken & red & ~word).sum() < 0.05 * (red & ~word).sum(), \
+        "the ghost claimed the overprint's own ink"
+    overlap = red & word
+    assert (taken & overlap).sum() < 0.2 * overlap.sum(), \
+        f"the overprint was carved: took {(taken & overlap).sum()} of {overlap.sum()}"
+    # a one-colour region (no rival ink): the whole neighbourhood is the word's
+    plain = np.full((h, w, 3), 245, np.uint8)
+    for c in range(3):
+        plain[:, :, c] = g
+    t2 = _claim(plain, word, core & word, cap=60.0, rivals=[])
+    assert (t2 & fringe).sum() > 0.8 * fringe.sum()
+
+
 def test_twin_artwork_vouches_for_the_better_reading(tmp_path):
     # The same design printed twice on a sheet, read two ways: the inks are
     # near-identical artwork, so the reading that is more of a word stands

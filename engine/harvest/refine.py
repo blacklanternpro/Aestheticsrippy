@@ -263,6 +263,46 @@ def refine(result, sheet, blocks: Sequence[Block], renderer, rounds: int = 3, pr
             rip, best_score = cand, s
         else:
             break
+    # Path frames (ghost words, flat path lines) have no Block to referee the
+    # loop above, but their reference ink box was MEASURED at harvest: render
+    # each alone on white paper and nudge the frame onto its ink.
+    path_refs = getattr(result, "frame_paths", {}) or {}
+    if path_refs:
+        cand = copy.deepcopy(rip)
+        fmap = {f["id"]: f for f in cand["frames"] if f.get("id")}
+        nudged = 0
+        for k, (rx0, ry0, rx1, ry1) in path_refs.items():
+            f = fmap.get(k)
+            if f is None:
+                continue
+            solo = copy.deepcopy(rip)
+            solo["tokens"] = dict(solo.get("tokens", {}), paper="#ffffff")
+            solo["frames"] = [x for x in solo["frames"] if x.get("id") == k]
+            img = render_rip(solo, data, pack_dir, renderer, size)
+            mag = np.linalg.norm(255.0 - img.astype(np.float32), axis=2)
+            ys, xs = np.nonzero(mag > 40)
+            if len(xs) < 10:
+                continue
+            l, t = float(np.percentile(xs, 0.3)), float(np.percentile(ys, 0.3))
+            r_, bt = float(np.percentile(xs, 99.7) + 1), float(np.percentile(ys, 99.7) + 1)
+            dx = (rx0 + rx1) / 2 - (l + r_) / 2
+            dy = (ry0 + ry1) / 2 - (t + bt) / 2
+            cap = ry1 - ry0
+            if DEBUG:
+                print(f"    path {k} dx={dx:+.1f} dy={dy:+.1f} ref=({rx0:.0f},{ry0:.0f},{rx1:.0f},{ry1:.0f}) ren=({l:.0f},{t:.0f},{r_:.0f},{bt:.0f})")
+            if abs(dx) > 0.8 * cap or abs(dy) > 0.5 * cap:
+                continue   # a measurement gone wrong, not a correction
+            if abs(dx) > 0.4 or abs(dy) > 0.4:
+                f["x"] = round(f["x"] + dx / px_mm, 2)
+                f["y"] = round(f["y"] + dy / px_mm, 2)
+                nudged += 1
+        if nudged:
+            s = score_image(ref, render_rip(cand, data, pack_dir, renderer, size))
+            say(f"Path nudge: {s:.1f}")
+            result.history.append({"round": "paths", "score": round(s, 1), "moved": nudged,
+                                   "kept": "position" if s >= best_score else None})
+            if s >= best_score:
+                rip, best_score = cand, s
     result.rip, result.score = rip, best_score
     from .pipeline import _write
     _write(pack_dir, rip, data)
