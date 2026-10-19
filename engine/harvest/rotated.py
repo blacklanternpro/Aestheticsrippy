@@ -30,6 +30,9 @@ class RotText:
     width: float          # ink width along the line, px
     colour: Tuple[int, int, int]
     conf: float
+    row: Optional[np.ndarray] = None    # the levelled, upright letters (soft gray, dark on white), for face matching
+    face: Optional[object] = None       # typeface.Face matched on `row`
+    size_px: Optional[float] = None     # font size matched on `row`, sheet px
 
 
 def _ribbons(pairs):
@@ -795,6 +798,14 @@ def _read_at(img, bg, reg, mask, deg, min_conf, glyphs=None, lexicon=None):
         gray = cv2.copyMakeBorder(gray, pad, pad, pad, pad, cv2.BORDER_CONSTANT, value=255)
         level, m = _rotate(gray, deg)
         inv = cv2.invertAffineTransform(m)
+        # A soft twin of `level` for the face matcher: the reader's image is
+        # boosted 3.5x and saturates every stroke, which reads as extra weight.
+        # Normalised to the mark's own ink peak, edges keep their antialiasing.
+        dk = dist * keep
+        pk = float(np.percentile(dk[dk > 5], 95)) if (dk > 5).any() else 1.0
+        soft = (255 - np.clip(dk * (255.0 / max(1.0, pk)), 0, 255)).astype(np.uint8)
+        soft = cv2.copyMakeBorder(soft, pad, pad, pad, pad, cv2.BORDER_CONSTANT, value=255)
+        soft, _ = _rotate(soft, deg)
         lmask = level < 150
         taken = np.zeros(level.shape, np.uint8)
         queue = list(_bands(lmask))
@@ -960,8 +971,17 @@ def _read_at(img, bg, reg, mask, deg, min_conf, glyphs=None, lexicon=None):
                 px, py = inv @ np.array([(lx0 + lx1) / 2, cyl, 1.0])
                 angle = deg + (180 if flip else 0)
                 angle = angle - 360 if angle > 180 else angle
+                # Its own band only (a neighbour's tops would confuse the bench), white-padded.
+                rr0 = max(0, by0 - 1, int(ly0 - 0.35 * cap))
+                rr1 = min(soft.shape[0], by1 + 1, int(np.ceil(ly1 + 0.35 * cap)))
+                row = soft[rr0:rr1, max(0, int(lx0) - 2):int(np.ceil(lx1)) + 2].copy()
+                if row.size:
+                    mpad = max(2, int(0.3 * cap))
+                    row = cv2.copyMakeBorder(row, mpad, mpad, 0, 0, cv2.BORDER_CONSTANT, value=255)
+                if flip:
+                    row = cv2.rotate(row, cv2.ROTATE_180)
                 found.append(RotText(gtext, float(angle), x0 + px - pad, y0 + py - pad, float(cap),
-                                     float(lx1 - lx0), reg.colour, gconf))
+                                     float(lx1 - lx0), reg.colour, gconf, row=row if row.size else None))
                 kept_spans.append((float(lx0), float(lx1)))
                 cv2.rectangle(taken, (int(lx0) - 2, int(ly0) - 2), (int(np.ceil(lx1)) + 2, int(np.ceil(ly1)) + 2), 1, -1)
             # The reader can settle on one phrase and ignore a neighbour in the

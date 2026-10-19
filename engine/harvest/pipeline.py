@@ -208,6 +208,7 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
             text_lines = [r.line for b in blocks for r in b.runs]
         if rotated:
             notes.append(f"Read {len(rotated)} {'line' if len(rotated) == 1 else 'lines'} of type set at an angle.")
+            match_rotated_faces(r, rotated, {m.face.family for m in matches.values()})
         from .curved import find as find_curved
         # One-or-two-letter level readings beside the art: letters spaced along a
         # path read level one by one, and belong to the path instead.
@@ -354,6 +355,102 @@ def match_path_faces(renderer, curved, sheet_families) -> None:
             pt.face, pt.size_px = face, got.size_px
     finally:
         bench.close()
+
+
+def match_rotated_faces(renderer, rotated, sheet_families) -> None:
+    """
+    Angled lines get their own face. Edge-running column heads and spine
+    titles are often a different cut from the sheet's text (a heavy narrow
+    grotesk beside a light book face); set in the main face and tracked open
+    to fill their length, they come out the right size and the wrong shape.
+
+    Each line's levelled row is benched like any line. Lines of one colour
+    and size are one design's repeated element, so their scores are pooled
+    and the set shares the face that wins on the pool - one row alone is
+    a noisy witness. A family the sheet already uses wins when nearly as good.
+    """
+    from .ocr import read_lines
+    from .typeface import _face
+    dbg = bool(os.environ.get("RIP_DEBUG_ROTFACE"))
+    got_by = {}
+    bench = Bench(renderer._browser)
+    try:
+        for k, rt in enumerate(rotated):
+            if rt.row is None or rt.row.shape[0] < 8 or rt.row.shape[1] < 16:
+                continue
+            pad = 12
+            row = cv2.copyMakeBorder(rt.row, pad, pad, pad, pad, cv2.BORDER_CONSTANT, value=255)
+            bgr = cv2.cvtColor(row, cv2.COLOR_GRAY2BGR)
+            try:
+                blocks = analyse(bgr, read_lines(bgr, psm=7))
+            except Exception:
+                continue
+            if not blocks:
+                continue
+            got = match_blocks(bench, bgr, blocks[:1]).get(0)
+            if got is not None and got.scores:
+                got_by[k] = got
+                if dbg:
+                    top = sorted(got.scores.items(), key=lambda kv: -kv[1])[:4]
+                    print(f"    rotface {rt.text!r}: {got.face.key} size {got.size_px:.1f} "
+                          f"(cap-size {rt.cap:.1f}) top {[(a, round(b, 3)) for a, b in top]}")
+    finally:
+        bench.close()
+    for s, win, pooled in pool_rotated_faces(rotated, {k: g.scores for k, g in got_by.items()}, sheet_families):
+        if dbg:
+            top = sorted(pooled.items(), key=lambda kv: -kv[1])[:6]
+            print(f"    rotface set {[rotated[k].text for k in s]} -> {win or 'main face (no consensus)'} "
+                  f"top {[(a, round(b, 3)) for a, b in top]}")
+        if win is None:
+            continue
+        face = _face(win)
+        for k in s:
+            rotated[k].face = face
+
+
+def pool_rotated_faces(rotated, scores: Dict[int, Dict[str, float]], sheet_families,
+                       family_window: float = 0.01, consensus: float = 0.03):
+    """
+    Group benched angled lines into sets (one colour, cap within 15%) and pick
+    each set's face on its pooled mean score. A face a line never shortlisted
+    counts at that line's worst score, not zero. A family the sheet already
+    uses wins when within `family_window` of the best - tighter than the path
+    rule (0.03): angled heads are usually a different cut on purpose, and
+    bench scores here sit within a few hundredths of each other.
+
+    The bench is a noisy witness on angled rows (small, resampled at 45
+    degrees, it scatters across lookalikes), so a set changes face only on
+    agreement: at least two lines, and the pooled winner within `consensus`
+    of the lines' own mean best. Without it the winner is None and the set
+    keeps the sheet's main face. (pangpang column heads: gap 0.014, switch;
+    forecaster's 45-degree labels: gap 0.072, nine lines, seven faces, stay.)
+    Returns [(line indices, winning face key or None, pooled scores)].
+    """
+    sets: List[List[int]] = []
+    for k in sorted(scores):
+        rt = rotated[k]
+        for st in sets:
+            o = rotated[st[0]]
+            if np.linalg.norm(np.subtract(o.colour, rt.colour, dtype=float)) <= 40 \
+                    and abs(o.cap / rt.cap - 1) <= 0.15:
+                st.append(k)
+                break
+        else:
+            sets.append([k])
+    out = []
+    for st in sets:
+        keys = set().union(*(scores[k] for k in st))
+        pooled = {key: float(np.mean([scores[k].get(key, min(scores[k].values())) for k in st]))
+                  for key in keys}
+        best = max(pooled.values())
+        near = [(v, key) for key, v in pooled.items()
+                if key.split("|")[0] in sheet_families and best - v <= family_window]
+        win = max(near)[1] if near else max(pooled, key=pooled.get)
+        own_best = float(np.mean([max(scores[k].values()) for k in st]))
+        if len(st) < 2 or own_best - pooled[win] > consensus:
+            win = None
+        out.append((st, win, pooled))
+    return out
 
 
 def live_share(img, bg, text_lines, rule_mask, regions) -> float:

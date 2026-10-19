@@ -237,6 +237,56 @@ def test_angled_type_is_read_and_rotated(ripped2):
     assert all(abs(abs(f["rotate"]) - 30) < 4 for f in rot)
 
 
+def test_angled_line_set_in_the_sheet_family_stays_in_it(ripped2):
+    # Angled lines are benched now; a line the design set in its own text
+    # family must not be dragged to a lookalike.
+    st = ripped2.rip["styles"]
+    rot = [f for f in ripped2.rip["frames"] if f.get("rotate")]
+    assert all(st[f["style"]]["font"] == "Inter" for f in rot), [st[f["style"]] for f in rot]
+
+
+def _rot(text, cap, colour=(90, 90, 220)):
+    from engine.harvest.rotated import RotText
+    return RotText(text, 90.0, 0.0, 0.0, cap, 10.0 * cap, colour, 90.0)
+
+
+def test_angled_sets_pool_their_bench_scores():
+    from engine.harvest.pipeline import pool_rotated_faces
+    rot = [_rot("PANGPANG", 34), _rot("MEDGES", 36), _rot("GPANG", 33),
+           _rot("NOTE", 12, colour=(20, 20, 20))]
+    scores = {
+        0: {"Epilogue|500|": 0.84, "Archivo Narrow|500|": 0.83},     # one row alone picks Epilogue
+        1: {"Archivo Narrow|500|": 0.83, "Epilogue|500|": 0.79},
+        2: {"Archivo Narrow|500|": 0.85, "Inter Tight|500|": 0.80},  # never shortlisted Epilogue
+        3: {"Inter|400|": 0.9},
+    }
+    out = {tuple(s): win for s, win, _ in pool_rotated_faces(rot, scores, set())}
+    assert out[(0, 1, 2)] == "Archivo Narrow|500|"     # the set wins on the pool
+    assert out[(3,)] is None      # another colour and size: its own set, and one line alone is no consensus
+
+
+def test_angled_sets_without_consensus_keep_the_main_face():
+    # Small 45-degree labels: every row crowns a different lookalike, and the
+    # pool's winner is far below what each row thought of its own pick.
+    from engine.harvest.pipeline import pool_rotated_faces
+    rot = [_rot("GD4 LLC", 15), _rot("ELEMENTARY", 16), _rot("SALT CELLAR", 16)]
+    scores = {0: {"Epilogue|900|": 0.84, "Archivo Narrow|700|": 0.77},
+              1: {"Archivo|900|75.0": 0.86, "Archivo Narrow|700|": 0.78},
+              2: {"IBM Plex Sans|700|100.0": 0.86, "Archivo Narrow|700|": 0.76}}
+    assert pool_rotated_faces(rot, scores, set())[0][1] is None
+
+
+def test_angled_sets_prefer_the_sheet_family_only_when_nearly_as_good():
+    from engine.harvest.pipeline import pool_rotated_faces
+    rot = [_rot("PANGPANG", 34), _rot("MEDGES", 35)]
+    near = {0: {"Archivo Narrow|500|": 0.820, "Epilogue|500|": 0.815},
+            1: {"Archivo Narrow|500|": 0.820, "Epilogue|500|": 0.815}}
+    far = {0: {"Archivo Narrow|500|": 0.820, "Epilogue|500|": 0.80},
+           1: {"Archivo Narrow|500|": 0.820, "Epilogue|500|": 0.80}}
+    assert pool_rotated_faces(rot, near, {"Epilogue"})[0][1] == "Epilogue|500|"
+    assert pool_rotated_faces(rot, far, {"Epilogue"})[0][1] == "Archivo Narrow|500|"
+
+
 def test_forced_width_lines_get_their_own_tracking(ripped2):
     frames = {ripped2.data[f["bind"]].upper(): f for f in ripped2.rip["frames"]
               if f.get("type") == "text" and isinstance(ripped2.data.get(f["bind"]), str)}

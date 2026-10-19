@@ -555,7 +555,11 @@ def _rotated_frames(h: "Harvest", styles: Dict[str, Dict], specs, names, data, l
     if inst is None:
         inst = next(m for m in matcher_data()["instances"] if m["family"] == main.family)
     frames, made = [], {}
+    base_inst = inst
     for k, rt in enumerate(h.rotated):
+        # Its own matched face when the bench found one; else the sheet's main face.
+        face = rt.face or main
+        inst = (_instance(face) or base_inst) if rt.face else base_inst
         size_px = rt.cap / max(0.3, inst["cap"])
         size_pt = mm(size_px) * PT_PER_MM
         sname = None
@@ -563,20 +567,24 @@ def _rotated_frames(h: "Harvest", styles: Dict[str, Dict], specs, names, data, l
         # Angled lines a hair off a level style in the same face are that style turned
         # (the design has one size of type, measured twice): join it rather than add a near twin.
         for n, st in styles.items():
-            if st["font"] == main.family and st["weight"] == main.weight and st.get("stretch") == main.stretch \
+            if st["font"] == face.family and st["weight"] == face.weight and st.get("stretch") == face.stretch \
                     and st["color"] == colour and abs(st["size"] / size_pt - 1) <= 0.06:
                 sname = n
                 break
         for n, st in made.items():
-            if sname is None and abs(st["size"] - size_pt) <= max(0.08 * size_pt, mm(2.2) * PT_PER_MM):
+            if sname is None and st["font"] == face.family and st["weight"] == face.weight \
+                    and st.get("stretch") == face.stretch \
+                    and abs(st["size"] - size_pt) <= max(0.08 * size_pt, mm(2.2) * PT_PER_MM):
                 sname = n
                 break
         if sname is None:
             sname = "angled" if not made else f"angled-{'bcdefghij'[(len(made) - 1) % 9]}"
-            made[sname] = {"font": main.family, "weight": main.weight, "size": round(size_pt, 1),
+            made[sname] = {"font": face.family, "weight": face.weight, "size": round(size_pt, 1),
                            "leading": 1.0, "color": colour}
-            if main.stretch:
-                made[sname]["stretch"] = main.stretch
+            if face.stretch:
+                made[sname]["stretch"] = face.stretch
+            if face.italic:
+                made[sname]["italic"] = True
         st = made.get(sname) or styles[sname]
         size_px = st["size"] / PT_PER_MM * sheet.px_per_mm
         adv = sum(inst["adv"].get(c, inst["adv"].get("n", 0.55)) for c in rt.text)
@@ -585,8 +593,7 @@ def _rotated_frames(h: "Harvest", styles: Dict[str, Dict], specs, names, data, l
         track = float(np.clip(track, -0.1, 0.6))
         width = size_px * (adv + track * (n - 1)) + 0.8 * size_px
         height = size_px * 1.0
-        m = metrics_of(main.family)
-        base = first_baseline(size_px, 1.0, main.family)
+        base = first_baseline(size_px, 1.0, face.family)
         cap_c = base - inst["cap"] * size_px / 2
         dvec = np.array([0.0, cap_c - height / 2])
         a = np.radians(rt.angle)
