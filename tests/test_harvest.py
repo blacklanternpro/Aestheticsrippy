@@ -287,6 +287,28 @@ def test_angled_sets_prefer_the_sheet_family_only_when_nearly_as_good():
     assert pool_rotated_faces(rot, far, {"Epilogue"})[0][1] == "Archivo Narrow|500|"
 
 
+def test_a_matched_angled_set_shares_one_size():
+    # The two MEDGES rows measure 36-37 px, the PANGPANG rows 32-34: round
+    # letters overshoot the cap line. Benched as one set they share the
+    # median cap, so the taller word does not mint an 'angled-b'.
+    from engine.harvest.build import Harvest, _rotated_frames
+    from engine.harvest.sheet import Sheet
+    from engine.harvest.typeface import Face
+    sheet = Sheet(np.full((1350, 1080, 3), 255, np.uint8), None, width_mm=200.0, height_mm=250.0)
+    rot = [_rot("PANGPANG", 33), _rot("MEDGES ALE", 37), _rot("MEDGES", 36.5), _rot("GPANG", 34)]
+    for r in rot:
+        r.face = Face("Archivo Narrow", 500)
+        r.set_cap = 35.0
+    lone = _rot("SPINE", 33)        # no set: keeps its own measured cap
+    h = Harvest(sheet, [], {}, [], [], (255, 255, 255), [], rotated=rot + [lone])
+    styles, data, labels = {}, {}, {}
+    frames = _rotated_frames(h, styles, [], {}, data, labels, {"accent": "#e1999a"})
+    assert {f["style"] for f in frames[:4]} == {"angled"}, [f["style"] for f in frames]
+    assert styles["angled"]["font"] == "Archivo Narrow"
+    lone_st = styles[frames[4]["style"]]
+    assert lone_st["font"] != "Archivo Narrow" or lone_st["size"] < styles["angled"]["size"]
+
+
 def test_forced_width_lines_get_their_own_tracking(ripped2):
     frames = {ripped2.data[f["bind"]].upper(): f for f in ripped2.rip["frames"]
               if f.get("type") == "text" and isinstance(ripped2.data.get(f["bind"]), str)}

@@ -560,7 +560,7 @@ def _rotated_frames(h: "Harvest", styles: Dict[str, Dict], specs, names, data, l
         # Its own matched face when the bench found one; else the sheet's main face.
         face = rt.face or main
         inst = (_instance(face) or base_inst) if rt.face else base_inst
-        size_px = rt.cap / max(0.3, inst["cap"])
+        size_px = (rt.set_cap or rt.cap) / max(0.3, inst["cap"])
         size_pt = mm(size_px) * PT_PER_MM
         sname = None
         colour = min(tokens, key=lambda t: _dist_hex(tokens[t], rt.colour)) if tokens else "ink"

@@ -33,6 +33,7 @@ class RotText:
     row: Optional[np.ndarray] = None    # the levelled, upright letters (soft gray, dark on white), for face matching
     face: Optional[object] = None       # typeface.Face matched on `row`
     size_px: Optional[float] = None     # font size matched on `row`, sheet px
+    set_cap: Optional[float] = None     # the cap height its matched set agreed on, px
 
 
 def _ribbons(pairs):

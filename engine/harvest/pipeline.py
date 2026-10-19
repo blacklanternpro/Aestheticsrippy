@@ -404,8 +404,14 @@ def match_rotated_faces(renderer, rotated, sheet_families) -> None:
         if win is None:
             continue
         face = _face(win)
+        # One element, one size: a word of round letters (G, S overshoot the cap
+        # line) measures a few percent taller than its flat-topped neighbour in
+        # the same type, enough to mint a near-twin style. The set's median cap
+        # is the honest estimate; each line keeps its own measured length.
+        cap = float(np.median([rotated[k].cap for k in s]))
         for k in s:
             rotated[k].face = face
+            rotated[k].set_cap = cap
 
 
 def pool_rotated_faces(rotated, scores: Dict[int, Dict[str, float]], sheet_families,
