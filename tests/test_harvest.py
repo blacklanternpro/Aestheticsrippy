@@ -862,6 +862,12 @@ def test_the_ghost_keeps_the_overprint_as_art(tmp_path):
     bg = np.full_like(band, 245)
     ghosts, regions = find_ghosts(band, [reg], bg, full, body_px=12.0)
     assert len(ghosts) == 1 and ghosts[0].text == "Garden", [g.text for g in ghosts]
+    # it carries its MEASURED ink box (refine nudges the live word onto it):
+    # tight to the word on every side, with no descender room under 'Garden'
+    wy, wx = np.nonzero(ink > 0)
+    gx0, gy0, gx1, gy1 = ghosts[0].ink_box
+    assert abs(gx0 - wx.min()) <= 3 and abs(gx1 - (wx.max() + 1)) <= 3, (ghosts[0].ink_box, wx.min(), wx.max())
+    assert abs(gy0 - wy.min()) <= 3 and abs(gy1 - (wy.max() + 1)) <= 3, (ghosts[0].ink_box, wy.min(), wy.max())
     # the region that remains is the red ink, not the word
     assert len(regions) == 1
     rm = regions[0].mask
@@ -1344,3 +1350,39 @@ def test_cabinet_is_complete():
             assert (ROOT / "fonts" / face["file"]).exists(), face["file"]
     css = (ROOT / "fonts" / "fonts.css").read_text()
     assert css.count("@font-face") == sum(len(f["faces"]) for f in cat["families"])
+
+
+def _ghost(text, size_px, length, face=("Familjen Grotesk", 700)):
+    from engine.harvest.curved import PathText
+    from engine.harvest.typeface import Face
+    pts = np.array([[0.0, 500.0], [length, 500.0]])
+    g = PathText(text, pts, 300.0, (70, 70, 70), 90.0, length=length)
+    g.face, g.size_px = Face(*face), size_px
+    return g
+
+
+def _ghost_track(g):
+    from engine.typecase import matcher_data
+    inst = next(m for m in matcher_data()["instances"] if m["family"] == g.face.family
+                and int(m["weight"]) == g.face.weight and not m.get("stretch"))
+    adv = sum(inst["adv"].get(c, inst["adv"].get("n", 0.55)) for c in g.text)
+    return (g.length / g.size_px - adv + 0.06) / (len(g.text) - 1)
+
+
+def test_a_ghost_keeps_its_bench_size_when_tracking_can_fit_it():
+    # The office card: Familjen at the bench's 468.5 px sets a hair wider than
+    # the measured 1170 px; tightening to -0.015 em fits it. It used to shrink
+    # to 426.5 px and lose 12% of its cap height.
+    from engine.harvest.ghost import fit_sizes
+    g = _ghost("Office", 468.5, 1170.0)
+    fit_sizes([g])
+    assert g.size_px == 468.5
+
+
+def test_a_ghost_too_wide_to_track_shrinks_only_to_the_floor():
+    from engine.harvest.ghost import TRACK_FLOOR, fit_sizes
+    g = _ghost("Office", 600.0, 1170.0)       # would need about -0.1 em
+    assert _ghost_track(g) < TRACK_FLOOR
+    fit_sizes([g])
+    assert g.size_px < 600.0
+    assert abs(_ghost_track(g) - TRACK_FLOOR) < 1e-6

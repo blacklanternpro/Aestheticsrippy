@@ -28,7 +28,7 @@ except ImportError:  # pragma: no cover
     fidelity_score = None
 
 
-DEBUG = False
+DEBUG = bool(__import__("os").environ.get("RIP_DEBUG_REFINE"))
 
 
 def render_rip(rip: Dict, data: Dict, pack_dir: Path, renderer, size: Tuple[int, int]) -> np.ndarray:

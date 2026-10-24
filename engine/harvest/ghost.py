@@ -31,10 +31,19 @@ MIN_LAYER = 0.18     # a colour layer below this share of the region's ink is no
 MIN_CONF = 70.0
 
 
+TRACK_FLOOR = -0.05   # em: tighter than this and a display word's letters collide
+
+
 def fit_sizes(ghosts: Sequence[PathText]) -> None:
-    """After face matching: a ghost's width was MEASURED, so a matched face
-    that sets wider than the ink shrinks to fit - on a display word a width
-    error screams louder than a few percent of height."""
+    """After face matching: the bench's size stands, and the measured width is
+    met by TRACKING - build tracks every tight path to its measured length.
+
+    A matched face that sets wider than the ink is usually a slightly wider cut
+    of the right design, and display words are set tight: shrinking it to fit at
+    zero tracking (as this once did) cost the office card 12% of its cap height
+    and 2.5 points, while the tracking the word actually needed was -0.015 em.
+    Only a face so wide that its length would need tracking below TRACK_FLOOR
+    shrinks, and only as far as the floor."""
     from ..typecase import matcher_data
     insts = matcher_data()["instances"]
     for pt in ghosts:
@@ -46,11 +55,14 @@ def fit_sizes(ghosts: Sequence[PathText]) -> None:
         if inst is None:
             continue
         adv = sum(inst["adv"].get(c, inst["adv"].get("n", 0.55)) for c in pt.text)
+        n = max(2, len(pt.text))
         if adv <= 0:
             continue
-        cap = 0.96 * pt.length / adv   # margin: browser advances run a hair
-        if pt.size_px > cap:           # wider than the cabinet's tables
-            pt.size_px = cap
+        # The same fit build makes (engine/harvest/build.py _path_frames):
+        # track = (length / size - adv + 0.06) / (n - 1).
+        track = (pt.length / pt.size_px - adv + 0.06) / (n - 1)
+        if track < TRACK_FLOOR:
+            pt.size_px = pt.length / (adv - 0.06 + TRACK_FLOOR * (n - 1))
 
 
 def _claim(crop: np.ndarray, mask: np.ndarray, layer: np.ndarray, cap: float,
@@ -178,7 +190,12 @@ def find(img: np.ndarray, regions: Sequence[Region], bg: np.ndarray, glyphs: Gly
                 text=text,
                 points=np.array([[x0 + lx0 - 2, y0 + base], [x0 + lx1 + 2, y0 + base]], np.float64),
                 cap=cap, colour=colour, conf=MIN_CONF + 25 * (shape - 0.65) / 0.35,
-                row=row, length=float(lx1 - lx0), finish=fin))
+                row=row, length=float(lx1 - lx0), finish=fin,
+                # The word's real ink: refine nudges the rendered word onto it,
+                # and a rule-of-thumb box (descender room below the baseline)
+                # drags a word with no descenders down.
+                ink_box=(float(x0 + lx0), float(y0 + min(p[1] for p in pieces)),
+                         float(x0 + lx1), float(y0 + max(p[1] + p[3] for p in pieces)))))
             rivals = [tuple(int(v) for v in np.median(crop[lays[k]], axis=0))
                       for k in range(1, len(lays)) if k != li and lays[k].sum() >= 50] if li else []
             taken |= _claim(crop, reg.mask.astype(bool), layer, cap, rivals)

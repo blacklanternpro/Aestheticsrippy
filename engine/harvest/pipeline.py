@@ -295,7 +295,9 @@ def harvest(image_path: Path, name: str, out_dir: Optional[Path] = None, pack_id
         # ink box so refine can nudge them onto it - they have no Block.
         frame_paths = {}
         for k, pt in enumerate(h.curved):
-            if float(np.ptp(pt.points[:, 1])) <= 0.1 * pt.cap:
+            if pt.ink_box is not None:
+                frame_paths[f"c{k + 1:02d}"] = tuple(pt.ink_box)
+            elif float(np.ptp(pt.points[:, 1])) <= 0.1 * pt.cap:
                 base = float(np.median(pt.points[:, 1]))
                 frame_paths[f"c{k + 1:02d}"] = (float(pt.points[:, 0].min()), base - 1.05 * pt.cap,
                                                 float(pt.points[:, 0].max()), base + 0.12 * pt.cap)

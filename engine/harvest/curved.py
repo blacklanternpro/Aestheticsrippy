@@ -48,6 +48,7 @@ class PathText:
     offset: float = 0.0           # px along `points` to the first letter (its left edge, or
     #                               its centre when pitched)
     length: float = 0.0           # px from the first letter's start to the last letter's end
+    ink_box: Optional[Tuple[float, float, float, float]] = None   # measured ink (x0, y0, x1, y1), sheet px, when known
     light: bool = False           # letters painted over in the art (holes, or a tint on a shape)
     finish: Optional[Dict] = None  # measured print finish for this line's style (ghost words)
 
